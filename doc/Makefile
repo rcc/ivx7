@@ -1,9 +1,10 @@
+PRJNAME=Sample
 DOCNAME=sample
 SRCTEXI=$(DOCNAME).texi
 OUTDIR=output
 
 .PHONY : all
-all : html single_html pdf info plaintext
+all : html single_html pdf info plaintext index
 
 .PHONY : html
 html : $(OUTDIR)/$(DOCNAME)
@@ -19,6 +20,9 @@ info : $(OUTDIR)/$(DOCNAME).info
 
 .PHONY : plaintext
 plaintext : $(OUTDIR)/$(DOCNAME).txt
+
+.PHONY : index
+index : $(OUTDIR)/index.html
 
 $(OUTDIR):
 	mkdir -p $@
@@ -37,6 +41,9 @@ $(OUTDIR)/$(DOCNAME).html : $(SRCTEXI) $(OUTDIR)
 
 $(OUTDIR)/$(DOCNAME).pdf : $(SRCTEXI) $(OUTDIR)
 	texi2pdf --clean -I inc -o $@ $<
+
+$(OUTDIR)/index.html : $(OUTDIR)
+	./mkdocindex $(PRJNAME) $(DOCNAME) > $@
 
 .PHONY : clean
 clean:

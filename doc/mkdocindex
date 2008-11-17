@@ -1,0 +1,23 @@
+#!/bin/bash
+
+PRJN=$1
+PRJF=$2
+
+cat << EOF
+<html>
+    <head>
+        <title>$PRJN Documentation</title>
+    </head>
+    <body>
+        <h1>$PRJN Documentation</h1>
+        Format Choices:
+        <ul>
+            <li><a href="$PRJF/index.html">HTML</a></li>
+            <li><a href="$PRJF.html">HTML</a> (All on one page)</li>
+            <li><a href="$PRJF.pdf">PDF</a></li>
+            <li><a href="$PRJF.txt">Plain Text</a></li>
+            <li><a href="$PRJF.info">Info Page</a></li>
+        </ul>
+    </body>
+</html>
+EOF
