@@ -3,7 +3,7 @@ SRCTEXI=$(DOCNAME).texi
 OUTDIR=output
 
 .PHONY : all
-all : html single_html pdf info
+all : html single_html pdf info plaintext
 
 .PHONY : html
 html : $(OUTDIR)/$(DOCNAME)
@@ -17,11 +17,17 @@ pdf : $(OUTDIR)/$(DOCNAME).pdf
 .PHONY : info
 info : $(OUTDIR)/$(DOCNAME).info
 
+.PHONY : plaintext
+plaintext : $(OUTDIR)/$(DOCNAME).txt
+
 $(OUTDIR):
 	mkdir -p $@
 
 $(OUTDIR)/$(DOCNAME).info : $(SRCTEXI) $(OUTDIR)
 	makeinfo $< -o $@
+
+$(OUTDIR)/$(DOCNAME).txt : $(SRCTEXI) $(OUTDIR)
+	makeinfo --plaintext $< -o $@
 
 $(OUTDIR)/$(DOCNAME) : $(SRCTEXI) $(OUTDIR)
 	makeinfo --html $< -o $@
@@ -34,4 +40,4 @@ $(OUTDIR)/$(DOCNAME).pdf : $(SRCTEXI) $(OUTDIR)
 
 .PHONY : clean
 clean:
-	rm -rf $(OUTDIR)
+	rm -rf $(OUTDIR) *.log
