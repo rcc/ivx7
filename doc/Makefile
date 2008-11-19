@@ -43,7 +43,7 @@ $(OUTDIR)/$(DOCNAME).pdf : $(SRCTEXI) $(OUTDIR)
 	texi2pdf --clean -I inc -o $@ $<
 
 $(OUTDIR)/index.html : $(OUTDIR)
-	./mkdocindex $(PRJNAME) $(DOCNAME) > $@
+	./mkdocindex "$(PRJNAME)" $(DOCNAME) > $@
 
 .PHONY : clean
 clean:
