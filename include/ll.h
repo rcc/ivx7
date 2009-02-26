@@ -1,7 +1,7 @@
 /*
  * ll.h - Link List Implementation.
  *
- * Copyright (C) 2008 Robert C. Curtis
+ * Copyright (C) 2009 Robert C. Curtis
  *
  * ll.h is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

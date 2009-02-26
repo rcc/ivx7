@@ -7,7 +7,7 @@
 @copying
 This is a short example of a complete Texinfo file.
 
-Copyright @copyright{} 2008 Robert Curtis
+Copyright @copyright{} 2009 Robert Curtis
 @end copying
 
 @titlepage
