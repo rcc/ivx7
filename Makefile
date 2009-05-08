@@ -44,7 +44,7 @@ $(DEPDIR) $(BINDIR) $(OBJDIR) $(DEPDIR)/$(BINDIR):
 
 $(bin_targets) : % : $(BINDIR) $(DEPDIR)/$(BINDIR)/%.d $(BINDIR)/% ;
 
-$(DEPDIR)/$(BINDIR)/%.d : $(DEPDIR)/$(BINDIR)
+$(DEPDIR)/$(BINDIR)/%.d : | $(DEPDIR)/$(BINDIR)
 	@set -e; rm -f $@;\
 	echo '$(BINDIR)/$* : $(addprefix $(OBJDIR)/,$(notdir $($(join \
 	$*,_sources):.c=.o))) $(addprefix $(DEPDIR)/,$($(join \
@@ -52,14 +52,14 @@ $(DEPDIR)/$(BINDIR)/%.d : $(DEPDIR)/$(BINDIR)
 	echo '	$$(CC) $$(LDFLAGS) $(addprefix $(OBJDIR)/,$(notdir $($(join \
 	$*,_sources):.c=.o))) $($(join $*,_libs)) -o $$@' >> $@
 
-$(OBJDIR)/%.o : %.c $(OBJDIR)
+$(OBJDIR)/%.o : %.c | $(OBJDIR)
 	$(CC) -c $(CPPFLAGS) $(CFLAGS) $< -o $@
 
 # include binary target rules
 BINDEPS=$(addsuffix .d,$(addprefix $(DEPDIR)/$(BINDIR)/,$(bin_targets)))
 sinclude $(BINDEPS)
 
-$(DEPDIR)/%.d : %.[cS] $(DEPDIR)
+$(DEPDIR)/%.d : %.[cS] | $(DEPDIR)
 	@if [ ! -d $(@D) ]; then mkdir -p $(@D); fi
 	@set -e; rm -f $@; \
 	$(CC) -MM $(CPPFLAGS) $< > $@.$$$$; \
