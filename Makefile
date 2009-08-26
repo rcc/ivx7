@@ -13,18 +13,9 @@ vpath %.c src
 ###############################################################################
 ### Config ###
 
-BINDIR = bin
-OBJDIR = obj
-DEPDIR = deps
-
-# define the tools
-PREFIX=
-CC=$(PREFIX)gcc
-LD=$(PREFIX)ld
-AS=$(PREFIX)as
-AR=$(PREFIX)ar
-OBJCOPY=$(PREFIX)objcopy
-SIZE=$(PREFIX)size
+BINDIR := bin
+OBJDIR := obj
+DEPDIR := deps
 
 # flags
 CFLAGS +=	-O2 \
@@ -62,9 +53,8 @@ sinclude $(BINDEPS)
 $(DEPDIR)/%.d : %.[cS] | $(DEPDIR)
 	@if [ ! -d $(@D) ]; then mkdir -p $(@D); fi
 	@set -e; rm -f $@; \
-	$(CC) -MM $(CPPFLAGS) $< > $@.$$$$; \
-	sed 's,\($(*F)\).o[ :]*,$(OBJDIR)/\1.o $@ : ,g' < $@.$$$$ > $@; \
-	rm -f $@.$$$$
+	$(CC) -MM $(CPPFLAGS) $< | \
+	sed 's,\($(*F)\).o[ :]*,$(OBJDIR)/\1.o $@ : ,g' > $@
 
 # include auto dependency rules
 SRCDEPS=$(foreach target,$(bin_targets),$(addprefix $(DEPDIR)/,$($(join \
