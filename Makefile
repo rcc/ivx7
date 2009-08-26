@@ -1,11 +1,11 @@
 ###############################################################################
 ### Targets ###
 
-bin_targets = hello
+bin_targets := hello
 
 # Hello
-hello_sources = src/hello.c
-hello_libs = -lpthread
+hello_sources := src/hello.c
+hello_libs := -lpthread
 
 # vpaths - add any directory that you have source in
 vpath %.c src
