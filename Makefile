@@ -54,7 +54,7 @@ $(DEPDIR)/%.d : %.[cS] | $(DEPDIR)
 	@if [ ! -d $(@D) ]; then mkdir -p $(@D); fi
 	@set -e; rm -f $@; \
 	$(CC) -MM $(CPPFLAGS) $< | \
-	sed 's,\($(*F)\).o[ ]*:,$(OBJDIR)/\1.o $@ : ,g' > $@
+	sed 's,\($(*F)\)\.o[ ]*:[ ]*,$(OBJDIR)/\1.o $@ : ,g' > $@
 
 # include auto dependency rules
 SRCDEPS=$(foreach target,$(bin_targets),$(addprefix $(DEPDIR)/,$($(join \
