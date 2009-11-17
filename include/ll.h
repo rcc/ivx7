@@ -14,10 +14,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with ll.h.  If not, see <http://www.gnu.org/licenses/>.
+ * along with ll.h. If not, see <http://www.gnu.org/licenses/>.
  */
 
 /****************************************************************************/
+
+#include <prjutil.h>
 
 /* DESCRIPTION: This is a doubly-linked circular list implementation heavily
  * borrowed from the Linux Kernel's list.h
@@ -25,33 +27,6 @@
 
 #ifndef I__LL_H__
 	#define I__LL_H__
-
-/**
- * offsetof - the offset of member with structure of type
- * type:	the structure type
- * member:	the name of the member within the struct.
- *
- */
-#ifndef offsetof
-#ifdef __compiler_offsetof
-#define offsetof(TYPE,MEMBER)	__compiler_offsetof(TYPE,MEMBER)
-#else
-#define offsetof(TYPE, MEMBER)	((size_t) &((TYPE *)0)->MEMBER)
-#endif /* ifdef __compiler_offsetof */
-#endif /* ifndef offsetof */
-
-/**
- * container_of - cast a member of a structure out to the containing structure
- * ptr:		the pointer to the member.
- * type:	the type of the container struct this is embedded in.
- * member:	the name of the member within the struct.
- *
- */
-#ifndef container_of
-#define container_of(ptr, type, member)	({			\
-	const typeof( ((type *)0)->member ) *__mptr = (ptr);	\
-	(type *)( (char *)__mptr - offsetof(type,member) );})
-#endif /* ifndef container_of */
 
 /* list_entry - get the struct for this entry
  * ptr:		the ll_t pointer
@@ -122,6 +97,24 @@ static inline void INIT_LIST_HEAD(ll_t *head)
 {
 	head->next = head;
 	head->prev = head;
+}
+
+
+/* TESTS */
+
+static inline int list_is_last(const ll_t *entry, const ll_t *head)
+{
+	return entry->next == head;
+}
+
+static inline int list_empty(const ll_t *head)
+{
+	return head->next == head;
+}
+
+static inline int list_is_singular(const ll_t *head)
+{
+	return !list_empty(head) && (head->next == head->prev);
 }
 
 
@@ -228,17 +221,55 @@ static inline void list_move_tail(ll_t *entry, ll_t *new_head)
 	list_add_tail(entry, new_head);
 }
 
-
-/* TESTS */
-
-static inline int list_is_last(const ll_t *entry, const ll_t *head)
+/* list_swap
+ * 	swap the position of two list nodes
+ */
+static inline void list_swap(ll_t *n1, ll_t *n2)
 {
-	return entry->next == head;
+	ll_t tmp;
+	tmp.next = n1->next;
+	tmp.prev = n1->prev;
+	n1->next = n2->next;
+	n1->prev = n2->prev;
+	n2->next = tmp.next;
+	n2->prev = tmp.prev;
+	n1->next->prev = n1;
+	n1->prev->next = n1;
+	n2->next->prev = n2;
+	n2->prev->next = n2;
 }
 
-static inline int list_empty(const ll_t *head)
+
+/* CUT */
+
+static inline void __list_cut_position(ll_t *list, ll_t *head, ll_t *entry)
 {
-	return head->next == head;
+	ll_t *new_first = entry->next;
+	list->next = head->next;
+	list->next->prev = list;
+	list->prev = entry;
+	entry->next = list;
+	head->next = new_first;
+	new_first->prev = head;
+}
+
+/* list_cut_position - Moves the initial part of @head to, up to an including
+ * 			@entry, from @head to @list.
+ * list		a new list to add all the removed entries
+ * head		a list with entries
+ * entry	an entry within head, could be the head itself and if so we
+ * 		won't cut the list
+ */
+static inline void list_cut_position(ll_t *list, ll_t *head, ll_t *entry)
+{
+	if(list_empty(head))
+		return;
+	if(list_is_singular(head) && (head->next != entry && head != entry))
+		return;
+	if(entry == head)
+		INIT_LIST_HEAD(list);
+	else
+		__list_cut_position(list, head, entry);
 }
 
 
