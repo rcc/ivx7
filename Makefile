@@ -1,68 +1,87 @@
-###############################################################################
-### Targets ###
+# Output Name
+TARGET := hello
 
-bin_targets := hello
+# Sources (space separated)
+SOURCES := src/hello.c
 
-# Hello
-hello_sources := src/hello.c
-hello_libs := -lpthread
+# Libraries (space separated)
+LIBRARIES := m
 
-# vpaths - add any directory that you have source in
-vpath %.c src
+# Options (space separated)
+OPTIONS :=
 
-###############################################################################
-### Config ###
+# Verbose Option
+ifeq ($(VERBOSE),1)
+	Q :=
+else
+	Q := @
+endif
 
-BINDIR := bin
-OBJDIR := obj
-DEPDIR := deps
+# Set default flags
+CPPFLAGS := -Iinclude
+CFLAGS := -Wall -O2
+ASFLAGS :=
+LDFLAGS :=
+LDLIBS := $(addprefix -l,$(LIBRARIES))
 
-# flags
-CFLAGS +=	-O2 \
-		-Wall 
+# Custom Functions
+CONVERTSRCEXT = $(patsubst %.S,%.$1,$(patsubst %.c,%.$1,$2))
+TOUPPER = $(shell echo $1 | \
+	  sed 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/')
+USCORESUB = $(shell echo $1 | sed 'y/ -./___/')
 
-CPPFLAGS +=	-Iinclude
+# Machine Name and Tool Versions
+MACHINE := $(call USCORESUB,$(shell uname -sm))
+CCNAME := $(call USCORESUB,$(notdir $(realpath $(shell which $(CC)))))
 
-###############################################################################
+# Build Directory
+BUILDDIR := buildresults/$(MACHINE)/$(CCNAME)
+
+# Add in the options
+CPPFLAGS += $(addprefix -D,$(OPTIONS))
+
+# Include the dependencies
+ifneq ($(MAKECMDGOALS),clean)
+sinclude $(addprefix $(BUILDDIR)/,$(call CONVERTSRCEXT,d,$(SOURCES)))
+endif
+
 ### Main Rule ###
+.DEFAULT_GOAL := $(BUILDDIR)/$(TARGET)
+$(BUILDDIR)/$(TARGET) : \
+		$(addprefix $(BUILDDIR)/,$(call CONVERTSRCEXT,o,$(SOURCES)))
+	@echo "[LINK]      $@"
+	@mkdir -p $(@D)
+	$(Q)$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
-all : $(bin_targets)
-
-###############################################################################
-### Implicit Rules ###
-$(DEPDIR) $(BINDIR) $(OBJDIR) $(DEPDIR)/$(BINDIR):
-	@mkdir -p $@
-
-$(bin_targets) : % : $(BINDIR) $(DEPDIR)/$(BINDIR)/%.d $(BINDIR)/% ;
-
-$(DEPDIR)/$(BINDIR)/%.d : | $(DEPDIR)/$(BINDIR)
-	@set -e; rm -f $@;\
-	echo '$(BINDIR)/$* : $(addprefix $(OBJDIR)/,$(notdir $($(join \
-	$*,_sources):.c=.o))) $(addprefix $(DEPDIR)/,$($(join \
-	$*,_sources):.c=.d)) $(BINDIR)' > $@; \
-	echo '	$$(CC) $$(LDFLAGS) $(addprefix $(OBJDIR)/,$(notdir $($(join \
-	$*,_sources):.c=.o))) $($(join $*,_libs)) -o $$@' >> $@
-
-$(OBJDIR)/%.o : %.c | $(OBJDIR)
-	$(CC) -c $(CPPFLAGS) $(CFLAGS) $< -o $@
-
-# include binary target rules
-BINDEPS=$(addsuffix .d,$(addprefix $(DEPDIR)/$(BINDIR)/,$(bin_targets)))
-sinclude $(BINDEPS)
-
-$(DEPDIR)/%.d : %.[cS] | $(DEPDIR)
-	@if [ ! -d $(@D) ]; then mkdir -p $(@D); fi
-	@set -e; rm -f $@; \
+################################################################################
+### Auto Dependency Rules ###
+$(BUILDDIR)/%.d : %.c
+	@mkdir -p $(@D)
+	@rm -f $@ && \
 	$(CC) -MM $(CPPFLAGS) $< | \
-	sed 's,\($(*F)\)\.o[ ]*:[ ]*,$(OBJDIR)/\1.o $@ : ,g' > $@
+	sed 's,\($(*F)\)\.o[ ]*:[ ]*,$(@D)/\1.o $@ : ,g' > $@
 
-# include auto dependency rules
-SRCDEPS=$(foreach target,$(bin_targets),$(addprefix $(DEPDIR)/,$($(join \
-	$(target),_sources):.c=.d)))
-sinclude $(SRCDEPS)
+$(BUILDDIR)/%.d : %.S
+	@mkdir -p $(@D)
+	@rm -f $@ && \
+	$(CC) -MM $(CPPFLAGS) $< | \
+	sed 's,\($(*F)\)\.o[ ]*:[ ]*,$(@D)/\1.o $@ : ,g' > $@
+################################################################################
 
-###############################################################################
-### Clean Up ###
+################################################################################
+### Implicit Rules ###
+$(BUILDDIR)/%.o : %.c
+	@mkdir -p $(@D)
+	@echo "[CC]        $<"
+	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+
+$(BUILDDIR)/%.o : %.S
+	@mkdir -p $(@D)
+	@echo "[AS]        $<"
+	$(Q)$(CC) $(CPPFLAGS) -c -o $@ $<
+################################################################################
+
+### Utility Rules ###
 .PHONY : clean
-clean:
-	rm -rf $(BINDIR) $(OBJDIR) $(DEPDIR)
+clean :
+	-rm -rf buildresults
