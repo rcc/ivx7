@@ -1,14 +1,19 @@
-# Output Name
-TARGET := hello
+# Custom Functions
+CONVERTSRCEXT = $(patsubst %.S,%.$1,$(patsubst %.c,%.$1,$2))
+TOUPPER = $(shell echo $1 | \
+	  sed 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/')
+USCORESUB = $(shell echo $1 | sed 'y/ -./___/')
 
-# Sources (space separated)
-SOURCES := src/hello.c
+# Set default flags
+CPPFLAGS := -Iinclude
+CFLAGS := -Wall -O2
+ASFLAGS :=
+LDFLAGS :=
 
-# Libraries (space separated)
-LIBRARIES := m
+include config.mk # include after default flags so config.mk can append to them
 
-# Options (space separated)
-OPTIONS :=
+# Add all the libraries defined in config.mk to LDLIBS
+LDLIBS := $(addprefix -l,$(LIBRARIES))
 
 # Verbose Option
 ifeq ($(VERBOSE),1)
@@ -18,35 +23,23 @@ else
 endif
 
 # Configuration
-ifeq ($(CONFIG),)
-	CONFIG := RELEASE
+ifeq ($(words $(CONFIGS)),0)
+$(error Must specify at least one config in config.mk)
 endif
-
-# Set default flags
-CPPFLAGS := -Iinclude
-CFLAGS := -Wall -O2
-ASFLAGS :=
-LDFLAGS :=
-LDLIBS := $(addprefix -l,$(LIBRARIES))
-
-# Custom Functions
-CONVERTSRCEXT = $(patsubst %.S,%.$1,$(patsubst %.c,%.$1,$2))
-TOUPPER = $(shell echo $1 | \
-	  sed 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/')
-USCORESUB = $(shell echo $1 | sed 'y/ -./___/')
+ifeq ($(CONFIG),)
+CONFIG := $(word 1,$(CONFIGS))
+endif
+ifeq ($(findstring $(CONFIG),$(CONFIGS)),)
+$(error Invalid config specified)
+endif
+OPTIONS += $($(call TOUPPER,$(CONFIG))_OPTIONS)
 
 # Machine Name and Tool Versions
 MACHINE := $(call USCORESUB,$(shell uname -sm))
 CCNAME := $(call USCORESUB,$(notdir $(realpath $(shell which $(CC)))))
 
-# Make CONFIG all uppercase
-CONFIGU := $(call TOUPPER,$(CONFIG))
-
 # Build Directory
-BUILDDIR := buildresults/$(MACHINE)/$(CCNAME)/$(CONFIGU)
-
-# Add in the config define
-CPPFLAGS += -DCONFIG_$(CONFIGU)
+BUILDDIR := buildresults/$(MACHINE)/$(CCNAME)/$(CONFIG)
 
 # Add in the options
 CPPFLAGS += $(addprefix -D,$(OPTIONS))
@@ -56,17 +49,12 @@ ifneq ($(MAKECMDGOALS),clean)
 sinclude $(addprefix $(BUILDDIR)/,$(call CONVERTSRCEXT,d,$(SOURCES)))
 endif
 
-ifneq ($(MAKECMDGOALS),clean)
-# only want to print this out on final run, so put it after the sinclude of the
-# deps, and only when its not a clean
-$(info [CONFIG]    $(CONFIGU))
-endif
-
 ### Main Rule ###
 .DEFAULT_GOAL := $(BUILDDIR)/$(TARGET)
 $(BUILDDIR)/$(TARGET) : \
 		$(addprefix $(BUILDDIR)/,$(call CONVERTSRCEXT,o,$(SOURCES)))
 	@echo "[LINK]      $@"
+	@echo "[CONFIG]    $(CONFIG)"
 	@mkdir -p $(@D)
 	$(Q)$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
