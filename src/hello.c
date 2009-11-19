@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "ll.h" /* to test auto dependency generation */
+#include <ll.h> /* to test auto dependency generation */
 
 int main(void)
 {
