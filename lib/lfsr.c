@@ -20,7 +20,6 @@
 /****************************************************************************/
 
 #include <lfsr.h>
-#include <prjutil.h>
 
 /* first element is the LFSR mask, then its a NULL terminated list of taps */
 const uint8_t lfsr_taps4[] =
