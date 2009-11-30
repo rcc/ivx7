@@ -87,4 +87,17 @@
 #endif
 /******************************************************************************/
 
+/*******************************************************************************
+ * pdebug
+ * 	printf that only works with DEBUG_PRINTS
+ */
+#ifndef pdebug
+#ifdef DEBUG_PRINTS
+#define pdebug(fmt, args...) printf(fmt, ## args)
+#else
+#define pdebug(fmt, args...)
+#endif
+#endif
+/******************************************************************************/
+
 #endif /* I__PRJUTIL_H__ */

@@ -1,9 +1,10 @@
 #include <stdio.h>
 
-#include <ll.h> /* to test auto dependency generation */
+#include <prjutil.h>
 
 int main(void)
 {
+	pdebug("%s : Debug Prints are ON\n", __FILE__);
 	printf("Hello, World\n");
 	return 0;
 }
