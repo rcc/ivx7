@@ -8,10 +8,10 @@ SOURCES := src/hello.c
 LIBRARIES := m
 
 # Options
-OPTIONS :=
+OPTIONS := SCM_HASH='"$(shell git rev-parse --short=16 HEAD)"'
 
 # Configurations (the first one is the default)
-CONFIGS := release debug
+CONFIGS := debug release
 
 # Configuration Specific Options
 RELEASE_OPTIONS := CONFIG_RELEASE

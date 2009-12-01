@@ -4,7 +4,7 @@
 
 int main(void)
 {
-	pdebug("%s : Debug Prints are ON\n", __FILE__);
+	pdebug("Version: %s\n", SCM_HASH);
 	printf("Hello, World\n");
 	return 0;
 }
