@@ -69,6 +69,16 @@
 		&pos->member != (head);					\
 		pos = list_entry(pos->member.next, typeof(*pos), member))
 
+/* list_for_each_entry_rev - iterate over a list of given type in reverse
+ * pos:		the type pointer to use as a loop cursor
+ * head:	the head of the list
+ * member:	the name of the ll_t within the type
+ */
+#define list_for_each_entry_rev(pos, head, member) \
+	for(pos = list_entry((head)->prev, typeof(*pos), member);	\
+		&pos->member != (head);					\
+		pos = list_entry(pos->member.prev, typeof(*pos), member))
+
 /* list_for_each_entry_safe - iterate over list of given type safe against
  *                            removal of list entry
  * pos:		the type pointer to use as a loop cursor
@@ -81,6 +91,19 @@
 		n = list_entry(pos->member.next, typeof(*pos), member);	\
 		&pos->member != (head);					\
 		pos = n, n = list_entry(n->member.next, typeof(*n), member))
+
+/* list_for_each_entry_safe_rev - iterate over list of given type in reverse
+ *                                safe against removal of list entry
+ * pos:		the type pointer to use as a loop cursor
+ * n:		another type pointer to use as temporary storage
+ * head:	the head of the list
+ * member:	the name of the ll_t within the type
+ */
+#define list_for_each_entry_safe_rev(pos, n, head, member)		\
+	for (pos = list_entry((head)->prev, typeof(*pos), member),	\
+		n = list_entry(pos->member.prev, typeof(*pos), member);	\
+		&pos->member != (head);					\
+		pos = n, n = list_entry(n->member.prev, typeof(*n), member))
 
 
 /* ll_t - linked list type. embed in data structures you wish to list */
