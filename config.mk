@@ -2,10 +2,13 @@
 TARGET := hello
 
 # Sources
-SOURCES := src/hello.c
+SOURCES := src/hello.m
 
 # Libraries
-LIBRARIES := m
+LIBRARIES :=
+
+# Frameworks
+FRAMEWORKS := Foundation
 
 # Options
 OPTIONS := SCM_HASH='"$(shell git rev-parse --short=16 HEAD)"'

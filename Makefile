@@ -1,5 +1,5 @@
 # Custom Functions
-CONVERTSRCEXT = $(patsubst %.S,%.$1,$(patsubst %.c,%.$1,$2))
+CONVERTEXT = $(addsuffix .$(strip $1), $(basename $2))
 TOUPPER = $(shell echo $1 | \
 	  sed 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/')
 USCORESUB = $(shell echo $1 | sed 'y/ -./___/')
@@ -14,6 +14,9 @@ include config.mk # include after default flags so config.mk can append to them
 
 # Add all the libraries defined in config.mk to LDLIBS
 LDLIBS := $(addprefix -l,$(LIBRARIES))
+
+# Add all the frameworks defined in config.mk to MFLAGS
+LDFLAGS += $(addprefix -framework ,$(FRAMEWORKS))
 
 # Verbose Option
 ifeq ($(VERBOSE),1)
@@ -46,13 +49,13 @@ CPPFLAGS += $(addprefix -D,$(OPTIONS))
 
 # Include the dependencies
 ifneq ($(MAKECMDGOALS),clean)
-sinclude $(addprefix $(BUILDDIR)/,$(call CONVERTSRCEXT,d,$(SOURCES)))
+sinclude $(addprefix $(BUILDDIR)/,$(call CONVERTEXT,d,$(SOURCES)))
 endif
 
 ### Main Rule ###
 .DEFAULT_GOAL := $(BUILDDIR)/$(TARGET)
 $(BUILDDIR)/$(TARGET) : \
-		$(addprefix $(BUILDDIR)/,$(call CONVERTSRCEXT,o,$(SOURCES)))
+		$(addprefix $(BUILDDIR)/,$(call CONVERTEXT,o,$(SOURCES)))
 	@echo "[LINK]      $@"
 	@echo "[CONFIG]    $(CONFIG)"
 	@mkdir -p $(@D)
@@ -61,6 +64,12 @@ $(BUILDDIR)/$(TARGET) : \
 ################################################################################
 ### Auto Dependency Rules ###
 $(BUILDDIR)/%.d : %.c
+	@mkdir -p $(@D)
+	@rm -f $@ && \
+	$(CC) -MM $(CPPFLAGS) $< | \
+	sed 's,\($(*F)\)\.o[ ]*:[ ]*,$(@D)/\1.o $@ : ,g' > $@
+
+$(BUILDDIR)/%.d : %.m
 	@mkdir -p $(@D)
 	@rm -f $@ && \
 	$(CC) -MM $(CPPFLAGS) $< | \
@@ -79,6 +88,11 @@ $(BUILDDIR)/%.o : %.c
 	@mkdir -p $(@D)
 	@echo "[CC]        $<"
 	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+
+$(BUILDDIR)/%.o : %.m
+	@mkdir -p $(@D)
+	@echo "[CC]        $<"
+	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) $(MFLAGS) -c -o $@ $<
 
 $(BUILDDIR)/%.o : %.S
 	@mkdir -p $(@D)

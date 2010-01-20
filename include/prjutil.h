@@ -100,4 +100,17 @@
 #endif
 /******************************************************************************/
 
+/*******************************************************************************
+ * logdebug
+ * 	NSLog that only works with DEBUG_PRINTS
+ */
+#ifndef logdebug
+#ifdef DEBUG_PRINTS
+#define logdebug(fmt, args...) NSLog(@fmt, ## args)
+#else
+#define logdebug(fmt, args...)
+#endif
+#endif
+/******************************************************************************/
+
 #endif /* I__PRJUTIL_H__ */
