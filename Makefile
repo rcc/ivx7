@@ -11,6 +11,11 @@ include config.mk # include after default flags so config.mk can append to them
 # Add all the libraries defined in config.mk to LDLIBS
 LDLIBS := $(addprefix -l,$(LIBRARIES))
 
+# Add all the frameworks defined in config.mk to LDFLAGS
+#   This is only for objective-C in OSX, but it doesn't hurt us here assuming
+#   no one defines FRAMEWORKS
+LDFLAGS += $(addprefix -framework ,$(FRAMEWORKS))
+
 # Verbose Option
 ifeq ($(VERBOSE),1)
 	Q :=
