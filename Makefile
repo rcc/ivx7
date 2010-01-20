@@ -1,8 +1,4 @@
-# Custom Functions
-CONVERTEXT = $(addsuffix .$(strip $1), $(basename $2))
-TOUPPER = $(shell echo $1 | \
-	  sed 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/')
-USCORESUB = $(shell echo $1 | sed 'y/ -./___/')
+include buildsystem/func.mk
 
 # Set default flags
 CPPFLAGS := -Iinclude
@@ -15,7 +11,9 @@ include config.mk # include after default flags so config.mk can append to them
 # Add all the libraries defined in config.mk to LDLIBS
 LDLIBS := $(addprefix -l,$(LIBRARIES))
 
-# Add all the frameworks defined in config.mk to MFLAGS
+# Add all the frameworks defined in config.mk to LDFLAGS
+#   This is only for objective-C in OSX, but it doesn't hurt us here assuming
+#   no one defines FRAMEWORKS
 LDFLAGS += $(addprefix -framework ,$(FRAMEWORKS))
 
 # Verbose Option
@@ -49,58 +47,22 @@ CPPFLAGS += $(addprefix -D,$(OPTIONS))
 
 # Include the dependencies
 ifneq ($(MAKECMDGOALS),clean)
-sinclude $(addprefix $(BUILDDIR)/,$(call CONVERTEXT,d,$(SOURCES)))
+sinclude $(addprefix $(BUILDDIR)/,$(call CONVERTEXT, d, $(SOURCES)))
 endif
 
 ### Main Rule ###
 .DEFAULT_GOAL := $(BUILDDIR)/$(TARGET)
 $(BUILDDIR)/$(TARGET) : \
-		$(addprefix $(BUILDDIR)/,$(call CONVERTEXT,o,$(SOURCES)))
+		$(addprefix $(BUILDDIR)/,$(call CONVERTEXT, o, $(SOURCES)))
 	@echo "[LINK]      $@"
 	@echo "[CONFIG]    $(CONFIG)"
 	@mkdir -p $(@D)
 	$(Q)$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
-################################################################################
-### Auto Dependency Rules ###
-$(BUILDDIR)/%.d : %.c
-	@mkdir -p $(@D)
-	@rm -f $@ && \
-	$(CC) -MM $(CPPFLAGS) $< | \
-	sed 's,\($(*F)\)\.o[ ]*:[ ]*,$(@D)/\1.o $@ : ,g' > $@
-
-$(BUILDDIR)/%.d : %.m
-	@mkdir -p $(@D)
-	@rm -f $@ && \
-	$(CC) -MM $(CPPFLAGS) $< | \
-	sed 's,\($(*F)\)\.o[ ]*:[ ]*,$(@D)/\1.o $@ : ,g' > $@
-
-$(BUILDDIR)/%.d : %.S
-	@mkdir -p $(@D)
-	@rm -f $@ && \
-	$(CC) -MM $(CPPFLAGS) $< | \
-	sed 's,\($(*F)\)\.o[ ]*:[ ]*,$(@D)/\1.o $@ : ,g' > $@
-################################################################################
-
-################################################################################
-### Implicit Rules ###
-$(BUILDDIR)/%.o : %.c
-	@mkdir -p $(@D)
-	@echo "[CC]        $<"
-	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
-
-$(BUILDDIR)/%.o : %.m
-	@mkdir -p $(@D)
-	@echo "[CC]        $<"
-	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) $(MFLAGS) -c -o $@ $<
-
-$(BUILDDIR)/%.o : %.S
-	@mkdir -p $(@D)
-	@echo "[AS]        $<"
-	$(Q)$(CC) $(CPPFLAGS) -c -o $@ $<
-################################################################################
-
 ### Utility Rules ###
 .PHONY : clean
 clean :
 	-rm -rf buildresults
+
+include buildsystem/autodep.mk
+include buildsystem/rules.mk
