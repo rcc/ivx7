@@ -54,8 +54,8 @@ endif
 .DEFAULT_GOAL := $(BUILDDIR)/$(TARGET)
 $(BUILDDIR)/$(TARGET) : \
 		$(addprefix $(BUILDDIR)/,$(call CONVERTEXT, o, $(SOURCES)))
-	@echo "[LINK]      $@"
-	@echo "[CONFIG]    $(CONFIG)"
+	$(call OUTPUTINFO,LINK,$@)
+	$(call OUTPUTINFO,CONFIG,$(CONFIG))
 	@mkdir -p $(@D)
 	$(Q)$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
 
