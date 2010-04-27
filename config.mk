@@ -2,7 +2,8 @@
 TARGET := hello
 
 # Sources
-SOURCES := src/hello.m
+SOURCES :=	src/hello.m \
+		lib/cmds.c \
 
 # Libraries
 LIBRARIES :=
