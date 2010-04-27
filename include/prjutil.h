@@ -103,6 +103,7 @@
 /*******************************************************************************
  * logdebug
  * 	NSLog that only works with DEBUG_PRINTS
+ * 	(Cocoa projects only)
  */
 #ifndef logdebug
 #ifdef DEBUG_PRINTS
