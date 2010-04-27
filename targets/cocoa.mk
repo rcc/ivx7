@@ -1,8 +1,8 @@
 # Output Name
-TARGET := hello
+TARGET := cocoa
 
 # Sources
-SOURCES :=	src/hello.m \
+SOURCES :=	src/cocoa.m \
 		lib/cmds.c \
 
 # Libraries

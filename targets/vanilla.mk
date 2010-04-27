@@ -1,8 +1,8 @@
 # Output Name
-TARGET := hello
+TARGET := vanilla
 
 # Sources
-SOURCES :=	src/hello.c \
+SOURCES :=	src/vanilla.c \
 		lib/cmds.c \
 
 # Libraries

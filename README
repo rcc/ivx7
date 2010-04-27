@@ -19,9 +19,17 @@ and release.
 The target makefile can be specified on the make command line or
 it can be linked to `target.mk'.
 
-    make MKTARGET=targets/vanilla.mk
+    $ make MKTARGET=targets/vanilla.mk
+    [CC]            src/vanilla.c
+    [CC]            lib/cmds.c
+    [LINK]          buildresults/Darwin_i386/gcc_4_2/VANILLA/debug/vanilla
+    [CONFIG]        debug
 
 Configs can also be specified on the command line. By default, the
 first config in the CONFIGS list is used.
 
-    make MKTARGET=targets/vanilla.mk CONFIG=release
+    $ make MKTARGET=targets/cocoa.mk CONFIG=release
+    [OBJCC]         src/cocoa.m
+    [CC]            lib/cmds.c
+    [LINK]          buildresults/Darwin_i386/gcc_4_2/COCOA/release/cocoa
+    [CONFIG]        release

@@ -45,7 +45,7 @@ MACHINE := $(call USCORESUB,$(shell uname -sm))
 CCNAME := $(call USCORESUB,$(notdir $(realpath $(shell which $(CC)))))
 
 # Build Directory
-BUILDDIR := buildresults/$(MACHINE)/$(CCNAME)/$(CONFIG)
+BUILDDIR := buildresults/$(MACHINE)/$(CCNAME)/$(call TOUPPER,$(TARGET))/$(CONFIG)
 
 # Add in the options
 CPPFLAGS += $(addprefix -D,$(OPTIONS))
