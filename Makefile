@@ -6,7 +6,12 @@ CFLAGS := -Wall -O2
 ASFLAGS :=
 LDFLAGS :=
 
-include config.mk # include after default flags so config.mk can append to them
+# include after default flags so config.mk can append to them
+ifneq ($(MKTARGET),)
+include $(MKTARGET)
+else
+include target.mk
+endif
 
 # Add all the libraries defined in config.mk to LDLIBS
 LDLIBS := $(addprefix -l,$(LIBRARIES))
@@ -25,7 +30,7 @@ endif
 
 # Configuration
 ifeq ($(words $(CONFIGS)),0)
-$(error Must specify at least one config in config.mk)
+$(error Must specify at least one config in target makefile (MKTARGET))
 endif
 ifeq ($(CONFIG),)
 CONFIG := $(word 1,$(CONFIGS))
