@@ -12,7 +12,8 @@ LIBRARIES :=
 FRAMEWORKS := Foundation
 
 # Options
-OPTIONS := SCM_HASH='"$(shell git rev-parse --short=16 HEAD)"'
+OPTIONS := SCM_HASH='"$(shell git rev-parse --short=16 HEAD || \
+		echo 0000000000000000)"'
 
 # Configurations (the first one is the default)
 CONFIGS := debug release
