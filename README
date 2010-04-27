@@ -1,0 +1,27 @@
+========
+PRJSTART
+========
+
+prjstart is a generic C project framework. The buildsystem supports
+both vanilla C and Cocoa projects. It works (has been tested) on
+Linux and OS X.
+
+
+Buildsystem
+-----------
+
+The Makefile and files under `buildsystem' should not need to be
+modified. Targets are configured with target makefiles. Two examples
+are under `targets'; one for a vanilla C project, and one for a Cocoa
+project. Targets can support multiple build configs, such as debug
+and release.
+
+The target makefile can be specified on the make command line or
+it can be linked to `target.mk'.
+
+    make MKTARGET=targets/vanilla.mk
+
+Configs can also be specified on the command line. By default, the
+first config in the CONFIGS list is used.
+
+    make MKTARGET=targets/vanilla.mk CONFIG=release
