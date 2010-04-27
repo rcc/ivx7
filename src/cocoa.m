@@ -14,7 +14,9 @@ int main(int argc, const char * argv[])
 	logdebug("Version: %s\n", SCM_HASH);
 
 	if((ret = run_cmds(argc-1, &argv[1], NULL)) < 0) {
-		printf("An error occurred with command at position %d\n", -ret);
+		fprintf(stderr,
+			"An error occurred with command at position %d\n",
+			-ret);
 		status = -1;
 		goto exit;
 	}
