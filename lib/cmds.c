@@ -44,7 +44,7 @@ int run_cmds(int argc, const char **argv, void *appdata)
 		const cmd_t *cmd_entry =
 			lookup_cmd(argv[carg++], &registered_cmds);
 		if(cmd_entry == NULL)
-			return -carg;
+			return carg;
 
 		/* call the command handler */
 		if((ret = (cmd_entry->handler)(argc-carg, &argv[carg],
@@ -60,7 +60,7 @@ int run_cmd(const char *name, int argc, const char **argv, void *appdata)
 {
 	const cmd_t *cmd_entry = lookup_cmd(name, &registered_cmds);
 	if(cmd_entry == NULL)
-		return -1;
+		return 1;
 
 	/* call the command handler */
 	if((cmd_entry->handler)(argc, argv, cmd_entry, appdata) < 0)

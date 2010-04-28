@@ -24,20 +24,22 @@
 int main(int argc, const char * argv[])
 {
 	int ret;
-	int status = 0;
 
 	pdebug("Version: %s\n", SCM_HASH);
 
-	if((ret = run_cmds(argc-1, &argv[1], NULL)) < 0) {
-		fprintf(stderr,
-			"An error occurred with command at position %d\n",
-			-ret);
-		status = -1;
-		goto exit;
+	if((ret = run_cmds(argc-1, &argv[1], NULL)) != 0) {
+		if(ret < 0) {
+			fprintf(stderr,
+				"An error occurred with command: %s\n",
+				argv[-ret]);
+		} else {
+			fprintf(stderr,
+				"Could not find command: %s\n", argv[ret]);
+		}
+		return 1;
 	}
 
-exit:
-	return status;
+	return 0;
 }
 
 CMDHANDLER(version)
