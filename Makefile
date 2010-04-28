@@ -47,6 +47,9 @@ CCNAME := $(call USCORESUB,$(notdir $(realpath $(shell which $(CC)))))
 # Build Directory
 BUILDDIR := buildresults/$(TARGET)/$(MACHINE)/$(CCNAME)/$(CONFIG)
 
+# Add in the target name
+OPTIONS += __TARGET__='"$(TARGET)"'
+
 # Add in the options
 CPPFLAGS += $(addprefix -D,$(OPTIONS))
 
