@@ -16,9 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with cmds.c.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-/****************************************************************************/
-
 #include <cmds.h>
 #include <string.h>
 #include <stdio.h>

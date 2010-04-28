@@ -17,8 +17,6 @@
  * along with cmds.h.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/****************************************************************************/
-
 /* DESCRIPTION: This header file describes data structures and functions for a
  * modular command system.
  */

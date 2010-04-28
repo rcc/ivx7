@@ -16,9 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with prjutil.h. If not, see <http://www.gnu.org/licenses/>.
  */
-
-/****************************************************************************/
-
 #ifndef I__PRJUTIL_H__
 	#define I__PRJUTIL_H__
 
