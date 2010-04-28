@@ -22,7 +22,7 @@
 
 LIST_HEAD(registered_cmds);
 
-const cmd_t *lookup_cmd(const char *name, ll_t *cmd_list)
+static const cmd_t *lookup_cmd(const char *name, ll_t *cmd_list)
 {
 	reg_cmd_t *pos;
 
@@ -52,6 +52,19 @@ int run_cmds(int argc, const char **argv, void *appdata)
 			return -carg;
 		carg += ret;
 	}
+
+	return 0;
+}
+
+int run_cmd(const char *name, int argc, const char **argv, void *appdata)
+{
+	const cmd_t *cmd_entry = lookup_cmd(name, &registered_cmds);
+	if(cmd_entry == NULL)
+		return -1;
+
+	/* call the command handler */
+	if((cmd_entry->handler)(argc, argv, cmd_entry, appdata) < 0)
+		return -1;
 
 	return 0;
 }

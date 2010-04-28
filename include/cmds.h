@@ -79,20 +79,20 @@ typedef struct reg_cmd_t {
 
 #define THISCMD cmd->name
 
-/* Lookup Command
- * 	name		- name of command to lookup
- * 	cmd_list	- list of reg_cmd_t structures
- *
- * 	RETURNS pointer to matched command on success, NULL of failure
- */
-const cmd_t *lookup_cmd(const char *name, ll_t *cmd_list);
-
 /* Run Commands
  * 	argc		- number of arguments in argv
  * 	argv		- list of commands and arguments
  * 	appdata		- data to pass to each command
  */
 int run_cmds(int argc, const char **argv, void *appdata);
+
+/* Run Command
+ * 	name		- name of command
+ * 	argc		- number of arguments in argv
+ * 	argv		- list of arguments
+ * 	appdata		- data to pass to command
+ */
+int run_cmd(const char *name, int argc, const char **argv, void *appdata);
 
 void _register_cmd(reg_cmd_t *rcmd);
 
