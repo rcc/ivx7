@@ -9,6 +9,11 @@ $(BUILDDIR)/%.o : %.m
 	$(call OUTPUTINFO,OBJCC,$<)
 	$(Q)$(CC)  $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
+$(BUILDDIR)/%.o : %.cpp
+	@mkdir -p $(@D)
+	$(call OUTPUTINFO,C++,$<)
+	$(Q)$(CC)  $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+
 $(BUILDDIR)/%.o : %.S
 	@mkdir -p $(@D)
 	$(call OUTPUTINFO,AS,$<)

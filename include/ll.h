@@ -25,6 +25,10 @@
 #ifndef I__LL_H__
 	#define I__LL_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /* list_entry - get the struct for this entry
  * ptr:		the ll_t pointer
  * type:	the type of structure this is embedded in
@@ -431,4 +435,7 @@ static inline void hlist_add_after(hl_node_t *n, hl_node_t *prev)
 		({ tpos = hlist_entry(pos, typeof(*tpos), member); 1; }); \
 		pos = n)
 
+#ifdef __cplusplus
+}
+#endif
 #endif /* I__LL_H__ */
