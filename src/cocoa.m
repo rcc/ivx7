@@ -28,7 +28,7 @@
 
 int main(int argc, const char * argv[])
 {
-	NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	int status = 0;
 	int ret;
 	char *arg0, *cmdname;
