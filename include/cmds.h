@@ -78,8 +78,8 @@ typedef struct reg_cmd_t {
  * 	RETURN -1 for error, otherwise number of arguments used
  */
 #define CMDHANDLER(name) \
-		int name(int argc, const char **argv, const cmd_t *cmd, \
-				void *appdata)
+		static int name(int argc, const char **argv, \
+				const cmd_t *cmd, void *appdata)
 
 #define THISCMD cmd->name
 
