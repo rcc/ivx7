@@ -52,12 +52,10 @@ int main(int argc, const char * argv[])
 	if(strcmp(__TARGET__, cmdname) == 0) {
 		if((ret = run_cmds(argc-1, &argv[1], NULL)) != 0) {
 			if(ret < 0) {
-				fprintf(stderr,
-					"An error occurred with command: %s\n",
+				printe("An error occurred with command: %s\n",
 					argv[-ret]);
 			} else {
-				fprintf(stderr,
-					"Could not find command: %s\n",
+				printe("Could not find command: %s\n",
 					argv[ret]);
 			}
 			status = 1;
@@ -67,13 +65,10 @@ int main(int argc, const char * argv[])
 		/* treat the argv[0] command name as a command */
 		if((ret = run_cmd(cmdname, argc - 1, &argv[1], NULL)) != 0) {
 			if(ret < 0) {
-				fprintf(stderr,
-					"An error occurred with command: %s\n",
+				printe("An error occurred with command: %s\n",
 					cmdname);
 			} else {
-				fprintf(stderr,
-					"Could not find command: %s\n",
-					cmdname);
+				printe("Could not find command: %s\n", cmdname);
 			}
 			status = 1;
 			goto exit2;
