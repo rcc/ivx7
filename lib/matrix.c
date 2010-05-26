@@ -179,7 +179,7 @@ matrix_dt *transpose_matrix_dt(const matrix_dt *A)
 
 	for(i = 0; i < A->rows; i++) {
 		for(j = 0; j < A->cols; j++) {
-			m->values[j * m->cols + i] = A->values[i * A->cols + j];
+			MATRIX_VAL(m, j, i) = MATRIX_VAL(A, i, j);
 		}
 	}
 
