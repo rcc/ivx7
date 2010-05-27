@@ -21,7 +21,7 @@
 #include <string.h>
 
 /***************************** Allocate and Free ****************************/
-matrix_dt *new_matrix_dt(uint32_t cols, uint32_t rows)
+matrix_dt *new_matrix_dt(uint32_t rows, uint32_t cols)
 {
 	matrix_dt *m = malloc(sizeof(matrix_dt) +
 			(sizeof(m->values[0]) * cols * rows));
@@ -43,7 +43,7 @@ matrix_dt *copy_matrix_dt(const matrix_dt *A)
 {
 	matrix_dt *m;
 
-	if(!(m = new_matrix_dt(A->cols, A->rows)))
+	if(!(m = new_matrix_dt(A->rows, A->cols)))
 		return NULL;
 
 	memcpy(m->values, A->values,
@@ -142,7 +142,7 @@ matrix_dt *add_matrix_dt(const matrix_dt *A, const matrix_dt *B)
 	if((A->cols != B->cols) || (A->rows != B->rows))
 		return NULL;
 
-	if(!(m = new_matrix_dt(A->cols, A->rows)))
+	if(!(m = new_matrix_dt(A->rows, A->cols)))
 		return NULL;
 
 	for(i = 0; i < (m->cols * m->rows); i++) {
@@ -158,7 +158,7 @@ matrix_dt *scalar_mult_matrix_dt(const matrix_dt *A, double S)
 	matrix_dt *m;
 	uint32_t i;
 
-	if(!(m = new_matrix_dt(A->cols, A->rows)))
+	if(!(m = new_matrix_dt(A->rows, A->cols)))
 		return NULL;
 
 	for(i = 0; i < (m->cols * m->rows); i++) {
@@ -174,7 +174,7 @@ matrix_dt *transpose_matrix_dt(const matrix_dt *A)
 	matrix_dt *m;
 	uint32_t i,j;
 
-	if(!(m = new_matrix_dt(A->rows, A->cols)))
+	if(!(m = new_matrix_dt(A->cols, A->rows)))
 		return NULL;
 
 	for(i = 0; i < A->rows; i++) {
@@ -266,7 +266,7 @@ double cofactor_dt(const matrix_dt *A, uint32_t i, uint32_t j)
 	matrix_dt *m;
 	uint32_t k, l;
 
-	if(!(m = new_matrix_dt(A->cols - 1, A->rows - 1)))
+	if(!(m = new_matrix_dt(A->rows - 1, A->cols - 1)))
 		return 0;
 
 	for(k = 0, l = 0; k < (A->cols * A->rows); k++) {
@@ -290,7 +290,7 @@ matrix_dt *cofactor_matrix_dt(const matrix_dt *A)
 	matrix_dt *m;
 	uint32_t i, j;
 
-	if(!(m = new_matrix_dt(A->cols, A->rows)))
+	if(!(m = new_matrix_dt(A->rows, A->cols)))
 		return NULL;
 
 	for(i = 0; i < A->rows; i++) {

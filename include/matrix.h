@@ -35,7 +35,7 @@ typedef struct matrix_dt {
 #define MATRIX_VAL(mp, row, col) ((mp)->values[(row) * (mp)->cols + (col)])
 
 /* Allocate and Free */
-matrix_dt *new_matrix_dt(uint32_t cols, uint32_t rows);
+matrix_dt *new_matrix_dt(uint32_t rows, uint32_t cols);
 void free_matrix_dt(matrix_dt *m);
 matrix_dt *copy_matrix_dt(const matrix_dt *A);
 void zero_matrix_dt(matrix_dt *A);
