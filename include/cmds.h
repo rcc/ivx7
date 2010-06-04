@@ -105,6 +105,12 @@ int run_cmds(int argc, const char **argv, void *appdata);
  */
 int run_cmd(const char *name, int argc, const char **argv, void *appdata);
 
+/* Run Command Line
+ * 	cmd_line	- string command line
+ * 	appdata		- data to pass to command
+ */
+int run_cmd_line(const char *cmd_line, void *appdata);
+
 void _register_cmd(reg_cmd_t *rcmd);
 
 #ifdef __cplusplus

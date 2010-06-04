@@ -17,8 +17,13 @@
  * along with cmds.c.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <cmds.h>
-#include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#ifndef CMDS_MAX_ARGUMENTS
+#define CMDS_MAX_ARGUMENTS	64
+#endif /* CMDS_MAX_ARGUMENTS */
 
 LIST_HEAD(registered_cmds);
 
@@ -32,6 +37,22 @@ static const cmd_t *lookup_cmd(const char *name, ll_t *cmd_list)
 	}
 
 	return NULL;
+}
+
+static int tokenize_cmd_string(char *argstr, char **argv, size_t max_args)
+{
+	char *tok, *brkt;
+	char *sep = " \t";
+	size_t i;
+
+	for(tok = strtok_r(argstr, sep, &brkt), i = 0;
+			tok && (i < (max_args - 1));
+			tok = strtok_r(NULL, sep, &brkt), i++) {
+		argv[i] = tok;
+	}
+	argv[i] = NULL;
+
+	return (int)i;
 }
 
 int run_cmds(int argc, const char **argv, void *appdata)
@@ -67,6 +88,39 @@ int run_cmd(const char *name, int argc, const char **argv, void *appdata)
 		return -1;
 
 	return 0;
+}
+
+int run_cmd_line(const char *cmd_line, void *appdata)
+{
+	int status = 0;
+	char *s;
+	int argc;
+	char **argv;
+
+	if((s = malloc(strlen(cmd_line))) == NULL) {
+		status = 1;
+		goto exit1;
+	}
+	if((argv = malloc(CMDS_MAX_ARGUMENTS * sizeof(argv[0]))) == NULL) {
+		status = 1;
+		goto exit2;
+	}
+	strcpy(s, cmd_line);
+
+	argc = tokenize_cmd_string(s, argv, CMDS_MAX_ARGUMENTS);
+
+	if(argc) {
+		status = run_cmd(argv[0], argc - 1, (const char **)&argv[1],
+				appdata);
+	} else {
+		status = 1;
+	}
+
+	free(argv);
+exit2:
+	free(s);
+exit1:
+	return status;
 }
 
 void _register_cmd(reg_cmd_t *rcmd)
