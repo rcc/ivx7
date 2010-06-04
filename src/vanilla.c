@@ -47,7 +47,9 @@ int main(int argc, const char * argv[])
 	pdebug("Version: %s\n", SCM_HASH);
 
 	if(strcmp(__TARGET__, cmdname) == 0) {
-		if((ret = run_cmds(argc-1, &argv[1], NULL)) != 0) {
+		if(argc == 1) {
+			run_cmd("help", 0, &argv[1], NULL);
+		} else if((ret = run_cmds(argc - 1, &argv[1], NULL)) != 0) {
 			if(ret < 0) {
 				printe("An error occurred with command: %s\n",
 					argv[-ret]);
