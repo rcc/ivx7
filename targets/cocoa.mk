@@ -4,6 +4,8 @@ TARGET := cocoa
 # Sources
 SOURCES :=	src/cocoa.m \
 		lib/cmds.c \
+		lib/getline.c \
+		lib/cmds_script.c \
 
 # Libraries
 LIBRARIES :=

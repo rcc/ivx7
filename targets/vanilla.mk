@@ -4,6 +4,8 @@ TARGET := vanilla
 # Sources
 SOURCES :=	src/vanilla.c \
 		lib/cmds.c \
+		lib/getline.c \
+		lib/cmds_script.c \
 
 # Libraries
 LIBRARIES :=

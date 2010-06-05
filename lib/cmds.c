@@ -133,7 +133,7 @@ CMDHANDLER(help)
 	if(argc > 0) {
 		const cmd_t *cmd_entry = lookup_cmd(argv[0], &registered_cmds);
 		if(cmd_entry == NULL) {
-			printf("%s: Command `%s' not found.\n", THISCMD,
+			printe("%s: Command `%s' not found.\n", THISCMD,
 					argv[0]);
 			return -1;
 		}
