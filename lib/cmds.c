@@ -135,7 +135,16 @@ exit1:
 
 void _register_cmd(reg_cmd_t *rcmd)
 {
-	list_add(&rcmd->node, &registered_cmds);
+	reg_cmd_t *pos;
+
+	/* add command in alphabetical order */
+	list_for_each_entry(pos, &registered_cmds, node) {
+		if(strcmp(rcmd->cmd->name, pos->cmd->name) <= 0) {
+			list_add_tail(&rcmd->node, &pos->node);
+			return;
+		}
+	}
+	list_add_tail(&rcmd->node, &registered_cmds);
 }
 
 CMDHANDLER(help)
