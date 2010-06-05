@@ -36,7 +36,7 @@ CMDHANDLER(script_handler)
 
 	/* check arguments */
 	if(!argc) {
-		printe("ERROR: %s: no file specified\n", THISCMD);
+		pcmderr("no file specified\n");
 		status = -1;
 		goto exit1;
 	}
@@ -59,9 +59,8 @@ CMDHANDLER(script_handler)
 	while((len = getline(fp, line, CMDS_SCRIPT_LINE_LENGTH)) >= 0) {
 		if((len > 0) && (line[0] != '#')) {
 			if(run_cmd_line(line, appdata) != 0) {
-				printe("ERROR: %s: "
-					"an error occured with line #%d\n",
-						THISCMD, line_num);
+				pcmderr("an error occured with line #%d\n",
+						line_num);
 				status = -1;
 				break;
 			}

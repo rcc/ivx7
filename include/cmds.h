@@ -21,6 +21,7 @@
  * modular command system.
  */
 
+#include <prjutil.h>
 #include <ll.h>
 
 #ifndef I__CMDS_H__
@@ -82,6 +83,10 @@ typedef struct reg_cmd_t {
 				const cmd_t *cmd, void *appdata)
 
 #define THISCMD cmd->name
+#define pcmderr(fmt, args...) printe("ERROR: %s: " fmt, THISCMD, ## args)
+
+/* Standard error print */
+
 
 /* Run Command[s] Error Handling
  * 	run_cmd[s] will return 0 on success. A positive error code, n, means
