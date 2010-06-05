@@ -3,18 +3,18 @@
  *
  * Copyright (C) 2008 Robert C. Curtis
  *
- * cmds.h is free software: you can redistribute it and/or modify
+ * cmds is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
  *
- * cmds.h is distributed in the hope that it will be useful,
+ * cmds is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with cmds.h.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cmds.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /* DESCRIPTION: This header file describes data structures and functions for a
@@ -75,7 +75,7 @@ typedef struct reg_cmd_t {
 
 
 /* Command handler prototype
- * 	RETURN -1 for error, otherwise number of arguments used
+ * 	RETURN negative for error, otherwise number of arguments used
  */
 #define CMDHANDLER(name) \
 		static int name(int argc, const char **argv, \
@@ -84,9 +84,12 @@ typedef struct reg_cmd_t {
 #define THISCMD cmd->name
 
 /* Run Command[s] Error Handling
- * 	run_cmd[s] will return 0 on success. A negative error code, -n, means
- * 	that command number n encountered an error. A positive error code
- * 	means that the cmds framework could not find command n.
+ * 	run_cmd[s] will return 0 on success. A positive error code, n, means
+ * 	that command number n encountered an error. A negative error code
+ * 	means that the cmds framework encountered an error.
+ * 		ENOSYS		- could not find command
+ * 		ENOMEM		- could not allocate enough memory
+ * 		EINVAL		- invalid argument
  * 	Note that 'command n' actually means argv[n].
  */
 

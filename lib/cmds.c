@@ -3,23 +3,25 @@
  *
  * Copyright (C) 2008 Robert C. Curtis
  *
- * cmds.c is free software: you can redistribute it and/or modify
+ * cmds is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
  *
- * cmds.c is distributed in the hope that it will be useful,
+ * cmds is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with cmds.c.  If not, see <http://www.gnu.org/licenses/>.
+ * along with cmds.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <cmds.h>
+#include <prjutil.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #ifndef CMDS_MAX_ARGUMENTS
 #define CMDS_MAX_ARGUMENTS	64
@@ -64,13 +66,16 @@ int run_cmds(int argc, const char **argv, void *appdata)
 	while(carg < argc) {
 		const cmd_t *cmd_entry =
 			lookup_cmd(argv[carg++], &registered_cmds);
-		if(cmd_entry == NULL)
-			return carg;
+		if(cmd_entry == NULL) {
+			printe("ERROR: could not find command '%s'\n",
+					argv[carg-1]);
+			return -ENOSYS;
+		}
 
 		/* call the command handler */
 		if((ret = (cmd_entry->handler)(argc-carg, &argv[carg],
 						cmd_entry, appdata)) < 0)
-			return -carg;
+			return carg;
 		carg += ret;
 	}
 
@@ -80,12 +85,14 @@ int run_cmds(int argc, const char **argv, void *appdata)
 int run_cmd(const char *name, int argc, const char **argv, void *appdata)
 {
 	const cmd_t *cmd_entry = lookup_cmd(name, &registered_cmds);
-	if(cmd_entry == NULL)
-		return 1;
+	if(cmd_entry == NULL) {
+		printe("ERROR: could not find command '%s'\n", name);
+		return -ENOSYS;
+	}
 
 	/* call the command handler */
 	if((cmd_entry->handler)(argc, argv, cmd_entry, appdata) < 0)
-		return -1;
+		return 1;
 
 	return 0;
 }
@@ -98,11 +105,13 @@ int run_cmd_line(const char *cmd_line, void *appdata)
 	char **argv;
 
 	if((s = malloc(strlen(cmd_line))) == NULL) {
-		status = 1;
+		perror("ERROR: could not allocate command line buffer");
+		status = -ENOMEM;
 		goto exit1;
 	}
 	if((argv = malloc(CMDS_MAX_ARGUMENTS * sizeof(argv[0]))) == NULL) {
-		status = 1;
+		perror("ERROR: could not allocate argv");
+		status = -ENOMEM;
 		goto exit2;
 	}
 	strcpy(s, cmd_line);
@@ -113,7 +122,8 @@ int run_cmd_line(const char *cmd_line, void *appdata)
 		status = run_cmd(argv[0], argc - 1, (const char **)&argv[1],
 				appdata);
 	} else {
-		status = 1;
+		printe("ERROR: command line empty\n");
+		status = -EINVAL;
 	}
 
 	free(argv);

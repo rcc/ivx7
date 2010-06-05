@@ -53,25 +53,12 @@ int main(int argc, const char * argv[])
 		if(argc == 1) {
 			run_cmd("help", 0, &argv[1], NULL);
 		} else if((ret = run_cmds(argc - 1, &argv[1], NULL)) != 0) {
-			if(ret < 0) {
-				printe("An error occurred with command: %s\n",
-					argv[-ret]);
-			} else {
-				printe("Could not find command: %s\n",
-					argv[ret]);
-			}
 			status = 1;
 			goto exit2;
 		}
 	} else {
 		/* treat the argv[0] command name as a command */
 		if((ret = run_cmd(cmdname, argc - 1, &argv[1], NULL)) != 0) {
-			if(ret < 0) {
-				printe("An error occurred with command: %s\n",
-					cmdname);
-			} else {
-				printe("Could not find command: %s\n", cmdname);
-			}
 			status = 1;
 			goto exit2;
 		}

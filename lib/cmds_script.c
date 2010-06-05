@@ -36,14 +36,14 @@ CMDHANDLER(script_handler)
 
 	/* check arguments */
 	if(!argc) {
-		printe("%s: no file specified\n", THISCMD);
+		printe("ERROR: %s: no file specified\n", THISCMD);
 		status = -1;
 		goto exit1;
 	}
 	/* try and open script file */
 	if(strcmp(argv[0], "-") != 0) {
 		if((fp = fopen(argv[0], "r")) == NULL) {
-			perror("Could not open script file");
+			perror("could not open script file");
 			status = -1;
 			goto exit1;
 		}
@@ -59,7 +59,8 @@ CMDHANDLER(script_handler)
 	while((len = getline(fp, line, CMDS_SCRIPT_LINE_LENGTH)) >= 0) {
 		if((len > 0) && (line[0] != '#')) {
 			if(run_cmd_line(line, appdata) != 0) {
-				printe("%s: an error occured with line #%d\n",
+				printe("ERROR: %s: "
+					"an error occured with line #%d\n",
 						THISCMD, line_num);
 				status = -1;
 				break;
