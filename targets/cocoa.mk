@@ -3,8 +3,8 @@ TARGET := cocoa
 
 # Sources
 SOURCES :=	src/cocoa.m \
-		lib/cmds.c \
 		lib/getline.c \
+		lib/cmds.c \
 		lib/cmds_script.c \
 		lib/cmds_shell.c \
 

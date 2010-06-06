@@ -3,10 +3,11 @@ PRJSTART
 ========
 
 prjstart is a generic C project framework. The buildsystem supports
-both vanilla C and Cocoa projects. It works (has been tested) on
-Linux and OS X.
+both vanilla C and Cocoa projects (OS X). It handles the C, Obj-C,
+and C++ languages. It has been tested on Linux and OS X.
 
 
+-----------
 Buildsystem
 -----------
 
@@ -19,17 +20,79 @@ and release.
 The target makefile can be specified on the make command line or
 it can be linked to `target.mk'.
 
-    $ make MKTARGET=targets/vanilla.mk
+::
+
+    $ make MKTARGET=targets/vanilla.mk 
     [CC]            src/vanilla.c
+    [CC]            lib/getline.c
     [CC]            lib/cmds.c
+    [CC]            lib/cmds_script.c
+    [CC]            lib/cmds_shell.c
     [LINK]          buildresults/vanilla/Darwin_i386/gcc_4_2/debug/vanilla
     [CONFIG]        debug
 
 Configs can also be specified on the command line. By default, the
 first config in the CONFIGS list is used.
 
+::
+
     $ make MKTARGET=targets/cocoa.mk CONFIG=release
     [OBJCC]         src/cocoa.m
+    [CC]            lib/getline.c
     [CC]            lib/cmds.c
+    [CC]            lib/cmds_script.c
+    [CC]            lib/cmds_shell.c
     [LINK]          buildresults/cocoa/Darwin_i386/gcc_4_2/release/cocoa
     [CONFIG]        release
+
+Target Makefiles
+++++++++++++++++
+
+TARGET
+    The name of the output executable. __TARGET__ is defined as the
+    string version of this.
+
+SOURCES
+    List of all sources to compile for the target.
+
+LIBRARIES
+    List of all required libraries to link against. Each library
+    becomes a -l<library> flag during the link stage.
+
+OPTIONS
+    Global build options for all configurations. Each option becomes
+    a -D<option> style flag.
+
+<CONFIG>_OPTIONS
+    Configuration specific options.
+
+FRAMEWORKS
+    List of frameworks to build against. (Obj-C)
+
+All flags can be appended to in the target makefile as well. For
+example, `CPPFLAGS += <flag>'
+
+
+------------------
+Commands Framework
+------------------
+
+TO BE WRITTEN
+
+
+--------
+Printing
+--------
+
+prjutil.h provides some convenience macros for printing. prjutil.h
+does not import the required header files for the functions used;
+this is up to the user of the macros.
+
+printe
+    printf to stderr.
+
+pdebug
+    printf only when DEBUG_PRINTS is defined.
+
+logdebug
+    NSLog only when DEBUG_PRINTS is defined.
