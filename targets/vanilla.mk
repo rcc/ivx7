@@ -6,9 +6,10 @@ SOURCES :=	src/vanilla.c \
 		lib/cmds.c \
 		lib/getline.c \
 		lib/cmds_script.c \
+		lib/cmds_shell.c \
 
 # Libraries
-LIBRARIES :=
+LIBRARIES := readline
 
 # Options
 OPTIONS := SCM_HASH='"$(shell git rev-parse --short=16 HEAD || \

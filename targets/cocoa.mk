@@ -6,9 +6,10 @@ SOURCES :=	src/cocoa.m \
 		lib/cmds.c \
 		lib/getline.c \
 		lib/cmds_script.c \
+		lib/cmds_shell.c \
 
 # Libraries
-LIBRARIES :=
+LIBRARIES := readline
 
 # Frameworks
 FRAMEWORKS := Foundation
