@@ -23,13 +23,28 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+/* shell colors */
+#define COLOR_NO	"\x1b[00;00m"
+#define COLOR_BR 	"\x1b[00;01m"
+#define COLOR_RD 	"\x1b[00;31m"
+#define COLOR_GR 	"\x1b[00;32m"
+#define COLOR_YL 	"\x1b[00;33m"
+#define COLOR_BL 	"\x1b[00;34m"
+#define COLOR_MG 	"\x1b[00;35m"
+#define COLOR_CY 	"\x1b[00;36m"
+
+/* shell prompt */
+#ifndef CMDS_SHELL_PROMPT
+#define CMDS_SHELL_PROMPT	COLOR_CY __TARGET__ COLOR_YL " $ " COLOR_NO
+#endif /* CMDS_SHELL_PROMPT */
+
 CMDHANDLER(shell_handler)
 {
 	int status = 0;
 	char *line;
 
 	/* loop through lines */
-	while((line = readline(__TARGET__ "> ")) != NULL) {
+	while((line = readline(CMDS_SHELL_PROMPT)) != NULL) {
 		if(strlen(line)) {
 			run_cmd_line(line, appdata);
 		}
