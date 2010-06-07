@@ -24,6 +24,11 @@
 #include <string.h>
 #include <libgen.h>
 
+/* appdata pointer */
+#ifndef APPDATA_POINTER
+#define APPDATA_POINTER		NULL
+#endif /* APPDATA_POINTER */
+
 int main(int argc, const char * argv[])
 {
 	int status = 0;
@@ -48,14 +53,16 @@ int main(int argc, const char * argv[])
 
 	if(strcmp(__TARGET__, cmdname) == 0) {
 		if(argc == 1) {
-			run_cmd("help", 0, &argv[1], NULL);
-		} else if((ret = run_cmds(argc - 1, &argv[1], NULL)) != 0) {
+			run_cmd("help", 0, &argv[1], APPDATA_POINTER);
+		} else if((ret = run_cmds(argc - 1, &argv[1],
+						APPDATA_POINTER)) != 0) {
 			status = 1;
 			goto exit2;
 		}
 	} else {
 		/* treat the argv[0] command name as a command */
-		if((ret = run_cmd(cmdname, argc - 1, &argv[1], NULL)) != 0) {
+		if((ret = run_cmd(cmdname, argc - 1, &argv[1],
+						APPDATA_POINTER)) != 0) {
 			status = 1;
 			goto exit2;
 		}
