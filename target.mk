@@ -1,1 +1,0 @@
-targets/vanilla.mk

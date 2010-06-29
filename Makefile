@@ -7,11 +7,41 @@ ASFLAGS :=
 LDFLAGS :=
 
 # include after default flags so config.mk can append to them
+#    first check for command line MKTARGET flag
 ifneq ($(MKTARGET),)
 include $(MKTARGET)
-else
+
+#    now check for the presence of a linked target.mk
+else ifneq ($(strip $(wildcard target.mk)),)
 include target.mk
+
+#    build every target in targets/ directory
+else
+MKTARGETS=$(wildcard targets/*.mk)
 endif
+
+#
+# Verbose Option
+ifeq ($(VERBOSE),1)
+	Q :=
+else
+	Q := @
+endif
+
+
+ifdef MKTARGETS
+.PHONY : alltargets
+all_targets clean : $(MKTARGETS)
+	$(call OUTPUTINFO,DONE,$@)
+
+targets/% : FORCE
+	$(call OUTPUTINFO,TARGET,$@)
+	$(Q)$(MAKE) MKTARGET=$@ $(MAKECMDGOALS)
+	$(Q)echo
+
+FORCE:
+
+else
 
 # Add all the libraries defined in config.mk to LDLIBS
 LDLIBS := $(addprefix -l,$(LIBRARIES))
@@ -20,13 +50,6 @@ LDLIBS := $(addprefix -l,$(LIBRARIES))
 #   This is only for objective-C in OSX, but it doesn't hurt us here assuming
 #   no one defines FRAMEWORKS
 LDFLAGS += $(addprefix -framework ,$(FRAMEWORKS))
-
-# Verbose Option
-ifeq ($(VERBOSE),1)
-	Q :=
-else
-	Q := @
-endif
 
 # Configuration
 ifeq ($(words $(CONFIGS)),0)
@@ -70,7 +93,9 @@ $(BUILDDIR)/$(TARGET) : \
 ### Utility Rules ###
 .PHONY : clean
 clean :
-	-rm -rf buildresults
+	-rm -rf buildresults/$(TARGET)
 
 include buildsystem/autodep.mk
 include buildsystem/rules.mk
+
+endif # ifdef $(MKTARGETS)
