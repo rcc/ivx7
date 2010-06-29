@@ -11,11 +11,11 @@ LDFLAGS :=
 ifneq ($(MKTARGET),)
 include $(MKTARGET)
 
-#    now check for the presence of a linked target.mk
+#    otherwise check for the presence of a linked target.mk
 else ifneq ($(strip $(wildcard target.mk)),)
 include target.mk
 
-#    build every target in targets/ directory
+#    otherwise build every target in targets/ directory
 else
 MKTARGETS=$(wildcard targets/*.mk)
 endif
@@ -62,6 +62,7 @@ ifeq ($(findstring $(CONFIG),$(CONFIGS)),)
 $(error Invalid config specified)
 endif
 OPTIONS += $($(call TOUPPER,$(CONFIG))_OPTIONS)
+SOURCES += $($(call TOUPPER,$(CONFIG))_SOURCES)
 
 # Machine Name and Tool Versions
 MACHINE := $(call USCORESUB,$(shell uname -sm))

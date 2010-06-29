@@ -55,6 +55,9 @@ TARGET
 SOURCES
     List of all sources to compile for the target.
 
+<CONFIG>_SOURCES
+    Configuration specific sources.
+
 LIBRARIES
     List of all required libraries to link against. Each library
     becomes a -l<library> flag during the link stage.
