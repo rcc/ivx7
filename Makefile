@@ -2,7 +2,7 @@ include buildsystem/func.mk
 
 # Set default flags
 CPPFLAGS := -Iinclude
-CFLAGS := -Wall -O2
+CFLAGS := -Wall -Werror -O2
 ASFLAGS :=
 LDFLAGS :=
 
