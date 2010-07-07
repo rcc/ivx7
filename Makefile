@@ -20,7 +20,7 @@ else
 MKTARGETS=$(wildcard targets/*.mk)
 endif
 
-#
+
 # Verbose Option
 ifeq ($(VERBOSE),1)
 	Q :=
@@ -28,10 +28,12 @@ else
 	Q := @
 endif
 
+# Default Install Script
+INSTALL_SCRIPT = targets/$(TARGET).install
 
 ifdef MKTARGETS
 .PHONY : alltargets
-all_targets clean : $(MKTARGETS)
+all_targets clean install : $(MKTARGETS)
 	$(call OUTPUTINFO,DONE,$@)
 
 targets/% : FORCE
@@ -95,6 +97,11 @@ $(BUILDDIR)/$(TARGET) : \
 .PHONY : clean
 clean :
 	-rm -rf buildresults/$(TARGET)
+
+.PHONY : install
+install : $(BUILDDIR)/$(TARGET)
+	$(call OUTPUTINFO,INSTALL,$<)
+	$(Q)$(INSTALL_SCRIPT) $<
 
 include buildsystem/autodep.mk
 include buildsystem/rules.mk
