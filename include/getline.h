@@ -23,12 +23,21 @@
 #ifndef I__GETLINE_H__
 	#define I__GETLINE_H__
 
-/* getline
- * 	fp	- file pointer
- * 	buf	- buffer to put line in
- * 	bufsz	- max size of buffer
+/* FUNCTION:    getline
  *
- * 	returns size of line, negative on EOF
+ * + DESCRIPTION:
+ *   - gets a line from a file pointer
+ *
+ * + PARAMETERS:
+ *   + FILE *fp
+ *     - file pointer
+ *   + char *buf
+ *     - buffer to put line in
+ *   + size_t bufsz
+ *     - max size of buffer
+ *
+ * + RETURNS: ssize_t
+ *   - size of line, negative on EOF
  */
 ssize_t getline(FILE *fp, char *buf, size_t bufsz);
 

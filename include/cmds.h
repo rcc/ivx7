@@ -83,9 +83,8 @@ typedef struct reg_cmd_t {
 				const cmd_t *cmd, void *appdata)
 
 #define THISCMD cmd->name
-#define pcmderr(fmt, args...) printe("ERROR: %s: " fmt, THISCMD, ## args)
-
 /* Standard error print */
+#define pcmderr(fmt, args...) printe("ERROR: %s: " fmt, THISCMD, ## args)
 
 
 /* Run Command[s] Error Handling
@@ -98,27 +97,71 @@ typedef struct reg_cmd_t {
  * 	Note that 'command n' actually means argv[n].
  */
 
-/* Run Commands
- * 	argc		- number of arguments in argv
- * 	argv		- list of commands and arguments
- * 	appdata		- data to pass to each command
+/* FUNCTION:    run_cmds
+ *
+ * + DESCRIPTION:
+ *   - parses and runs a mixed argument list of commands and parameters
+ *
+ * + PARAMETERS:
+ *   + int argc
+ *     - number of arguments
+ *   + const char **argv
+ *     - argument list
+ *   + void *appdata
+ *     - appdata pointer to pass to each command run
+ *
+ * + RETURNS: int
+ *   - see Error Handling above
  */
 int run_cmds(int argc, const char **argv, void *appdata);
 
-/* Run Command
- * 	name		- name of command
- * 	argc		- number of arguments in argv
- * 	argv		- list of arguments
- * 	appdata		- data to pass to command
+/* FUNCTION:    run_cmd
+ *
+ * + DESCRIPTION:
+ *   - runs a single command with arguments
+ *
+ * + PARAMETERS:
+ *   + const char *name
+ *     - name of command
+ *   + int argc
+ *     - number of arguments
+ *   + const char **argv
+ *     - argument list
+ *   + void *appdata
+ *     - appdata pointer to pass to command
+ *
+ * + RETURNS: int
+ *   - see Error Handling above
  */
 int run_cmd(const char *name, int argc, const char **argv, void *appdata);
 
-/* Run Command Line
- * 	cmd_line	- string command line
- * 	appdata		- data to pass to command
+/* FUNCTION:    run_cmd_line
+ *
+ * + DESCRIPTION:
+ *   - parse a string as a command line
+ *
+ * + PARAMETERS:
+ *   + const char *cmd_line
+ *     - command line string
+ *   + void *appdata
+ *     - appdata to pass to command
+ *
+ * + RETURNS: int
+ *   - see Error Handling above
  */
 int run_cmd_line(const char *cmd_line, void *appdata);
 
+
+/* FUNCTION:    _register_cmd
+ *
+ * + DESCRIPTION:
+ *   - adds a command to the command list. this is a low-level function that
+ *   users should normally not need to call.
+ *
+ * + PARAMETERS:
+ *   + reg_cmd_t *rcmd
+ *     - command structure to register
+ */
 void _register_cmd(reg_cmd_t *rcmd);
 
 #ifdef __cplusplus
