@@ -25,7 +25,8 @@ static void hexdump_line(FILE *outf, void *line, size_t size, size_t width)
 
 	for(i = 0; i < width; i++) {
 		if(i < size) {
-			fprintf(outf, "%02x ", *((char *)(line + i)));
+			fprintf(outf, "%02x ",
+					*((unsigned char *)(line + i)) & 0xFF);
 		} else {
 			fprintf(outf, "   ");
 		}
