@@ -17,6 +17,7 @@ FRAMEWORKS := Foundation
 
 # Options
 OPTIONS := VERSION='"0.1"'
+OPTIONS += LOG_WITH_NSLOG
 
 # Configurations (the first one is the default)
 CONFIGS := debug release

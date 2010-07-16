@@ -20,9 +20,8 @@
 #include <stdarg.h>
 
 #ifdef LOG_WITH_NSLOG
-#import <Foundation/Foundation.h>
+extern void _nslog_hook(const char *fmt, va_list ap);
 #endif
-
 
 FILE *logfd[MAX_LOGLEVEL + 1];
 
@@ -41,7 +40,7 @@ void _log(int level, const char *fmt, ...)
 
 	if(level && (level <= loglevel)) {
 #ifdef LOG_WITH_NSLOG
-		NSLogv(fmt, argp);
+		_nslog_hook(fmt, argp);
 #else
 		vfprintf(logfd[level], fmt, argp);
 #endif

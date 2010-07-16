@@ -83,3 +83,14 @@ CMDHANDLER(version)
 	return 0;
 }
 APPCMD(version, &version, "print the version", "usage: version", NULL);
+
+#ifdef LOG_WITH_NSLOG
+/* The logging framework needs a cocoa hook to make this work */
+#import <stdarg.h>
+void _nslog_hook(const char *fmt, va_list ap)
+{
+	NSString *NSfmt = [[NSString alloc] initWithUTF8String:fmt];
+	NSLogv(NSfmt, ap);
+	[NSfmt release];
+}
+#endif
