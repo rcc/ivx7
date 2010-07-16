@@ -50,7 +50,6 @@ int main(int argc, const char * argv[])
 	}
 
 	logdebug("Command: %s\n", cmdname);
-	logdebug("Version: %s\n", SCM_HASH);
 
 	if(strcmp(__TARGET__, cmdname) == 0) {
 		if(argc == 1) {
@@ -77,7 +76,7 @@ exit1:
 
 CMDHANDLER(version)
 {
-	printf("Version: %s\n", SCM_HASH);
+	printf("Version:  %s\n", VERSION);
 	return 0;
 }
 APPCMD(version, &version, "print the version", "usage: version", NULL);
