@@ -71,6 +71,8 @@ int run_cmds(int argc, const char **argv, void *appdata)
 					argv[carg-1]);
 			return -ENOSYS;
 		}
+		logverbose("%s: running command: %s\n", __FUNCTION__,
+				cmd_entry->name);
 
 		/* call the command handler */
 		if((ret = (cmd_entry->handler)(argc-carg, &argv[carg],
@@ -89,6 +91,8 @@ int run_cmd(const char *name, int argc, const char **argv, void *appdata)
 		logerror("ERROR: could not find command '%s'\n", name);
 		return -ENOSYS;
 	}
+
+	logverbose("%s: running command: %s\n", __FUNCTION__, cmd_entry->name);
 
 	/* call the command handler */
 	if((cmd_entry->handler)(argc, argv, cmd_entry, appdata) < 0)

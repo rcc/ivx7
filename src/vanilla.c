@@ -49,7 +49,7 @@ int main(int argc, const char * argv[])
 		goto exit2;
 	}
 
-	logdebug("Command: %s\n", cmdname);
+	logverbose("Command: %s\n", cmdname);
 
 	if(strcmp(__TARGET__, cmdname) == 0) {
 		if(argc == 1) {
