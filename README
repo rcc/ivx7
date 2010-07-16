@@ -83,19 +83,8 @@ Commands Framework
 TO BE WRITTEN
 
 
---------
-Printing
---------
+-------
+Logging
+-------
 
-prjutil.h provides some convenience macros for printing. prjutil.h
-does not import the required header files for the functions used;
-this is up to the user of the macros.
-
-printe
-    printf to stderr.
-
-pdebug
-    printf only when DEBUG_PRINTS is defined.
-
-logdebug
-    NSLog only when DEBUG_PRINTS is defined.
+see include/logging.h

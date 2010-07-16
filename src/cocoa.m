@@ -40,19 +40,19 @@ int main(int argc, const char * argv[])
 
 	/* create the command string with basename() */
 	if((arg0 = malloc(strlen(argv[0]))) == NULL) {
-		perror("Could not allocate arg0");
+		logerror("Could not allocate arg0");
 		status = 1;
 		goto exit1;
 	}
 	strcpy(arg0, argv[0]);
 	if((cmdname = basename(arg0)) == NULL) {
-		perror("Could not get basename of command");
+		logerror("Could not get basename of command");
 		status = 1;
 		goto exit2;
 	}
 
-	pdebug("Command: %s\n", cmdname);
-	pdebug("Version: %s\n", SCM_HASH);
+	logdebug("Command: %s\n", cmdname);
+	logdebug("Version: %s\n", SCM_HASH);
 
 	if(strcmp(__TARGET__, cmdname) == 0) {
 		if(argc == 1) {

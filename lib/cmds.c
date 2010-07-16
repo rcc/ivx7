@@ -67,7 +67,7 @@ int run_cmds(int argc, const char **argv, void *appdata)
 		const cmd_t *cmd_entry =
 			lookup_cmd(argv[carg++], &registered_cmds);
 		if(cmd_entry == NULL) {
-			printe("ERROR: could not find command '%s'\n",
+			logerror("ERROR: could not find command '%s'\n",
 					argv[carg-1]);
 			return -ENOSYS;
 		}
@@ -86,7 +86,7 @@ int run_cmd(const char *name, int argc, const char **argv, void *appdata)
 {
 	const cmd_t *cmd_entry = lookup_cmd(name, &registered_cmds);
 	if(cmd_entry == NULL) {
-		printe("ERROR: could not find command '%s'\n", name);
+		logerror("ERROR: could not find command '%s'\n", name);
 		return -ENOSYS;
 	}
 
@@ -105,12 +105,12 @@ int run_cmd_line(const char *cmd_line, void *appdata)
 	char **argv;
 
 	if((s = malloc(strlen(cmd_line))) == NULL) {
-		perror("ERROR: could not allocate command line buffer");
+		logerror("ERROR: could not allocate command line buffer");
 		status = -ENOMEM;
 		goto exit1;
 	}
 	if((argv = malloc(CMDS_MAX_ARGUMENTS * sizeof(argv[0]))) == NULL) {
-		perror("ERROR: could not allocate argv");
+		logerror("ERROR: could not allocate argv");
 		status = -ENOMEM;
 		goto exit2;
 	}
@@ -122,7 +122,7 @@ int run_cmd_line(const char *cmd_line, void *appdata)
 		status = run_cmd(argv[0], argc - 1, (const char **)&argv[1],
 				appdata);
 	} else {
-		printe("ERROR: command line empty\n");
+		logerror("ERROR: command line empty\n");
 		status = -EINVAL;
 	}
 

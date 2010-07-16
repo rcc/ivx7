@@ -3,6 +3,7 @@ TARGET := vanilla
 
 # Sources
 SOURCES :=	src/vanilla.c \
+		lib/logging.c \
 		lib/getline.c \
 		lib/cmds.c \
 		lib/cmds_script.c \
@@ -19,6 +20,6 @@ OPTIONS := SCM_HASH='"$(shell git rev-parse --short=16 HEAD || \
 CONFIGS := debug release
 
 # Configuration Specific Options
-RELEASE_OPTIONS := CONFIG_RELEASE
+RELEASE_OPTIONS := CONFIG_RELEASE MAX_LOGLEVEL=2
 
-DEBUG_OPTIONS := CONFIG_DEBUG DEBUG_PRINTS
+DEBUG_OPTIONS := CONFIG_DEBUG MAX_LOGLEVEL=5 DEFAULT_LOGLEVEL=4

@@ -22,6 +22,7 @@
  */
 
 #include <prjutil.h>
+#include <logging.h>
 #include <ll.h>
 
 #ifndef I__CMDS_H__
@@ -84,7 +85,7 @@ typedef struct reg_cmd_t {
 
 #define THISCMD cmd->name
 /* Standard error print */
-#define pcmderr(fmt, args...) printe("ERROR: %s: " fmt, THISCMD, ## args)
+#define pcmderr(fmt, args...) logerror("ERROR: %s: " fmt, THISCMD, ## args)
 
 
 /* Run Command[s] Error Handling

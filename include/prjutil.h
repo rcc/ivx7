@@ -89,42 +89,6 @@
 /******************************************************************************/
 
 /*******************************************************************************
- * printe
- * 	error printf. goes out stderr
- */
-#ifndef printe
-#define printe(fmt, args...) fprintf(stderr, fmt, ## args)
-#endif
-/******************************************************************************/
-
-/*******************************************************************************
- * pdebug
- * 	printf that only works with DEBUG_PRINTS
- */
-#ifndef pdebug
-#ifdef DEBUG_PRINTS
-#define pdebug(fmt, args...) printf(fmt, ## args)
-#else
-#define pdebug(fmt, args...)
-#endif
-#endif
-/******************************************************************************/
-
-/*******************************************************************************
- * logdebug
- * 	NSLog that only works with DEBUG_PRINTS
- * 	(Cocoa projects only)
- */
-#ifndef logdebug
-#ifdef DEBUG_PRINTS
-#define logdebug(fmt, args...) NSLog(@fmt, ## args)
-#else
-#define logdebug(fmt, args...)
-#endif
-#endif
-/******************************************************************************/
-
-/*******************************************************************************
  * __constructor
  * 	constructor attribute
  */
@@ -142,6 +106,19 @@
 #ifndef __packed
 #ifdef __GNUC__
 #define __packed	__attribute__((packed))
+#endif
+#endif
+/******************************************************************************/
+
+/*******************************************************************************
+ * __printf_check
+ * 	attribute for printf style functions. istr is the 1 based index of the
+ * 	format string. iarg is the 1 based index of the arguments.
+ */
+#ifndef __printf_check
+#ifdef __GNUC__
+#define __printf_check(istr, iarg) \
+			__attribute__((format (printf, istr, iarg)))
 #endif
 #endif
 /******************************************************************************/
