@@ -62,14 +62,16 @@
 
 /* LOGDEBUG */
 #if MAX_LOGLEVEL >= LOGLEVEL_DEBUG
-#define logdebug(fmt, args...)		_log(LOGLEVEL_DEBUG, fmt, ## args)
+#define logdebug(fmt, args...)		_log(LOGLEVEL_DEBUG, "%s(%d): " fmt, \
+						__FUNCTION__, __LINE__, ## args)
 #else
 #define logdebug(fmt, args...)
 #endif
 
 /* LOGVERBOSE */
 #if MAX_LOGLEVEL >= LOGLEVEL_VERBOSE
-#define logverbose(fmt, args...)	_log(LOGLEVEL_VERBOSE, fmt, ## args)
+#define logverbose(fmt, args...)	_log(LOGLEVEL_VERBOSE, "%s(%d): " fmt, \
+						__FUNCTION__, __LINE__, ## args)
 #else
 #define logverbose(fmt, args...)
 #endif
