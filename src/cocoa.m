@@ -35,7 +35,6 @@ int main(int argc, const char * argv[])
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	int status = 0;
-	int ret;
 	char *arg0, *cmdname;
 
 	/* create the command string with basename() */
@@ -56,15 +55,13 @@ int main(int argc, const char * argv[])
 	if(strcmp(__TARGET__, cmdname) == 0) {
 		if(argc == 1) {
 			run_cmd("help", 0, &argv[1], APPDATA_POINTER);
-		} else if((ret = run_cmds(argc - 1, &argv[1],
-						APPDATA_POINTER)) != 0) {
+		} else if(run_cmds(argc - 1, &argv[1], APPDATA_POINTER) != 0) {
 			status = 1;
 			goto exit2;
 		}
 	} else {
 		/* treat the argv[0] command name as a command */
-		if((ret = run_cmd(cmdname, argc - 1, &argv[1],
-						APPDATA_POINTER)) != 0) {
+		if(run_cmd(cmdname, argc - 1, &argv[1], APPDATA_POINTER) != 0) {
 			status = 1;
 			goto exit2;
 		}
