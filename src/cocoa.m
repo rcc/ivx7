@@ -31,6 +31,12 @@
 #define APPDATA_POINTER		NULL
 #endif /* APPDATA_POINTER */
 
+/* command strings that get run if program given no arguments */
+const char *default_cmds[] = {
+	"version",
+	"help",
+};
+
 int main(int argc, const char * argv[])
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -54,7 +60,11 @@ int main(int argc, const char * argv[])
 
 	if(strcmp(__TARGET__, cmdname) == 0) {
 		if(argc == 1) {
-			run_cmd("help", 0, &argv[1], APPDATA_POINTER);
+			int i;
+			for(i = 0; i < num_elements(default_cmds); i++) {
+				run_cmd_line(default_cmds[i], APPDATA_POINTER);
+			}
+
 		} else if(run_cmds(argc - 1, &argv[1], APPDATA_POINTER) != 0) {
 			status = 1;
 			goto exit2;
