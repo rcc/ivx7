@@ -18,6 +18,7 @@
  */
 #import <Foundation/Foundation.h>
 
+#import "prjstart.h"
 #import <prjutil.h>
 #import <cmds.h>
 
@@ -26,10 +27,8 @@
 #import <string.h>
 #import <libgen.h>
 
-/* appdata pointer */
-#ifndef APPDATA_POINTER
-#define APPDATA_POINTER		NULL
-#endif /* APPDATA_POINTER */
+/* application's data structure */
+static struct appdata_priv apppriv;
 
 /* command strings that get run if program given no arguments */
 const char *default_cmds[] = {
@@ -62,16 +61,16 @@ int main(int argc, const char * argv[])
 		if(argc == 1) {
 			int i;
 			for(i = 0; i < num_elements(default_cmds); i++) {
-				run_cmd_line(default_cmds[i], APPDATA_POINTER);
+				run_cmd_line(default_cmds[i], &apppriv);
 			}
 
-		} else if(run_cmds(argc - 1, &argv[1], APPDATA_POINTER) != 0) {
+		} else if(run_cmds(argc - 1, &argv[1], &apppriv) != 0) {
 			status = 1;
 			goto exit2;
 		}
 	} else {
 		/* treat the argv[0] command name as a command */
-		if(run_cmd(cmdname, argc - 1, &argv[1], APPDATA_POINTER) != 0) {
+		if(run_cmd(cmdname, argc - 1, &argv[1], &apppriv) != 0) {
 			status = 1;
 			goto exit2;
 		}
