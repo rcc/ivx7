@@ -17,9 +17,6 @@
  * along with prjstart.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include <sys/types.h>
-
 #ifndef I__PRJSTART_H__
 	#define I__PRJSTART_H__
 
