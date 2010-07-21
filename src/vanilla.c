@@ -28,6 +28,7 @@
 
 /* application's data structure */
 static struct appdata_priv apppriv;
+static void init_appdata_priv(struct appdata_priv *priv);
 
 /* command strings that get run if program given no arguments */
 const char *default_cmds[] = {
@@ -55,6 +56,8 @@ int main(int argc, const char * argv[])
 
 	logverbose("Command: %s\n", cmdname);
 
+	init_appdata_priv(&apppriv);
+
 	if(strcmp(__TARGET__, cmdname) == 0) {
 		if(argc == 1) {
 			int i;
@@ -77,6 +80,11 @@ exit2:
 	free(arg0);
 exit1:
 	return status;
+}
+
+static void init_appdata_priv(struct appdata_priv *priv)
+{
+	logverbose("initializing application data: %p\n", priv);
 }
 
 CMDHANDLER(version)
