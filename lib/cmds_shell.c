@@ -47,6 +47,7 @@ CMDHANDLER(shell_handler)
 	while((line = readline(CMDS_SHELL_PROMPT)) != NULL) {
 		if(strlen(line)) {
 			run_cmd_line(line, appdata);
+			add_history(line);
 		}
 		free(line);
 	}
