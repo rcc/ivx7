@@ -57,7 +57,7 @@ typedef struct cmd_t {
 } cmd_t;
 
 typedef struct reg_cmd_t {
-	ll_t node;
+	struct list_head node;
 	const cmd_t *cmd;
 } reg_cmd_t;
 

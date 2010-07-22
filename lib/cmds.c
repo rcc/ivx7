@@ -29,7 +29,7 @@
 
 LIST_HEAD(registered_cmds);
 
-static const cmd_t *lookup_cmd(const char *name, ll_t *cmd_list)
+static const cmd_t *lookup_cmd(const char *name, struct list_head *cmd_list)
 {
 	reg_cmd_t *pos;
 
