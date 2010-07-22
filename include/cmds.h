@@ -33,17 +33,17 @@ extern "C" {
 #endif
 
 /* Command Data Structure */
-typedef struct cmd_t {
+struct cmd {
 	/* The name of the command */
 	const char *name;
 
 	/* The handler function for the command.
 	 * 	int argc	- number of arguments passed to handler
 	 * 	char **argv	- arguments passed to handler
-	 * 	cmd_t *cmd	- pointer to command structure
+	 * 	struct cmd *cmd	- pointer to command structure
 	 * 	void *appdata	- optional data passed by the the application
 	 */
-	int (*handler)(int argc, const char **argv, const struct cmd_t *cmd,
+	int (*handler)(int argc, const char **argv, const struct cmd *cmd,
 			void *appdata);
 
 	/* A _short_ summary of the command. shown with list of commands */
@@ -54,23 +54,23 @@ typedef struct cmd_t {
 
 	/* pointer to private data structure for command */
 	void *priv;
-} cmd_t;
+};
 
-typedef struct reg_cmd_t {
+struct cmd_mgr {
 	struct list_head node;
-	const cmd_t *cmd;
-} reg_cmd_t;
+	const struct cmd *cmd;
+};
 
 /* Add a Command to Section - use this for defining commands */
 #define APPCMD(name,handler,summary,help,priv) \
-	static const cmd_t cmd_entry_ ## name = { \
+	static const struct cmd cmd_entry_ ## name = { \
 		#name, \
 		handler, \
 		summary, \
 		help, \
 		priv }; \
 	static void __constructor REGFUNC__ ## name(void) { \
-		static reg_cmd_t c; \
+		static struct cmd_mgr c; \
 		c.cmd = &cmd_entry_ ## name; \
 		_register_cmd(&c); \
 	}
@@ -81,7 +81,7 @@ typedef struct reg_cmd_t {
  */
 #define CMDHANDLER(name) \
 		static int name(int argc, const char **argv, \
-				const cmd_t *cmd, void *appdata)
+				const struct cmd *cmd, void *appdata)
 
 #define THISCMD cmd->name
 /* Standard error print */
@@ -160,10 +160,10 @@ int run_cmd_line(const char *cmd_line, void *appdata);
  *   users should normally not need to call.
  *
  * + PARAMETERS:
- *   + reg_cmd_t *rcmd
+ *   + struct cmd_mgr *rcmd
  *     - command structure to register
  */
-void _register_cmd(reg_cmd_t *rcmd);
+void _register_cmd(struct cmd_mgr *rcmd);
 
 #ifdef __cplusplus
 }
