@@ -76,7 +76,7 @@
 #define logverbose(fmt, args...)
 #endif
 
-extern FILE *logfd[];
+extern FILE *logfds[];
 
 void _log(int level, const char *fmt, ...) __printf_check(2, 3);
 void set_loglevel(int level);

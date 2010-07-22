@@ -25,7 +25,7 @@
 extern void _nslog_hook(const char *fmt, va_list ap);
 #endif
 
-FILE *logfd[MAX_LOGLEVEL + 1];
+FILE *logfds[MAX_LOGLEVEL + 1];
 
 static int loglevel = min_of(DEFAULT_LOGLEVEL, MAX_LOGLEVEL);
 
@@ -44,7 +44,7 @@ void _log(int level, const char *fmt, ...)
 #ifdef LOG_WITH_NSLOG
 		_nslog_hook(fmt, argp);
 #else
-		vfprintf(logfd[level], fmt, argp);
+		vfprintf(logfds[level], fmt, argp);
 #endif
 	}
 
@@ -57,8 +57,8 @@ void _log(int level, const char *fmt, ...)
 static void __constructor _init_logging(void)
 {
 	int i;
-	for(i = 0; i < ARRAY_SIZE(logfd); i++) {
-		logfd[i] = stderr;
+	for(i = 0; i < ARRAY_SIZE(logfds); i++) {
+		logfds[i] = stderr;
 	}
 }
 
