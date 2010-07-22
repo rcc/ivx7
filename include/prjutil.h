@@ -60,13 +60,13 @@
 /******************************************************************************/
 
 /*******************************************************************************
- * num_elements
+ * ARRAY_SIZE
  * 	Get the number of elements in an array
  *
  * array:	array variable
  */
-#ifndef num_elements
-#define num_elements(array)	(sizeof((array))/sizeof((array)[0]))
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(array)	(sizeof((array))/sizeof((array)[0]))
 #endif
 /******************************************************************************/
 

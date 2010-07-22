@@ -63,7 +63,7 @@ int main(int argc, const char * argv[])
 	if(strcmp(__TARGET__, cmdname) == 0) {
 		if(argc == 1) {
 			int i;
-			for(i = 0; i < num_elements(default_cmds); i++) {
+			for(i = 0; i < ARRAY_SIZE(default_cmds); i++) {
 				run_cmd_line(default_cmds[i], &apppriv);
 			}
 

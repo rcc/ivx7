@@ -57,7 +57,7 @@ void _log(int level, const char *fmt, ...)
 static void __constructor _init_logging(void)
 {
 	int i;
-	for(i = 0; i < num_elements(logfd); i++) {
+	for(i = 0; i < ARRAY_SIZE(logfd); i++) {
 		logfd[i] = stderr;
 	}
 }
