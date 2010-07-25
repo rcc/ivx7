@@ -82,6 +82,10 @@ exit1:
 	return status;
 }
 
+/*
+ * This function is used to initialize non-constant data in the application's
+ * data structure.
+ */
 static void init_appdata_priv(struct appdata_priv *priv)
 {
 	logverbose("initializing application data: %p\n", priv);
