@@ -2,17 +2,17 @@
 $(BUILDDIR)/%.o : %.c
 	@mkdir -p $(@D)
 	$(call OUTPUTINFO,CC,$<)
-	$(Q)$(CC)  $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
 $(BUILDDIR)/%.o : %.m
 	@mkdir -p $(@D)
 	$(call OUTPUTINFO,OBJCC,$<)
-	$(Q)$(CC)  $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
 $(BUILDDIR)/%.o : %.cpp
 	@mkdir -p $(@D)
 	$(call OUTPUTINFO,C++,$<)
-	$(Q)$(CC)  $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+	$(Q)$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 $(BUILDDIR)/%.o : %.S
 	@mkdir -p $(@D)
