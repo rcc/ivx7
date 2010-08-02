@@ -33,16 +33,10 @@ static void hexdump_line(FILE *outf, void *line, size_t size, size_t width)
 	}
 	fprintf(outf, " ");
 	for(i = 0; i < width; i++) {
-		if(i < size) {
-			char c = *((char *)(line + i));
-			if((c > 31) && (c < 127)) {
-				fprintf(outf, "%c", c);
-			} else {
-				fprintf(outf, ".");
-			}
-		} else {
-			fprintf(outf, " ");
-		}
+		char c = (i < size) ? *((char *)(line + i)) : ' ';
+		if((c < 32) || (c > 126))
+			c = '.';
+		fprintf(outf, "%c", c);
 	}
 }
 
