@@ -27,20 +27,44 @@
 #import <string.h>
 #import <libgen.h>
 
-/* application's data structure */
+/*
+ * Application Data Structure
+ * 	This data structure is passed around to all commands and pre/post
+ * 	command functions.
+ */
 static struct appdata_priv apppriv;
-static void init_appdata_priv(struct appdata_priv *priv);
 
-/* command strings that get run if program given no arguments */
+/*
+ * Default Commands
+ * 	These commands get run if no arguments are passed to the program, and
+ * 	the program name == TARGET.
+ */
 const char *default_cmds[] = {
 	"version",
 	"help",
+};
+
+/*
+ * Pre-command Functions
+ * 	These functions get run before any commands are processed. They should
+ * 	return 0 on success.
+ */
+int (*precmdfuncs[])(struct appdata_priv *priv) = {
+};
+
+/*
+ * Post-command Functions
+ * 	These functions get run after all commands are processed. They should
+ * 	return 0 on success.
+ */
+int (*postcmdfuncs[])(struct appdata_priv *priv) = {
 };
 
 int main(int argc, const char * argv[])
 {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	int status = 0;
+	int i;
 	char *arg0, *cmdname;
 
 	/* create the command string with basename() */
@@ -58,11 +82,19 @@ int main(int argc, const char * argv[])
 
 	logverbose("Command: %s\n", cmdname);
 
-	init_appdata_priv(&apppriv);
+	/* run the pre-command functions */
+	for(i = 0; i < ARRAY_SIZE(precmdfuncs); i++) {
+		logverbose("running pre-command function %d\n", i);
+		if(precmdfuncs[i](&apppriv) != 0) {
+			logerror("pre-command function %d returned error\n", i);
+			status = 1;
+			goto exit2;
+		}
+	}
 
+	/* process commands */
 	if(strcmp(__TARGET__, cmdname) == 0) {
 		if(argc == 1) {
-			int i;
 			for(i = 0; i < ARRAY_SIZE(default_cmds); i++) {
 				run_cmd_line(default_cmds[i], &apppriv);
 			}
@@ -79,20 +111,22 @@ int main(int argc, const char * argv[])
 		}
 	}
 
+	/* run the post-command functions */
+	for(i = 0; i < ARRAY_SIZE(postcmdfuncs); i++) {
+		logverbose("running post-command function %d\n", i);
+		if(postcmdfuncs[i](&apppriv) != 0) {
+			logerror("post-command function %d returned error\n",
+					i);
+			status = 1;
+			goto exit2;
+		}
+	}
+
 exit2:
 	free(arg0);
 exit1:
 	[pool drain];
 	return status;
-}
-
-/*
- * This function is used to initialize non-constant data in the application's
- * data structure.
- */
-static void init_appdata_priv(struct appdata_priv *priv)
-{
-	logverbose("initializing application data: %p\n", priv);
 }
 
 CMDHANDLER(version)
