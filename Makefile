@@ -24,10 +24,13 @@ endif
 
 # Verbose Option
 ifeq ($(VERBOSE),1)
-	Q :=
+export Q :=
+export VERBOSE := 1
 else
-	Q := @
+export Q := @
+export VERBOSE := 0
 endif
+
 
 # Default Install Script
 INSTALL_SCRIPT = targets/$(TARGET).install
