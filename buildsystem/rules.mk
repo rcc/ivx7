@@ -1,30 +1,30 @@
 ### Implicit Source Rules ###
 $(BUILDDIR)/%.o : %.c
-	@mkdir -p $(@D)
 	$(call OUTPUTINFO,CC,$<)
+	$(Q)[ -d "$(@D)" ] || mkdir -p $(@D)
 	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
 $(BUILDDIR)/%.o : %.m
-	@mkdir -p $(@D)
 	$(call OUTPUTINFO,OBJCC,$<)
+	$(Q)[ -d "$(@D)" ] || mkdir -p $(@D)
 	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
 
 $(BUILDDIR)/%.o : %.cpp
-	@mkdir -p $(@D)
 	$(call OUTPUTINFO,C++,$<)
+	$(Q)[ -d "$(@D)" ] || mkdir -p $(@D)
 	$(Q)$(CXX) $(CPPFLAGS) $(CXXFLAGS) -c -o $@ $<
 
 $(BUILDDIR)/%.o : %.S
-	@mkdir -p $(@D)
 	$(call OUTPUTINFO,AS,$<)
+	$(Q)[ -d "$(@D)" ] || mkdir -p $(@D)
 	$(Q)$(CC) $(CPPFLAGS) -c -o $@ $<
 
 $(BUILDDIR)/%.o : %.s
-	@mkdir -p $(@D)
 	$(call OUTPUTINFO,AS,$<)
+	$(Q)[ -d "$(@D)" ] || mkdir -p $(@D)
 	$(Q)$(AS) $(ASFLAGS) -c -o $@ $<
 
 %.a :
-	@mkdir -p $(@D)
 	$(call OUTPUTINFO,AR,$@)
+	$(Q)[ -d "$(@D)" ] || mkdir -p $(@D)
 	$(Q)$(AR) crs $@ $^
