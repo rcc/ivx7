@@ -8,7 +8,9 @@ TOUPPER = $(shell echo $1 | \
 
 RMTRAILINGSLASH = $(patsubst %/,%,$1)
 
-USCORESUB = $(shell echo $1 | sed 'y/ -./___/')
+USCORESUB = $(shell echo $1 | sed 'y; -./;____;')
 
 OUTPUTINFO = @echo "[$1],$2" | \
-	     awk 'BEGIN {FS = ",";} {printf("%-15s %s\n",$$1,$$2);}'
+	     awk 'BEGIN {FS = "[ \t]*,[ \t]*";} {printf("%-15s %s\n",$$1,$$2);}'
+
+PRINTLIST = @echo $1 | awk '{for(ii=1;ii<=NF;ii++){print "$2" $$ii;}}'
