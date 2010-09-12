@@ -3,6 +3,7 @@ TARGET := cocoa
 
 # Sources
 SOURCES :=	src/cocoa.m \
+		src/AppMgr.m \
 		lib/logging.c \
 		lib/getline.c \
 		lib/cmds.c \

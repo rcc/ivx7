@@ -16,7 +16,7 @@
  * You should have received a copy of the GNU General Public License
  * along with <prjstart>.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "prjstart.h"
+#include "vanilla.h"
 #include <prjutil.h>
 #include <logging.h>
 #include <cmds.h>
