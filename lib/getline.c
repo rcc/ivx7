@@ -18,7 +18,7 @@
  */
 #include <getline.h>
 
-ssize_t getline(FILE *fp, char *buf, size_t bufsz)
+ssize_t fgetline(FILE *fp, char *buf, size_t bufsz)
 {
 	size_t i = 0;
 	int c;

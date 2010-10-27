@@ -23,7 +23,7 @@
 #ifndef I__GETLINE_H__
 	#define I__GETLINE_H__
 
-/* FUNCTION:    getline
+/* FUNCTION:    fgetline
  *
  * + DESCRIPTION:
  *   - gets a line from a file pointer
@@ -39,6 +39,6 @@
  * + RETURNS: ssize_t
  *   - size of line, negative on EOF
  */
-ssize_t getline(FILE *fp, char *buf, size_t bufsz);
+ssize_t fgetline(FILE *fp, char *buf, size_t bufsz);
 
 #endif /* I__GETLINE_H__ */

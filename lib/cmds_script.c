@@ -56,7 +56,7 @@ CMDHANDLER(script_handler)
 	}
 
 	/* loop through lines */
-	while((len = getline(fp, line, CMDS_SCRIPT_LINE_LENGTH)) >= 0) {
+	while((len = fgetline(fp, line, CMDS_SCRIPT_LINE_LENGTH)) >= 0) {
 		if((len > 0) && (line[0] != '#')) {
 			if(run_cmd_line(line, appdata) != 0) {
 				pcmderr("an error occured with line #%d\n",
