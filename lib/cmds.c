@@ -108,7 +108,7 @@ int run_cmd_line(const char *cmd_line, void *appdata)
 	int argc;
 	char **argv;
 
-	if((s = malloc(strlen(cmd_line))) == NULL) {
+	if((s = malloc(strlen(cmd_line) + 1)) == NULL) {
 		logerror("ERROR: could not allocate command line buffer");
 		status = -ENOMEM;
 		goto exit1;

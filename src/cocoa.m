@@ -61,7 +61,7 @@ int main(int argc, const char * argv[])
 	char *arg0, *cmdname;
 
 	/* create the command string with basename() */
-	if((arg0 = malloc(strlen(argv[0]))) == NULL) {
+	if((arg0 = malloc(strlen(argv[0]) + 1)) == NULL) {
 		logerror("Could not allocate arg0");
 		status = 1;
 		goto exit1;
