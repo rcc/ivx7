@@ -33,7 +33,7 @@
  * 	the program name == TARGET.
  */
 const char *default_cmds[] = {
-	"version",
+	"version --pretty",
 	"help",
 };
 
@@ -132,8 +132,15 @@ exit1:
 
 CMDHANDLER(version)
 {
-	printf("Version:  %s\n", VERSION);
-	return 0;
+	int args = 0;
+
+	if(argc && (strcmp(argv[0], "--pretty") == 0)) {
+		args = 1;
+		printf("Version: ");
+	}
+	printf("%s\n", VERSION);
+
+	return args;
 }
 APPCMD(version, &version, "print the version", "usage: version", NULL);
 
