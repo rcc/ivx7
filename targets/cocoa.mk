@@ -17,7 +17,7 @@ LIBRARIES := readline
 FRAMEWORKS := Foundation
 
 # Options
-VERSION := $(shell git describe --tags HEAD || echo "Unknown")
+VERSION := $(shell git describe --tags HEAD 2>/dev/null || echo "Unknown")
 OPTIONS += VERSION='"$(VERSION)"'
 OPTIONS += LOG_WITH_NSLOG
 
