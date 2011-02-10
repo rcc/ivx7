@@ -13,7 +13,8 @@ SOURCES :=	src/vanilla.c \
 LIBRARIES := readline
 
 # Options
-OPTIONS := VERSION='"0.1"'
+VERSION := $(shell git describe --tags HEAD || echo "Unknown")
+OPTIONS += VERSION='"$(VERSION)"'
 
 # Configurations (the first one is the default)
 CONFIGS := debug release
