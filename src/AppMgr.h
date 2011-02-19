@@ -3,7 +3,7 @@
 @interface AppMgr: NSObject {
 }
 
-/* Use this macro without CMDHANDLER functions */
+/* Use this macro with CMDHANDLER functions */
 #define APPMGR		((AppMgr *)appdata)
 
 @end
