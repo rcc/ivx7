@@ -2,7 +2,7 @@
 TARGET := vanilla
 
 # Sources
-SOURCES :=	src/vanilla.c \
+SOURCES :=	src/main.c \
 		lib/logging.c \
 		lib/getline.c \
 		lib/cmds.c \

@@ -1,37 +1,31 @@
 /*
- * vanilla.c
+ * entry.m
  *
  * Copyright (C) 2011 Robert C. Curtis
  *
- * vanilla is free software: you can redistribute it and/or modify
+ * <prjstart> is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 2 of the License, or
  * (at your option) any later version.
  *
- * vanilla is distributed in the hope that it will be useful,
+ * <prjstart> is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with vanilla.  If not, see <http://www.gnu.org/licenses/>.
+ * along with <prjstart>.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "vanilla.h"
-#include <prjutil.h>
-#include <logging.h>
-#include <cmds.h>
+#import <Foundation/Foundation.h>
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <libgen.h>
+#import "AppMgr.h"
+#import <prjutil.h>
+#import <cmds.h>
 
-/*
- * Application Data Structure
- * 	This data structure is passed around to all commands and pre/post
- * 	command functions.
- */
-static struct appdata_priv apppriv;
+#import <stdio.h>
+#import <stdlib.h>
+#import <string.h>
+#import <libgen.h>
 
 /*
  * Default Commands
@@ -48,7 +42,7 @@ const char *default_cmds[] = {
  * 	These functions get run before any commands are processed. They should
  * 	return 0 on success.
  */
-int (*precmdfuncs[])(struct appdata_priv *priv) = {
+int (*precmdfuncs[])(AppMgr *mgr) = {
 };
 
 /*
@@ -56,11 +50,12 @@ int (*precmdfuncs[])(struct appdata_priv *priv) = {
  * 	These functions get run after all commands are processed. They should
  * 	return 0 on success.
  */
-int (*postcmdfuncs[])(struct appdata_priv *priv) = {
+int (*postcmdfuncs[])(AppMgr *mgr) = {
 };
 
 int main(int argc, const char * argv[])
 {
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	int status = 0;
 	int i;
 	char *arg0, *cmdname;
@@ -80,10 +75,18 @@ int main(int argc, const char * argv[])
 
 	logverbose("Command: %s\n", cmdname);
 
+	/*
+	 * Application Mananger
+	 * 	This object is passed around to all commands and pre/post
+	 * 	command functions.
+	 */
+	AppMgr *appmgr = [[AppMgr alloc] init];
+	[appmgr autorelease];
+
 	/* run the pre-command functions */
 	for(i = 0; i < ARRAY_SIZE(precmdfuncs); i++) {
 		logverbose("running pre-command function %d\n", i);
-		if(precmdfuncs[i](&apppriv) != 0) {
+		if(precmdfuncs[i](appmgr) != 0) {
 			logerror("pre-command function %d returned error\n", i);
 			status = 1;
 			goto exit2;
@@ -94,15 +97,16 @@ int main(int argc, const char * argv[])
 	if(strcmp(__TARGET__, cmdname) == 0) {
 		if(argc == 1) {
 			for(i = 0; i < ARRAY_SIZE(default_cmds); i++) {
-				run_cmd_line(default_cmds[i], &apppriv);
+				run_cmd_line(default_cmds[i], appmgr);
 			}
-		} else if(run_cmds(argc - 1, &argv[1], &apppriv) != 0) {
+
+		} else if(run_cmds(argc - 1, &argv[1], appmgr) != 0) {
 			status = 1;
 			goto exit2;
 		}
 	} else {
 		/* treat the argv[0] command name as a command */
-		if(run_cmd(cmdname, argc - 1, &argv[1], &apppriv) != 0) {
+		if(run_cmd(cmdname, argc - 1, &argv[1], appmgr) != 0) {
 			status = 1;
 			goto exit2;
 		}
@@ -111,7 +115,7 @@ int main(int argc, const char * argv[])
 	/* run the post-command functions */
 	for(i = 0; i < ARRAY_SIZE(postcmdfuncs); i++) {
 		logverbose("running post-command function %d\n", i);
-		if(postcmdfuncs[i](&apppriv) != 0) {
+		if(postcmdfuncs[i](appmgr) != 0) {
 			logerror("post-command function %d returned error\n",
 					i);
 			status = 1;
@@ -122,6 +126,7 @@ int main(int argc, const char * argv[])
 exit2:
 	free(arg0);
 exit1:
+	[pool drain];
 	return status;
 }
 
@@ -138,3 +143,14 @@ CMDHANDLER(version)
 	return args;
 }
 APPCMD(version, &version, "print the version", "usage: version", NULL);
+
+#ifdef LOG_WITH_NSLOG
+/* The logging framework needs a cocoa hook to make this work */
+#import <stdarg.h>
+void _nslog_hook(const char *fmt, va_list ap)
+{
+	NSString *NSfmt = [[NSString alloc] initWithUTF8String:fmt];
+	NSLogv(NSfmt, ap);
+	[NSfmt release];
+}
+#endif
