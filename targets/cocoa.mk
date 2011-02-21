@@ -14,7 +14,7 @@ SOURCES :=	src/entry.m \
 LIBRARIES := readline
 
 # Frameworks
-FRAMEWORKS := Foundation
+FRAMEWORKS := Foundation CoreFoundation
 
 # Options
 VERSION := $(shell git describe --tags HEAD 2>/dev/null || echo "Unknown")
