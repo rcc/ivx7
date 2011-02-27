@@ -41,14 +41,16 @@
 
 /* LOGERROR */
 #if MAX_LOGLEVEL >= LOGLEVEL_ERROR
-#define logerror(fmt, args...)		_log(LOGLEVEL_ERROR, fmt, ## args)
+#define logerror(fmt, args...)		_log(LOGLEVEL_ERROR, "%s(%d): " fmt, \
+						__FUNCTION__, __LINE__, ## args)
 #else
 #define logerror(fmt, args...)
 #endif
 
 /* LOGWARN */
 #if MAX_LOGLEVEL >= LOGLEVEL_WARNING
-#define logwarn(fmt, args...)		_log(LOGLEVEL_WARNING, fmt, ## args)
+#define logwarn(fmt, args...)		_log(LOGLEVEL_WARNING, "%s(%d): " fmt, \
+						__FUNCTION__, __LINE__, ## args)
 #else
 #define logwarn(fmt, args...)
 #endif
