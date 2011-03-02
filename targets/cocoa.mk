@@ -2,7 +2,7 @@
 TARGET := cocoa
 
 # Sources
-SOURCES :=	src/cocoa.m \
+SOURCES :=	src/entry.m \
 		src/AppMgr.m \
 		lib/logging.c \
 		lib/getline.c \
@@ -14,7 +14,7 @@ SOURCES :=	src/cocoa.m \
 LIBRARIES := readline
 
 # Frameworks
-FRAMEWORKS := Foundation
+FRAMEWORKS := Foundation CoreFoundation
 
 # Options
 VERSION := $(shell git describe --tags HEAD 2>/dev/null || echo "Unknown")

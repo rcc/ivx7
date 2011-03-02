@@ -3,7 +3,10 @@
 @interface AppMgr: NSObject {
 }
 
-/* Use this macro without CMDHANDLER functions */
+- (void) startRunLoop;
+- (void) stopRunLoop;
+
+/* Use this macro with CMDHANDLER functions */
 #define APPMGR		((AppMgr *)appdata)
 
 @end
