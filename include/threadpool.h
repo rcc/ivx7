@@ -29,27 +29,44 @@
 extern "C" {
 #endif
 
-struct poolthread;
+struct poolthread; /* Forward Declaration */
 
+/*
+ * Main Threadpool Data Structure
+ */
 struct threadpool {
+	/* Configuration */
 	unsigned int max_threads;
 	void (*work_func)(struct poolthread *thread, struct list_head *work);
 
+	/* Pool */
 	volatile unsigned int thread_count;
 	struct list_head thread_pool;
 	pthread_mutex_t pool_lock;
+	pthread_cond_t pool_change;
 
+	/* Work Queue */
 	struct list_head work_queue;
 	volatile unsigned int idle_threads;
 	pthread_cond_t queue_wake;
 	pthread_mutex_t queue_lock;
 };
 
+/*
+ * Thread Data Structure
+ */
 struct poolthread {
+	/* Parent Pool */
 	struct threadpool *pool;
+
+	/* Pool Connectivity */
 	struct list_head pool_node;
-	pthread_t thread;
+
+	/* Timeout Info */
 	time_t idle_start;
+
+	/* Thread */
+	pthread_t thread;
 	volatile unsigned int shutdown;
 };
 

@@ -65,6 +65,7 @@ static void *threadpool_thread(struct poolthread *t)
 	list_del(&t->pool_node);
 	t->pool->thread_count--;
 	pthread_mutex_unlock(&t->pool->pool_lock);
+	pthread_cond_broadcast(&t->pool->pool_change);
 
 	logverbose("end %p\n", t);
 	free(t);
@@ -100,6 +101,7 @@ int threadpool_init(struct threadpool *pool)
 
 	INIT_LIST_HEAD(&pool->thread_pool);
 	pthread_mutex_init(&pool->pool_lock, NULL);
+	pthread_cond_init(&pool->pool_change, NULL);
 
 	INIT_LIST_HEAD(&pool->work_queue);
 	pthread_mutex_init(&pool->queue_lock, NULL);
@@ -110,37 +112,48 @@ int threadpool_init(struct threadpool *pool)
 
 int threadpool_shutdown(struct threadpool *pool)
 {
+	int status = -1;
 	struct poolthread *pos, *n;
+	struct timeval tv;
+	struct timespec ts;
 
 	pthread_mutex_lock(&pool->pool_lock);
 	list_for_each_entry_safe(pos, n, &pool->thread_pool, pool_node) {
 		pos->shutdown = 1;
 	}
-	pthread_mutex_unlock(&pool->pool_lock);
 
-	while(1) {
-		pthread_mutex_lock(&pool->pool_lock);
+	do {
 		if(list_empty(&pool->thread_pool)) {
-			pthread_mutex_unlock(&pool->pool_lock);
+			logdebug("threadpool shutdown successful\n");
+			status = 0;
 			break;
 		}
-		pthread_mutex_unlock(&pool->pool_lock);
-	}
+		gettimeofday(&tv, NULL);
+		ts.tv_sec = tv.tv_sec + 30;
+		ts.tv_nsec = 0;
+	} while(pthread_cond_timedwait(&pool->pool_change,
+				&pool->pool_lock, &ts) == 0);
+	pthread_mutex_unlock(&pool->pool_lock);
 
 	pthread_mutex_destroy(&pool->pool_lock);
+	pthread_cond_destroy(&pool->pool_change);
 	pthread_mutex_destroy(&pool->queue_lock);
 	pthread_cond_destroy(&pool->queue_wake);
 
-	return 0;
+	return status;
 }
 
 void threadpool_queue_work(struct threadpool *pool, struct list_head *work)
 {
+	/* Queue work and signal pool */
 	pthread_mutex_lock(&pool->queue_lock);
 	list_add_tail(work, &pool->work_queue);
+	pthread_mutex_unlock(&pool->queue_lock);
+	pthread_cond_signal(&pool->queue_wake);
 
-	/* if there are no idle threads, try to start a new one */
-	if(!pool->idle_threads) {
+	/* If work is waiting, try to start a new thread */
+	pthread_mutex_lock(&pool->queue_lock);
+	if(!pool->idle_threads && !list_empty(&pool->work_queue)) {
 		pthread_mutex_lock(&pool->pool_lock);
 		if(pool->thread_count < pool->max_threads) {
 			logdebug("starting new pool thread\n");
@@ -148,9 +161,7 @@ void threadpool_queue_work(struct threadpool *pool, struct list_head *work)
 		}
 		pthread_mutex_unlock(&pool->pool_lock);
 	}
-
 	pthread_mutex_unlock(&pool->queue_lock);
-	pthread_cond_signal(&pool->queue_wake);
 }
 
 int threadpool_is_work_done(struct threadpool *pool)
@@ -162,7 +173,7 @@ int threadpool_is_work_done(struct threadpool *pool)
 	return ret;
 }
 
-#ifdef THREADPOOLTEST
+#ifdef THREADPOOLTESTCMD
 #include <prjutil.h>
 #include <cmds.h>
 #include <unistd.h>
@@ -176,7 +187,7 @@ static void test_work_func(struct poolthread *thread, struct list_head *work)
 {
 	struct test_work_data *d =
 		list_entry(work, struct test_work_data, node);
-	logdebug("waiting for %d seconds\n", d->sec);
+	logdebug("%p : waiting for %d seconds\n", thread, d->sec);
 	sleep(d->sec);
 }
 
@@ -207,4 +218,4 @@ CMDHANDLER(threadpool_test)
 }
 APPCMD(threadpool, &threadpool_test, "test threadpool", "usage: threadpool",
 		NULL);
-#endif /* THREADPOOLTEST */
+#endif /* THREADPOOLTESTCMD */
