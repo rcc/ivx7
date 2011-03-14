@@ -85,7 +85,7 @@ struct cmd_mgr {
 
 #define THISCMD cmd->name
 /* Standard error print */
-#define pcmderr(fmt, args...) logerror("ERROR: %s: " fmt, THISCMD, ## args)
+#define pcmderr(fmt, args...) logerror("%s: " fmt, THISCMD, ## args)
 
 
 /* Run Command[s] Error Handling
