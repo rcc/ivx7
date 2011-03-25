@@ -35,25 +35,42 @@ struct poolthread; /* Forward Declaration */
  * Main Threadpool Data Structure
  */
 struct threadpool {
-	/* Configuration */
+	/*
+	 * Configuration
+	 *
+	 * These members need to be filled by the owner of the thread pool.
+	 * They should be filled after the call to threadpool_init() since
+	 * it zeros the structure.
+	 */
 	unsigned int max_threads;
-	void (*work_func)(struct poolthread *thread, struct list_head *work);
+	unsigned int idle_secs;
+	struct list_head *(*work_func)(struct poolthread *thread,
+			struct list_head *work);
 
+	/************************** Private Members *************************/
 	/* Pool */
-	volatile unsigned int thread_count;
-	struct list_head thread_pool;
+	struct list_head pool_threads;
+	volatile unsigned int pool_thread_count;
 	pthread_mutex_t pool_lock;
 	pthread_cond_t pool_change;
 
 	/* Work Queue */
 	struct list_head work_queue;
+	volatile unsigned int work_count;
 	volatile unsigned int idle_threads;
-	pthread_cond_t queue_wake;
 	pthread_mutex_t queue_lock;
+	pthread_cond_t queue_wake;
+
+	/* Control Threads */
+	struct list_head ctrl_threads;
+	pthread_mutex_t ctrl_lock;
+	pthread_cond_t ctrl_change;
+
+	volatile unsigned int shutdown;
 };
 
 /*
- * Thread Data Structure
+ * Thread Data Structures
  */
 struct poolthread {
 	/* Parent Pool */
@@ -67,6 +84,19 @@ struct poolthread {
 
 	/* Thread */
 	pthread_t thread;
+};
+
+struct ctrlthread {
+	/* Parent Pool */
+	struct threadpool *pool;
+
+	/* Pool Connectivity */
+	struct list_head ctrl_node;
+
+	/* Thread */
+	pthread_t thread;
+	void (*ctrl_func)(struct ctrlthread *thread);
+	void *priv;
 	volatile unsigned int shutdown;
 };
 
@@ -112,7 +142,7 @@ void threadpool_queue_work(struct threadpool *pool, struct list_head *work);
 /* FUNCTION:    threadpool_is_work_done
  *
  * + DESCRIPTION:
- *   - check if work queue is empty
+ *   - check if work queue is empty and all threads are idle
  *
  * + PARAMETERS:
  *   + struct threadpool *pool
@@ -122,6 +152,30 @@ void threadpool_queue_work(struct threadpool *pool, struct list_head *work);
  *   - boolean
  */
 int threadpool_is_work_done(struct threadpool *pool);
+
+/* FUNCTION:    threadpool_start_control_thread
+ *
+ * + DESCRIPTION:
+ *   - Starts a threadpool control thread. A control thread is independent of
+ *   the work queue, but is signaled to shutdown with the rest of the
+ *   threadpool. It's function is called in a loop until a shutdown is
+ *   requested. The function should not loop itself, and should properly
+ *   handle yielding (either explicitly or calling blocking calls). It can
+ *   shut itself down by setting its own shutdown flag.
+ *
+ * + PARAMETERS:
+ *   + struct threadpool *pool
+ *     - pool
+ *   + void (*ctrl_func)(struct ctrlthread *thread)
+ *     - control thread function
+ *   + void *priv
+ *     - private data
+ *
+ * + RETURNS: int
+ *   - 0 on success
+ */
+int threadpool_start_control_thread(struct threadpool *pool,
+	void (*ctrl_func)(struct ctrlthread *thread), void *priv);
 
 #ifdef __cplusplus
 }
