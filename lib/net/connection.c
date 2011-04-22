@@ -7,7 +7,7 @@
  *
  *    1. Redistributions of source code must retain the above copyright
  *       notice, this list of conditions and the following disclaimer.
- *    
+ *
  *    2. Redistributions in binary form must reproduce the above
  *       copyright notice, this list of conditions and the following
  *       disclaimer in the documentation and/or other materials
@@ -104,7 +104,7 @@ void net_deinit_connection(struct net_connection *c)
 		free(c->rx_buf);
 		c->rx_buf = NULL;
 	}
-	c->rx_buf_sz = 0; 
+	c->rx_buf_sz = 0;
 	pthread_mutex_destroy(&c->rx_buf_lock);
 }
 
