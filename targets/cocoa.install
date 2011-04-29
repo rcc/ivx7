@@ -1,3 +1,9 @@
 #!/bin/bash
 
-echo "<stub install script>" $0 $(basename "$1")
+INSTALLDIR=${DESTDIR:-/usr/bin}
+if [ -w "$INSTALLDIR" ]; then
+	CPCMD="cp -v"
+else
+	CPCMD="sudo cp -v"
+fi
+$CPCMD "$1" "${INSTALLDIR%%/}/"
