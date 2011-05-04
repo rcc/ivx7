@@ -98,7 +98,15 @@
 
 extern FILE *logfds[];
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void _log(int level, const char *fmt, ...) __printf_check(2, 3);
 void set_loglevel(int level);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* I__LOGGING_H__ */
