@@ -77,7 +77,7 @@ static int tokenize_cmd_string(char *argstr, char **argv, size_t max_args)
 	return (int)i;
 }
 
-static const struct cmd_opt *cmd_findlongopt(const struct cmd *cmd_entry,
+static const struct cmd_opt *findlongopt(const struct cmd *cmd_entry,
 		const char *longopt)
 {
 	const struct cmd_opt *o;
@@ -93,7 +93,7 @@ static const struct cmd_opt *cmd_findlongopt(const struct cmd *cmd_entry,
 	return NULL;
 }
 
-static const struct cmd_opt *cmd_findshortopt(const struct cmd *cmd_entry,
+static const struct cmd_opt *findshortopt(const struct cmd *cmd_entry,
 		char shortopt)
 {
 	const struct cmd_opt *o;
@@ -109,17 +109,44 @@ static const struct cmd_opt *cmd_findshortopt(const struct cmd *cmd_entry,
 	return NULL;
 }
 
-static void cmd_addopt(const struct cmd_opt *opt, struct dictionary *optdict)
+static inline void addopt(const struct cmd_opt *opt, struct dictionary *optdict)
 {
 	dict_add_key(optdict, opt->name, NULL, 0);
+}
+
+static void handle_longopt(const struct cmd *cmd_entry, struct dictionary *od,
+		int argc, const char **argv, unsigned int *carg)
+{
+	const struct cmd_opt *opt;
+
+	if((opt = findlongopt(cmd_entry, argv[*carg])) == NULL) {
+		logwarn("`%s' doesn not take '%s' option\n", cmd_entry->name,
+				argv[*carg]);
+	} else {
+		addopt(opt, od);
+	}
+}
+
+static void handle_shortopt(const struct cmd *cmd_entry, struct dictionary *od,
+		int argc, const char **argv, unsigned int *carg)
+{
+	const struct cmd_opt *opt;
+	int i;
+
+	for(i = 1; i < strlen(argv[*carg]); i++) {
+		if((opt = findshortopt(cmd_entry, argv[*carg][i])) == NULL) {
+			logwarn("`%s' doesn not take '-%c' option\n",
+					cmd_entry->name, argv[*carg][i]);
+		} else {
+			addopt(opt, od);
+		}
+	}
 }
 
 static struct dictionary *cmd_getopt(const struct cmd *cmd_entry,
 		int argc, const char **argv, unsigned int *carg)
 {
 	struct dictionary *od;
-	const struct cmd_opt *opt;
-	int i;
 
 	if((od = new_dict()) == NULL) {
 		return NULL;
@@ -133,27 +160,10 @@ static struct dictionary *cmd_getopt(const struct cmd *cmd_entry,
 		logverbose("opt: %s, carg = %d\n", argv[*carg], *carg);
 		if(argv[*carg][1] == '-') {
 			/* Handle Long Opt */
-			if((opt = cmd_findlongopt(cmd_entry, argv[*carg]))
-					== NULL) {
-				logwarn("%s doesn not take '%s' option\n",
-						cmd_entry->name, argv[*carg]);
-			} else {
-				cmd_addopt(opt, od);
-			}
+			handle_longopt(cmd_entry, od, argc, argv, carg);
 		} else {
 			/* Handle Short Opts */
-			for(i = 1; i < strlen(argv[*carg]); i++) {
-				if((opt = cmd_findshortopt(cmd_entry,
-							argv[*carg][i]))
-						== NULL) {
-					logwarn("%s doesn not take '-%c' "
-							"option\n",
-							cmd_entry->name,
-							argv[*carg][i]);
-				} else {
-					cmd_addopt(opt, od);
-				}
-			}
+			handle_shortopt(cmd_entry, od, argc, argv, carg);
 		}
 	}
 
