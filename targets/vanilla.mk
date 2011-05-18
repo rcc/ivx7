@@ -9,6 +9,7 @@ SOURCES :=	src/main.c \
 		lib/cmds.c \
 		lib/cmds_script.c \
 		lib/cmds_shell.c \
+		src/cmds/version.c \
 
 # Libraries
 LIBRARIES := readline

@@ -6,9 +6,11 @@ SOURCES :=	src/entry.m \
 		src/AppMgr.m \
 		lib/logging.c \
 		lib/getline.c \
+		lib/dict.c \
 		lib/cmds.c \
 		lib/cmds_script.c \
 		lib/cmds_shell.c \
+		src/cmds/version.c \
 
 # Libraries
 LIBRARIES := readline

@@ -139,20 +139,3 @@ exit2:
 exit1:
 	return status;
 }
-
-CMDHANDLER(version)
-{
-	int args = 0;
-
-	if(dict_has_key(opts, "pretty")) {
-		printf("Version: ");
-	}
-	printf("%s\n", VERSION);
-
-	return args;
-}
-START_CMD_OPTS(version_opts)
-	CMD_OPT(pretty, '\0', "pretty", "print version with context")
-END_CMD_OPTS;
-APPCMD_OPT(version, &version, "print the version", "usage: version", NULL,
-		version_opts);

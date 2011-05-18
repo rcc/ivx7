@@ -145,20 +145,6 @@ exit1:
 	return status;
 }
 
-CMDHANDLER(version)
-{
-	int args = 0;
-
-	if(argc && (strcmp(argv[0], "--pretty") == 0)) {
-		args = 1;
-		printf("Version: ");
-	}
-	printf("%s\n", VERSION);
-
-	return args;
-}
-APPCMD(version, &version, "print the version", "usage: version", NULL);
-
 #ifdef LOG_WITH_NSLOG
 /* The logging framework needs a cocoa hook to make this work */
 #import <stdarg.h>
