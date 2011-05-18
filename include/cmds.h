@@ -41,6 +41,7 @@
 #include <prjutil.h>
 #include <logging.h>
 #include <ll.h>
+#include <dict.h>
 
 #ifndef I__CMDS_H__
 	#define I__CMDS_H__
@@ -48,6 +49,17 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/* Option Data Structure */
+struct cmd_opt {
+	const char *name;	/* Name of opt. This will be dictionary key. */
+	char shortopt;		/* \0 for none */
+	const char *longopt;	/* NULL for none */
+};
+
+#define START_CMD_OPTS(name)		static const struct cmd_opt name[] = {
+#define CMD_OPT(name, shorto, longo)	{#name, shorto, longo},
+#define END_CMD_OPTS			{NULL, 0, NULL}}
 
 /* Command Data Structure */
 struct cmd {
@@ -61,7 +73,7 @@ struct cmd {
 	 * 	void *appdata	- optional data passed by the the application
 	 */
 	int (*handler)(int argc, const char **argv, const struct cmd *cmd,
-			void *appdata);
+			void *appdata, struct dictionary *opts);
 
 	/* A _short_ summary of the command. shown with list of commands */
 	const char *summary;
@@ -71,6 +83,9 @@ struct cmd {
 
 	/* pointer to private data structure for command */
 	void *priv;
+
+	/* pointer to option list */
+	const struct cmd_opt *options;
 };
 
 struct cmd_mgr {
@@ -80,12 +95,17 @@ struct cmd_mgr {
 
 /* Add a Command to Section - use this for defining commands */
 #define APPCMD(name,handler,summary,help,priv) \
+		_APPCMD(name,handler,summary,help,priv,NULL)
+#define APPCMD_OPT(name,handler,summary,help,priv,opt) \
+		_APPCMD(name,handler,summary,help,priv,opt)
+#define _APPCMD(name,handler,summary,help,priv,opt) \
 	static const struct cmd cmd_entry_ ## name = { \
 		#name, \
 		handler, \
 		summary, \
 		help, \
-		priv }; \
+		priv, \
+		opt }; \
 	static void __constructor REGFUNC__ ## name(void) { \
 		static struct cmd_mgr c; \
 		c.cmd = &cmd_entry_ ## name; \
@@ -98,7 +118,8 @@ struct cmd_mgr {
  */
 #define CMDHANDLER(name) \
 		static int name(int argc, const char **argv, \
-				const struct cmd *cmd, void *appdata)
+				const struct cmd *cmd, void *appdata, \
+				struct dictionary *opts)
 
 #define THISCMD cmd->name
 /* Standard error print */

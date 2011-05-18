@@ -144,12 +144,15 @@ CMDHANDLER(version)
 {
 	int args = 0;
 
-	if(argc && (strcmp(argv[0], "--pretty") == 0)) {
-		args = 1;
+	if(dict_has_key(opts, "pretty")) {
 		printf("Version: ");
 	}
 	printf("%s\n", VERSION);
 
 	return args;
 }
-APPCMD(version, &version, "print the version", "usage: version", NULL);
+START_CMD_OPTS(version_opts)
+	CMD_OPT(pretty, '\0', "pretty")
+END_CMD_OPTS;
+APPCMD_OPT(version, &version, "print the version", "usage: version", NULL,
+		version_opts);

@@ -77,10 +77,94 @@ static int tokenize_cmd_string(char *argstr, char **argv, size_t max_args)
 	return (int)i;
 }
 
+static const struct cmd_opt *cmd_findlongopt(const struct cmd *cmd_entry,
+		const char *longopt)
+{
+	const struct cmd_opt *o;
+
+	if(cmd_entry->options == NULL)
+		return NULL;
+
+	for(o = cmd_entry->options; o->name != NULL; o++) {
+		if(o->longopt && (strcmp(o->longopt, &longopt[2]) == 0))
+			return o;
+	}
+
+	return NULL;
+}
+
+static const struct cmd_opt *cmd_findshortopt(const struct cmd *cmd_entry,
+		char shortopt)
+{
+	const struct cmd_opt *o;
+
+	if(cmd_entry->options == NULL)
+		return NULL;
+
+	for(o = cmd_entry->options; o->name != NULL; o++) {
+		if(o->shortopt == shortopt)
+			return o;
+	}
+
+	return NULL;
+}
+
+static void cmd_addopt(const struct cmd_opt *opt, struct dictionary *optdict)
+{
+	dict_add_key(optdict, opt->name, NULL, 0);
+}
+
+static struct dictionary *cmd_getopt(const struct cmd *cmd_entry,
+		int argc, const char **argv, unsigned int *carg)
+{
+	struct dictionary *od;
+	const struct cmd_opt *opt;
+	int i;
+
+	if((od = new_dict()) == NULL) {
+		return NULL;
+	}
+
+	for(;(*carg < argc) && argv[*carg][0] == '-'; (*carg)++) {
+		if(strlen(argv[*carg]) < 2) {
+			logwarn("unhandled '-' on command line\n");
+			continue;
+		}
+		logverbose("opt: %s, carg = %d\n", argv[*carg], *carg);
+		if(argv[*carg][1] == '-') {
+			/* Handle Long Opt */
+			if((opt = cmd_findlongopt(cmd_entry, argv[*carg]))
+					== NULL) {
+				logwarn("%s doesn not take '%s' option\n",
+						cmd_entry->name, argv[*carg]);
+			} else {
+				cmd_addopt(opt, od);
+			}
+		} else {
+			/* Handle Short Opts */
+			for(i = 1; i < strlen(argv[*carg]); i++) {
+				if((opt = cmd_findshortopt(cmd_entry,
+							argv[*carg][i]))
+						== NULL) {
+					logwarn("%s doesn not take '-%c' "
+							"option\n",
+							cmd_entry->name,
+							argv[*carg][i]);
+				} else {
+					cmd_addopt(opt, od);
+				}
+			}
+		}
+	}
+
+	return od;
+}
+
 int run_cmds(int argc, const char **argv, void *appdata)
 {
 	unsigned int carg = 0;
 	int ret = 0;
+	struct dictionary *opts;
 
 	/* loop over all argv entries */
 	while(carg < argc) {
@@ -93,11 +177,17 @@ int run_cmds(int argc, const char **argv, void *appdata)
 		}
 		logverbose("running command: %s\n", cmd_entry->name);
 
+		if((opts = cmd_getopt(cmd_entry, argc, argv, &carg)) == NULL) {
+			logerror("could not create option dictionary\n");
+			return -ENOMEM;
+		}
+
 		/* call the command handler */
 		if((ret = (cmd_entry->handler)(argc-carg, &argv[carg],
-						cmd_entry, appdata)) < 0)
+						cmd_entry, appdata, opts)) < 0)
 			return carg;
 		carg += ret;
+		delete_dict(opts);
 	}
 
 	return 0;
@@ -105,6 +195,8 @@ int run_cmds(int argc, const char **argv, void *appdata)
 
 int run_cmd(const char *name, int argc, const char **argv, void *appdata)
 {
+	struct dictionary *opts;
+	unsigned int carg = 0;
 	const struct cmd *cmd_entry = lookup_cmd(name, &registered_cmds);
 	if(cmd_entry == NULL) {
 		logerror("could not find command '%s'\n", name);
@@ -113,9 +205,18 @@ int run_cmd(const char *name, int argc, const char **argv, void *appdata)
 
 	logverbose("running command: %s\n", cmd_entry->name);
 
+	if((opts = cmd_getopt(cmd_entry, argc, argv, &carg)) == NULL) {
+		logerror("could not create option dictionary\n");
+		return -ENOMEM;
+	}
+
 	/* call the command handler */
-	if((cmd_entry->handler)(argc, argv, cmd_entry, appdata) < 0)
+	if((cmd_entry->handler)(argc-carg, &argv[carg], cmd_entry, appdata,
+				opts) < 0) {
+		delete_dict(opts);
 		return 1;
+	}
+	delete_dict(opts);
 
 	return 0;
 }
