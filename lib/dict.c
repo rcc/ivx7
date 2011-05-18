@@ -218,6 +218,14 @@ void dict_remove_key(struct dictionary *dict, const char *key)
 	}
 }
 
+int dict_has_key(struct dictionary *dict, const char *key)
+{
+	if(find_kvpair(dict, key))
+		return 1;
+
+	return 0;
+}
+
 void *dict_value_for_key(struct dictionary *dict, const char *key, size_t *size)
 {
 	struct kvpair_mgr *kvm = find_kvpair(dict, key);

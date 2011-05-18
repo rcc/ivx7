@@ -157,6 +157,22 @@ void *dict_add_key(struct dictionary *dict, const char *key,
  */
 void dict_remove_key(struct dictionary *dict, const char *key);
 
+/* FUNCTION:    dict_has_key
+ *
+ * + DESCRIPTION:
+ *   - returns true if a dictionary has a key
+ *
+ * + PARAMETERS:
+ *   + struct dictionary *dict
+ *     - dictionary pointer
+ *   + const char *key
+ *     - key string
+ *
+ * + RETURNS: int
+ *   - boolean
+ */
+int dict_has_key(struct dictionary *dict, const char *key);
+
 /* FUNCTION:    dict_value_for_key
  *
  * + DESCRIPTION:
