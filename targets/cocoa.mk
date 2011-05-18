@@ -18,9 +18,14 @@ LIBRARIES := readline
 # Frameworks
 FRAMEWORKS := Foundation CoreFoundation
 
+# Version
+SCMVERSION := $(shell git describe --tags HEAD 2>/dev/null || \
+		git rev-parse --short=16 HEAD 2>/dev/null || \
+	    	echo "UNKNOWN")
+OPTIONS += SCMVERSION='"$(SCMVERSION)"'
+CPPFLAGS += -DBUILD_DATE='"$(shell date)"'
+
 # Options
-VERSION := $(shell git describe --tags HEAD 2>/dev/null || echo "Unknown")
-OPTIONS += VERSION='"$(VERSION)"'
 OPTIONS += LOG_WITH_NSLOG
 
 # Configurations (the first one is the default)

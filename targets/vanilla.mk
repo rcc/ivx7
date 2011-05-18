@@ -14,9 +14,14 @@ SOURCES :=	src/main.c \
 # Libraries
 LIBRARIES := readline
 
+# Version
+SCMVERSION := $(shell git describe --tags HEAD 2>/dev/null || \
+		git rev-parse --short=16 HEAD 2>/dev/null || \
+	    	echo "UNKNOWN")
+OPTIONS += SCMVERSION='"$(SCMVERSION)"'
+CPPFLAGS += -DBUILD_DATE='"$(shell date)"'
+
 # Options
-VERSION := $(shell git describe --tags HEAD 2>/dev/null || echo "Unknown")
-OPTIONS += VERSION='"$(VERSION)"'
 
 # Configurations (the first one is the default)
 CONFIGS := debug release

@@ -38,16 +38,20 @@ CMDHANDLER(version)
 {
 	int args = 0;
 
-	if(dict_has_key(opts, "pretty")) {
+	if(dict_has_key(opts, "date")) {
+		printf("Build Date: %s\n", BUILD_DATE);
+		printf("Version:    ");
+	} else if(dict_has_key(opts, "pretty")) {
 		printf("Version: ");
 	}
-	printf("%s\n", VERSION);
+	printf("%s\n", SCMVERSION);
 
 	return args;
 }
 
 START_CMD_OPTS(version_opts)
-	CMD_OPT(pretty, '\0', "pretty", "print version with context")
+	CMD_OPT(pretty, 'p', "pretty", "print version with context")
+	CMD_OPT(date,   'd', "date", "print build date")
 END_CMD_OPTS;
 
 APPCMD_OPT(version, &version, "print the version", "usage: version", NULL,
