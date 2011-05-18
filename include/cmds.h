@@ -53,13 +53,14 @@ extern "C" {
 /* Option Data Structure */
 struct cmd_opt {
 	const char *name;	/* Name of opt. This will be dictionary key. */
+	const char *description;
 	char shortopt;		/* \0 for none */
 	const char *longopt;	/* NULL for none */
 };
 
 #define START_CMD_OPTS(name)		static const struct cmd_opt name[] = {
-#define CMD_OPT(name, shorto, longo)	{#name, shorto, longo},
-#define END_CMD_OPTS			{NULL, 0, NULL}}
+#define CMD_OPT(name, shorto, longo, desc)	{#name, desc, shorto, longo},
+#define END_CMD_OPTS			{NULL, NULL, 0, NULL}}
 
 /* Command Data Structure */
 struct cmd {

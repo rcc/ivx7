@@ -152,7 +152,7 @@ CMDHANDLER(version)
 	return args;
 }
 START_CMD_OPTS(version_opts)
-	CMD_OPT(pretty, '\0', "pretty")
+	CMD_OPT(pretty, '\0', "pretty", "print version with context")
 END_CMD_OPTS;
 APPCMD_OPT(version, &version, "print the version", "usage: version", NULL,
 		version_opts);

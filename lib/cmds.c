@@ -274,6 +274,7 @@ void _register_cmd(struct cmd_mgr *rcmd)
 CMDHANDLER(help)
 {
 	if(argc > 0) {
+		const struct cmd_opt *o;
 		const struct cmd *cmd_entry = lookup_cmd(argv[0],
 				&registered_cmds);
 		if(cmd_entry == NULL) {
@@ -282,6 +283,23 @@ CMDHANDLER(help)
 		}
 		printf("Help for `%s' command:\n", cmd_entry->name);
 		printf("%s\n", cmd_entry->help);
+		if(cmd_entry->options) {
+		printf("OPTIONS:\n");
+			for(o = cmd_entry->options; o->name != NULL; o++) {
+				printf("  ");
+				if(o->shortopt && o->longopt)
+					printf("-%c, --%-13s",
+							o->shortopt,
+							o->longopt);
+				else if(o->shortopt)
+					printf("-%c                 ",
+							o->shortopt);
+				else if(o->longopt)
+					printf("--%-17s", o->longopt);
+				printf("  %s\n", o->description);
+			}
+		}
+
 	} else {
 		struct cmd_mgr *pos;
 		int j;
