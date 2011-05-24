@@ -2,7 +2,7 @@ include buildsystem/func.mk
 
 # Set default flags
 CPPFLAGS := -Iinclude -Isrc
-CFLAGS := -Wall -Werror -O2
+CFLAGS := -Wall -Werror
 CXXFLAGS := $(CFLAGS)
 ASFLAGS :=
 LDFLAGS :=
@@ -69,6 +69,11 @@ $(error Invalid config specified)
 endif
 OPTIONS += $($(call TOUPPER,$(CONFIG))_OPTIONS)
 SOURCES += $($(call TOUPPER,$(CONFIG))_SOURCES)
+CPPFLAGS += $($(call TOUPPER,$(CONFIG))_CPPFLAGS)
+CFLAGS += $($(call TOUPPER,$(CONFIG))_CFLAGS)
+CXXFLAGS += $($(call TOUPPER,$(CONFIG))_CXXFLAGS)
+ASFLAGS += $($(call TOUPPER,$(CONFIG))_ASFLAGS)
+LDFLAGS += $($(call TOUPPER,$(CONFIG))_LDFLAGS)
 
 # Machine Name and Tool Versions
 MACHINE := $(call USCORESUB,$(shell uname -sm))
