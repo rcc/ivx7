@@ -38,6 +38,7 @@
 #include <dict.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/types.h>
 
 #ifndef I__PKV_H__
 	#define I__PKV_H__
