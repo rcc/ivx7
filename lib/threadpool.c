@@ -52,7 +52,8 @@ static void *threadpool_thread(struct poolthread *t)
 	pthread_mutex_lock(&t->pool->queue_lock);
 	t->pool->idle_threads++;
 	while(!t->pool->shutdown &&
-			((time(NULL) - t->idle_start) < t->pool->idle_secs)) {
+			((time(NULL) - t->idle_start) <
+				t->pool->config.idle_secs)) {
 		if(!list_empty(&t->pool->work_queue)) {
 			/* get the work from the work_queue */
 			work = t->pool->work_queue.next;
@@ -62,8 +63,8 @@ static void *threadpool_thread(struct poolthread *t)
 			t->pool->idle_threads--;
 			/* do the work */
 			pthread_mutex_unlock(&t->pool->queue_lock);
-			if(t->pool->work_func)
-				work = t->pool->work_func(t, work);
+			if(t->pool->config.work_func)
+				work = t->pool->config.work_func(t, work);
 			pthread_mutex_lock(&t->pool->queue_lock);
 			/* set self as idle again */
 			t->pool->idle_threads++;
@@ -148,8 +149,8 @@ int threadpool_init(struct threadpool *pool)
 {
 	memset(pool, 0, sizeof(*pool));
 
-	pool->max_threads = 10;
-	pool->idle_secs = 60;
+	pool->config.max_threads = 10;
+	pool->config.idle_secs = 60;
 
 	INIT_LIST_HEAD(&pool->pool_threads);
 	pthread_mutex_init(&pool->pool_lock, NULL);
@@ -229,7 +230,7 @@ void threadpool_queue_work(struct threadpool *pool, struct list_head *work)
 	/* Check if a new thread is needed */
 	if(pool->work_count > pool->idle_threads) {
 		pthread_mutex_lock(&pool->pool_lock);
-		if(pool->pool_thread_count < pool->max_threads) {
+		if(pool->pool_thread_count < pool->config.max_threads) {
 			logdebug("starting new pool thread\n");
 			threadpool_start_new_thread(pool);
 		}
@@ -322,8 +323,8 @@ CMDHANDLER(threadpool_test)
 	if(threadpool_init(&testpool) != 0) {
 		return -1;
 	}
-	testpool.max_threads = 3;
-	testpool.work_func = &test_work_func;
+	testpool.config.max_threads = 3;
+	testpool.config.work_func = &test_work_func;
 	for(i = 0; i < ARRAY_SIZE(test_data); i++) {
 		test_data[i].sec = i;
 		threadpool_queue_work(&testpool, &test_data[i].node);

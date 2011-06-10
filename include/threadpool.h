@@ -56,10 +56,12 @@ struct threadpool {
 	 * They should be filled after the call to threadpool_init() since
 	 * it zeros the structure.
 	 */
-	unsigned int max_threads;
-	unsigned int idle_secs;
-	struct list_head *(*work_func)(struct poolthread *thread,
-			struct list_head *work);
+	struct {
+		unsigned int max_threads;
+		unsigned int idle_secs;
+		struct list_head *(*work_func)(struct poolthread *thread,
+				struct list_head *work);
+	} config;
 
 	/************************** Private Members *************************/
 	/* Pool */
