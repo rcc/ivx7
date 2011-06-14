@@ -187,10 +187,10 @@ int threadpool_is_work_done(struct threadpool *pool);
  *   + void *priv
  *     - private data
  *
- * + RETURNS: int
- *   - 0 on success
+ * + RETURNS: struct ctrlthread *
+ *   - NULL on failure
  */
-int threadpool_start_control_thread(struct threadpool *pool,
+struct ctrlthread *threadpool_start_control_thread(struct threadpool *pool,
 	void (*ctrl_func)(struct ctrlthread *thread), void *priv);
 
 #ifdef __cplusplus

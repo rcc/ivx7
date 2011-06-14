@@ -254,19 +254,18 @@ int threadpool_is_work_done(struct threadpool *pool)
 	return ret;
 }
 
-int threadpool_start_control_thread(struct threadpool *pool,
+struct ctrlthread *threadpool_start_control_thread(struct threadpool *pool,
 	void (*ctrl_func)(struct ctrlthread *thread), void *priv)
 {
-	int status = 0;
 	struct ctrlthread *t;
 
 	if((ctrl_func == NULL) || (pool == NULL))
-		return EINVAL;
+		return NULL;
 
 	if((t = malloc(sizeof(*t))) == NULL) {
 		logerror("could not allocate control thread: %s\n",
 				strerror(errno));
-		return errno;
+		return NULL;
 	}
 
 	t->pool = pool;
@@ -275,19 +274,18 @@ int threadpool_start_control_thread(struct threadpool *pool,
 	t->shutdown = 0;
 
 	pthread_mutex_lock(&t->pool->ctrl_lock);
-	if((status = pthread_create(&t->thread, NULL,
-				(void *(*)(void *))ctrlthread_thread, t))
-			!= 0) {
+	if(pthread_create(&t->thread, NULL,
+				(void *(*)(void *))ctrlthread_thread, t) != 0) {
 		logerror("could not start control thread\n");
 		pthread_mutex_unlock(&t->pool->ctrl_lock);
 		free(t);
-		return status;
+		return NULL;
 	}
 	pthread_detach(t->thread);
 	list_add(&t->ctrl_node, &pool->ctrl_threads);
 	pthread_mutex_unlock(&t->pool->ctrl_lock);
 
-	return status;
+	return t;
 }
 
 #ifdef THREADPOOLTESTCMD
