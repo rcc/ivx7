@@ -59,12 +59,15 @@ struct net_connection {
 	 *     - length of received data
 	 */
 	void (*rx_data)(struct net_connection *c, size_t len);
+
 	/*
 	 * Recieve Buffer
 	 */
-	void *rx_buf;
-	size_t rx_buf_sz;
-	pthread_mutex_t rx_buf_lock;
+	struct {
+		void *buf;
+		size_t size;
+		pthread_mutex_t lock;
+	} rxb;
 
 	/*
 	 * Disconnect Callback

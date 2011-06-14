@@ -54,15 +54,15 @@ int net_init_connection(struct net_connection *c, size_t rx_buf_sz)
 	memset(c, 0, sizeof(*c));
 
 	if(rx_buf_sz) {
-		if((c->rx_buf = malloc(rx_buf_sz)) == NULL) {
+		if((c->rxb.buf = malloc(rx_buf_sz)) == NULL) {
 			logerror("could not allocate new receive buffer: "
 					"%s\n", strerror(errno));
 			return errno;
 		}
-		c->rx_buf_sz = rx_buf_sz;
+		c->rxb.size = rx_buf_sz;
 	}
 
-	pthread_mutex_init(&c->rx_buf_lock, NULL);
+	pthread_mutex_init(&c->rxb.lock, NULL);
 	pthread_mutex_init(&c->cx_lock, NULL);
 	pthread_mutex_init(&c->handled_lock, NULL);
 
@@ -120,14 +120,14 @@ void net_close_connection(struct net_connection *c)
 void net_deinit_connection(struct net_connection *c)
 {
 	pthread_mutex_lock(&c->cx_lock);
-	pthread_mutex_lock(&c->rx_buf_lock);
-	if(c->rx_buf) {
-		free(c->rx_buf);
-		c->rx_buf = NULL;
+	pthread_mutex_lock(&c->rxb.lock);
+	if(c->rxb.buf) {
+		free(c->rxb.buf);
+		c->rxb.buf = NULL;
 	}
-	c->rx_buf_sz = 0;
+	c->rxb.size = 0;
 	pthread_mutex_destroy(&c->cx_lock);
-	pthread_mutex_destroy(&c->rx_buf_lock);
+	pthread_mutex_destroy(&c->rxb.lock);
 }
 
 
@@ -173,9 +173,9 @@ static struct list_head *connection_handler_thread(struct poolthread *thread,
 	if(POLLIN & sockpoll.revents) {
 		/* Data Ready */
 		ssize_t rlen;
-		pthread_mutex_lock(&c->rx_buf_lock);
+		pthread_mutex_lock(&c->rxb.lock);
 		pthread_mutex_lock(&c->cx_lock);
-		rlen = recvfrom(c->sock, c->rx_buf, c->rx_buf_sz, 0,
+		rlen = recvfrom(c->sock, c->rxb.buf, c->rxb.size, 0,
 				NULL, NULL);
 		pthread_mutex_unlock(&c->cx_lock);
 
@@ -187,7 +187,7 @@ static struct list_head *connection_handler_thread(struct poolthread *thread,
 			if(c->rx_data)
 				c->rx_data(c, rlen);
 		}
-		pthread_mutex_unlock(&c->rx_buf_lock);
+		pthread_mutex_unlock(&c->rxb.lock);
 	}
 	if(POLLHUP & sockpoll.revents) {
 		/* Connection Closed */
