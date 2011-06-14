@@ -31,10 +31,6 @@
  * official policies, either expressed or implied, of Robert C. Curtis.
  */
 
-/*
- * pkv.h - Simple key/value based packet protocol
- */
-
 #include <dict.h>
 #include <stddef.h>
 #include <stdint.h>

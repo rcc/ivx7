@@ -32,8 +32,9 @@
  */
 
 #include <ll.h>
-#include <pthread.h>
+#include <threadpool.h>
 
+#include <pthread.h>
 #include <sys/socket.h>
 
 #ifndef I__NETCONNECTION_H__
@@ -69,8 +70,9 @@ struct net_connection {
 	 * Disconnect Callback
 	 *
 	 * + DESCRIPTION:
-	 *   - called when the connection is closed. the socket and rx buffer
-	 *   are no longer valid.
+	 *   - called when the connection is closed. the socket is no
+	 *   longer valid. should take care of any memory management
+	 *   (e.g. free()).
 	 *
 	 * + PARAMETERS:
 	 *   + struct net_connection *c
@@ -83,12 +85,14 @@ struct net_connection {
 	 */
 	int sock;
 	struct sockaddr addr;
+	pthread_mutex_t cx_lock;
 
 	/*
 	 * List Connectivity
 	 */
 	struct list_head connection_node;
 	struct list_head work_node;
+	pthread_mutex_t handled_lock;
 };
 
 int net_init_connection(struct net_connection *c, size_t rx_buf_sz);
@@ -96,5 +100,24 @@ int net_open_connection(struct net_connection *c);
 int net_connect_connection(struct net_connection *c);
 void net_close_connection(struct net_connection *c);
 void net_deinit_connection(struct net_connection *c);
+
+/*
+ * Net Connection Handler
+ * 	This data structure defines a connection handler (thread pool).
+ */
+struct net_connection_handler {
+	struct threadpool pool;
+	struct list_head connections;
+	pthread_mutex_t connections_lock;
+};
+
+int net_connection_handler_init(struct net_connection_handler *h);
+void net_connection_handler_shutdown(struct net_connection_handler *h);
+void net_handle_connection(struct net_connection_handler *h,
+		struct net_connection *c);
+void net_unhandle_connection(struct net_connection_handler *h,
+		struct net_connection *c);
+void net_close_handled_connection(struct net_connection_handler *h,
+		struct net_connection *c);
 
 #endif /* I__NETCONNECTION_H__ */

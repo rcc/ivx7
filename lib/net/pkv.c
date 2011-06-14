@@ -31,7 +31,7 @@
  * official policies, either expressed or implied, of Robert C. Curtis.
  */
 
-#include <pkv.h>
+#include <net/pkv.h>
 #include <prjutil.h>
 #include <logging.h>
 
