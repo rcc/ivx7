@@ -92,7 +92,11 @@ int net_connect_connection(struct net_connection *c)
 	int status = 0;
 
 	pthread_mutex_lock(&c->cx_lock);
+#ifdef __HOST_DARWIN__
 	if(connect(c->sock, &c->addr, c->addr.sa_len) != 0) {
+#else
+	if(connect(c->sock, &c->addr, sizeof(c->addr)) != 0) {
+#endif
 		logerror("could not open socket: %s\n", strerror(errno));
 		status = errno;
 		goto exit;

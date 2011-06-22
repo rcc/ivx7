@@ -56,14 +56,18 @@ int sockaddr_by_hostname(struct sockaddr *addr, const char *name,
 	switch(addr->sa_family) {
 	case AF_INET: {
 		struct sockaddr_in *sin = (struct sockaddr_in *)addr;
+#ifdef __HOST_DARWIN__
 		sin->sin_len = sizeof(struct sockaddr_in);
+#endif
 		sin->sin_port = htons(port);
 		memcpy(&sin->sin_addr, h->h_addr_list[0], h->h_length);
 		break;
 	      }
 	case AF_INET6: {
 		struct sockaddr_in6 *sin = (struct sockaddr_in6 *)addr;
+#ifdef __HOST_DARWIN__
 		sin->sin6_len = sizeof(struct sockaddr_in6);
+#endif
 		sin->sin6_port = htons(port);
 		memcpy(&sin->sin6_addr, h->h_addr_list[0], h->h_length);
 		break;
