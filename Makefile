@@ -31,6 +31,8 @@ export Q := @
 export VERBOSE := 0
 endif
 
+# Host OS
+HOSTOS := $(call TOUPPER,$(call USCORESUB,$(shell uname -s)))
 
 # Default Install Script
 INSTALL_SCRIPT = targets/$(TARGET).install
@@ -52,10 +54,10 @@ else
 # Add all the libraries defined in config.mk to LDLIBS
 LDLIBS := $(addprefix -l,$(LIBRARIES))
 
-# Add all the frameworks defined in config.mk to LDFLAGS
-#   This is only for objective-C in OSX, but it doesn't hurt us here assuming
-#   no one defines FRAMEWORKS
+# Add all the frameworks defined in config.mk to LDFLAGS (This is only for OSX)
+ifeq ($(HOSTOS),DARWIN)
 LDFLAGS += $(addprefix -framework ,$(FRAMEWORKS))
+endif
 
 # Configuration
 ifeq ($(words $(CONFIGS)),0)
@@ -82,8 +84,8 @@ CCNAME := $(call USCORESUB,$(notdir $(realpath $(shell which $(CC)))))
 # Build Directory
 BUILDDIR := buildresults/$(TARGET)/$(MACHINE)/$(CCNAME)/$(CONFIG)
 
-# Add in the target name
-OPTIONS += __TARGET__='"$(TARGET)"'
+# Add in the target name and host OS
+OPTIONS += __TARGET__='"$(TARGET)"' __HOST_$(HOSTOS)__
 
 # Add in the options
 CPPFLAGS += $(addprefix -D,$(OPTIONS))
