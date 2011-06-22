@@ -1,5 +1,8 @@
 include buildsystem/func.mk
 
+# Host OS
+HOSTOS := $(call TOUPPER,$(call USCORESUB,$(shell uname -s)))
+
 # Set default flags
 CPPFLAGS := -Iinclude -Isrc
 CFLAGS := -Wall -Werror
@@ -30,9 +33,6 @@ else
 export Q := @
 export VERBOSE := 0
 endif
-
-# Host OS
-HOSTOS := $(call TOUPPER,$(call USCORESUB,$(shell uname -s)))
 
 # Default Install Script
 INSTALL_SCRIPT = targets/$(TARGET).install
