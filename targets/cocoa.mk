@@ -19,7 +19,7 @@ LIBRARIES := readline
 FRAMEWORKS := Foundation CoreFoundation
 
 # Version
-SCMVERSION := $(shell git describe --tags HEAD 2>/dev/null || \
+SCMVERSION := $(shell git describe --tags --dirty=+ HEAD 2>/dev/null || \
 		git rev-parse --short=16 HEAD 2>/dev/null || \
 	    	echo "UNKNOWN")
 OPTIONS += SCMVERSION='"$(SCMVERSION)"'
