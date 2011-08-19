@@ -109,22 +109,43 @@ static const struct cmd_opt *findshortopt(const struct cmd *cmd_entry,
 	return NULL;
 }
 
-static inline void addopt(const struct cmd_opt *opt, struct dictionary *optdict)
+static inline void addopt(const struct cmd_opt *opt, struct dictionary *optdict,
+		const char *val)
 {
-	dict_add_key(optdict, opt->name, NULL, 0);
+	size_t val_len = val ? (strlen(val) + 1) : 0;
+	dict_add_key(optdict, opt->name, val, val_len);
 }
 
 static void handle_longopt(const struct cmd *cmd_entry, struct dictionary *od,
 		int argc, const char **argv, unsigned int *carg)
 {
 	const struct cmd_opt *opt;
+	char *optstr = strdup(argv[*carg]);
+	char *val = NULL;
+	int i;
 
-	if((opt = findlongopt(cmd_entry, argv[*carg])) == NULL) {
-		logwarn("`%s' doesn not take '%s' option\n", cmd_entry->name,
-				argv[*carg]);
-	} else {
-		addopt(opt, od);
+	if(optstr == NULL) {
+		logerror("%s\n", strerror(errno));
+		return;
 	}
+
+	/* Look for an = sign to separate opt from value */
+	for(i = 0; i < strlen(optstr); i++) {
+		if(optstr[i] == '=') {
+			optstr[i] = '\0';
+			val = &optstr[i + 1];
+			break;
+		}
+	}
+
+	if((opt = findlongopt(cmd_entry, optstr)) == NULL) {
+		logwarn("`%s' doesn not take '%s' option\n", cmd_entry->name,
+				optstr);
+	} else {
+		addopt(opt, od, val);
+	}
+
+	free(optstr);
 }
 
 static void handle_shortopt(const struct cmd *cmd_entry, struct dictionary *od,
@@ -138,7 +159,7 @@ static void handle_shortopt(const struct cmd *cmd_entry, struct dictionary *od,
 			logwarn("`%s' doesn not take '-%c' option\n",
 					cmd_entry->name, argv[*carg][i]);
 		} else {
-			addopt(opt, od);
+			addopt(opt, od, NULL);
 		}
 	}
 }

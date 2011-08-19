@@ -299,6 +299,27 @@ static inline char *dict_add_string(struct dictionary *dict, const char *key,
 	return (char *)dict_add_key(dict, key, str, strlen(str) + 1);
 }
 
+/* FUNCTION:    dict_str_for_key
+ *
+ * + DESCRIPTION:
+ *   - get a string value for a key
+ *
+ * + PARAMETERS:
+ *   + struct dictionary *dict
+ *     - dictionary pointer
+ *   + const char *key
+ *     - key string
+ *
+ * + RETURNS: char *
+ *   - pointer to value string, NULL for no value
+ */
+static inline char *dict_str_for_key(struct dictionary *dict, const char *key)
+{
+	size_t sz;
+	char *ret = dict_value_for_key(dict, key, &sz);
+	return sz ? ret : NULL;
+}
+
 /**************************** Low Level Functions ***************************/
 /* These are used internally to the dict library, but can also be used for
  * more advanced and optimized implementations.
