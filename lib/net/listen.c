@@ -134,12 +134,29 @@ void net_stop_listener(struct net_listener *l)
 
 static void listener_accept_connection(struct net_listener *l)
 {
-	/* Reject */
 	int rsock;
-	if((rsock = accept(l->sock, NULL, 0)) >= 0) {
-		logdebug("rejecting client connection\n");
-		close(rsock);
+	struct sockaddr addr;
+	socklen_t addr_len = sizeof(addr);
+	struct net_connection *cx;
+
+	if((rsock = accept(l->sock, &addr, &addr_len)) < 0) {
+		logerror("could not accept client connection\n");
+		return;
 	}
+	if((cx = l->new_cx(l)) == NULL) {
+		logerror("rejecting client connection\n");
+		close(rsock);
+		return;
+	}
+	cx->sock = rsock;
+	cx->addr_len = addr_len;
+	memcpy(&cx->addr, &addr, sizeof(addr));
+
+	net_handle_connection(l->handler, cx);
+
+	logdebug("client connected\n");
+	if(l->new_client)
+		l->new_client(l, cx);
 }
 
 static void listener_thread(struct ctrlthread *thread)
@@ -153,7 +170,7 @@ static void listener_thread(struct ctrlthread *thread)
 	listenpoll.events = POLLIN;
 	listenpoll.revents = 0;
 
-	e = poll(&listenpoll, 1, 500);
+	e = poll(&listenpoll, 1, 200);
 	if(e == 0) {
 		/* nothing to do */
 	} else if(e < 0) {
@@ -161,7 +178,6 @@ static void listener_thread(struct ctrlthread *thread)
 		logwarn("poll returned an error: %s\n", strerror(errno));
 	} else {
 		/* client is trying to connect */
-		logdebug("client trying to connect\n");
 		listener_accept_connection(l);
 	}
 
@@ -181,6 +197,16 @@ static void test_rx_data_handler(struct net_connection *c, size_t len)
 	loginfo("RX Data: %u bytes\n", (unsigned int)len);
 }
 
+static void test_new_client_handler(struct net_listener *l,
+		struct net_connection *c)
+{
+#if MAX_LOGLEVEL >= LOGLEVEL_DEBUG
+	char addr_str[SOCKADDR_ADDR_STR_LEN];
+#endif
+	logdebug("New client: %s\n", sockaddr_addr_str(&c->addr, &addr_str[0]));
+	send(c->sock, "Hello, World\n", 13, 0);
+}
+
 static void test_disconnect_handler(struct net_connection *c)
 {
 	loginfo("Disconnected\n");
@@ -190,7 +216,20 @@ static void test_disconnect_handler(struct net_connection *c)
 
 static struct net_connection *new_client_connection(struct net_listener *l)
 {
-	return NULL;
+	struct net_connection *c;
+
+	if((c = malloc(sizeof(*c))) == NULL) {
+		return NULL;
+	}
+
+	if(net_init_connection(c, (4<<10)) != 0) {
+		logerror("could not init connection\n");
+		return NULL;
+	}
+	c->rx_data = &test_rx_data_handler;
+	c->disconnect = &test_disconnect_handler;
+
+	return c;
 }
 
 static struct net_connection_handler test_handler;
@@ -198,9 +237,6 @@ static struct net_listener test_listener;
 
 CMDHANDLER(listener_test)
 {
-#if MAX_LOGLEVEL >= LOGLEVEL_DEBUG
-	//char addr_str[SOCKADDR_ADDR_STR_LEN];
-#endif
 	uint16_t port;
 
 	if(argc < 1) {
@@ -220,6 +256,7 @@ CMDHANDLER(listener_test)
 		pcmderr("could not init listener\n");
 		return -1;
 	}
+	test_listener.new_client = &test_new_client_handler;
 
 	if(net_open_listener_afinet(&test_listener, port) != 0) {
 		pcmderr("could not open listener\n");

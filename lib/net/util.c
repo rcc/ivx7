@@ -40,8 +40,8 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-int sockaddr_by_hostname(struct sockaddr *addr, const char *name,
-		uint32_t port)
+int sockaddr_by_hostname(struct sockaddr *addr, socklen_t *addr_len,
+		const char *name, uint32_t port)
 {
 	struct hostent *h;
 
@@ -56,6 +56,7 @@ int sockaddr_by_hostname(struct sockaddr *addr, const char *name,
 	switch(addr->sa_family) {
 	case AF_INET: {
 		struct sockaddr_in *sin = (struct sockaddr_in *)addr;
+		*addr_len = sizeof(struct sockaddr_in);
 #ifdef __HOST_DARWIN__
 		sin->sin_len = sizeof(struct sockaddr_in);
 #endif
@@ -65,6 +66,7 @@ int sockaddr_by_hostname(struct sockaddr *addr, const char *name,
 	      }
 	case AF_INET6: {
 		struct sockaddr_in6 *sin = (struct sockaddr_in6 *)addr;
+		*addr_len = sizeof(struct sockaddr_in6);
 #ifdef __HOST_DARWIN__
 		sin->sin6_len = sizeof(struct sockaddr_in6);
 #endif

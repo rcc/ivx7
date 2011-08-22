@@ -88,6 +88,7 @@ struct net_connection {
 	 */
 	int sock;
 	struct sockaddr addr;
+	socklen_t addr_len;
 	pthread_mutex_t cx_lock;
 
 	/*

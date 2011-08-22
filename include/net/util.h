@@ -37,8 +37,8 @@
 #ifndef I__NETUTIL_H__
 	#define I__NETUTIL_H__
 
-int sockaddr_by_hostname(struct sockaddr *addr, const char *name,
-		uint32_t port);
+int sockaddr_by_hostname(struct sockaddr *addr, socklen_t *addr_len,
+		const char *name, uint32_t port);
 
 int sockaddr_port(struct sockaddr *addr);
 

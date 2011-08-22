@@ -54,7 +54,7 @@ struct net_listener {
 	 *   - Provides new initialized net_connection data structures.
 	 *
 	 * + PARAMETERS:
-	 *   + struct net_listener *l
+	 *   + struct net_listener *
 	 *     - the listener requesting a new connection data structure
 	 *
 	 * + RETURNS: struct net_connection *
@@ -63,10 +63,25 @@ struct net_listener {
 	struct net_connection *(*new_cx)(struct net_listener *);
 
 	/*
+	 * New Connection Notification
+	 *
+	 * + DESCRIPTION:
+	 *   - Called after a new client connection is setup.
+	 *
+	 * + PARAMETERS:
+	 *   + struct net_listener *
+	 *     - the listener that received the client
+	 *   + struct net_connection *
+	 *     - the new client connection
+	 */
+	void (*new_client)(struct net_listener *, struct net_connection *);
+
+	/*
 	 * Socket
 	 */
 	int sock;
 	struct sockaddr addr;
+	socklen_t addr_len;
 
 	/*
 	 * Threadpool

@@ -92,11 +92,7 @@ int net_connect_connection(struct net_connection *c)
 	int status = 0;
 
 	pthread_mutex_lock(&c->cx_lock);
-#ifdef __HOST_DARWIN__
-	if(connect(c->sock, &c->addr, c->addr.sa_len) != 0) {
-#else
-	if(connect(c->sock, &c->addr, sizeof(c->addr)) != 0) {
-#endif
+	if(connect(c->sock, &c->addr, c->addr_len) != 0) {
 		logerror("could not open socket: %s\n", strerror(errno));
 		status = errno;
 		goto exit;
@@ -115,10 +111,12 @@ void net_close_connection(struct net_connection *c)
 		shutdown(c->sock, SHUT_RDWR);
 		close(c->sock);
 		c->sock = -1;
+		pthread_mutex_unlock(&c->cx_lock);
 		if(c->disconnect)
 			c->disconnect(c);
+	} else {
+		pthread_mutex_unlock(&c->cx_lock);
 	}
-	pthread_mutex_unlock(&c->cx_lock);
 }
 
 void net_deinit_connection(struct net_connection *c)
@@ -317,7 +315,8 @@ CMDHANDLER(connection_test)
 	test_connection.rx_data = &test_rx_data_handler;
 	test_connection.disconnect = &test_disconnect_handler;
 
-	if(sockaddr_by_hostname(&test_connection.addr, argv[0], port) != 0) {
+	if(sockaddr_by_hostname(&test_connection.addr,
+			&test_connection.addr_len, argv[0], port) != 0) {
 		pcmderr("could not lookup hostname\n");
 		return -1;
 	}

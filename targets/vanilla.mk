@@ -14,8 +14,8 @@ SOURCES :=	src/main.c \
 SNOW_SOURCES +=	lib/threadpool.c \
 		lib/net/util.c \
 		lib/net/pkv.c \
-		lib/net/connection.c
-		#lib/net/listen.c
+		lib/net/connection.c \
+		lib/net/listen.c \
 
 # Libraries
 LIBRARIES := readline
