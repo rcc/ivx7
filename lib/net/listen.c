@@ -102,6 +102,19 @@ int net_open_listener_afinet(struct net_listener *l, uint16_t port)
 	return 0;
 }
 
+void net_close_listener(struct net_listener *l)
+{
+	if(pthread_mutex_trylock(&l->listener_lock)) {
+		/* Listen thread not running */
+		if(l->sock >= 0) {
+			close(l->sock);
+			l->sock = -1;
+		}
+	} else {
+		l->shutdown = 1;
+	}
+}
+
 int net_start_listener(struct net_listener *l)
 {
 	int status = 0;
@@ -184,6 +197,7 @@ static void listener_thread(struct ctrlthread *thread)
 	if(l->shutdown) {
 		logdebug("shutting down listener\n");
 		close(l->sock);
+		l->sock = -1;
 		thread->shutdown = 1;
 		pthread_mutex_unlock(&l->listener_lock);
 	}

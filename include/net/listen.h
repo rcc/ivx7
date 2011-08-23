@@ -97,6 +97,9 @@ int net_init_listener(struct net_listener *l,
 		struct net_connection *(*new_cx)(struct net_listener *));
 void net_deinit_listener(struct net_listener *l);
 
+int net_open_listener_afinet(struct net_listener *l, uint16_t port);
+void net_close_listener(struct net_listener *l);
+
 int net_start_listener(struct net_listener *l);
 void net_stop_listener(struct net_listener *l);
 
