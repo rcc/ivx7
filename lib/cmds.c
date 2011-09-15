@@ -175,8 +175,11 @@ static struct dictionary *cmd_getopt(const struct cmd *cmd_entry,
 
 	for(;(*carg < argc) && argv[*carg][0] == '-'; (*carg)++) {
 		if(strlen(argv[*carg]) < 2) {
-			logwarn("unhandled '-' on command line\n");
-			continue;
+			/* A single - is most likely an argument denoting
+			 * 'stdin'. We should stop processing opts.
+			 */
+			logverbose("single -, stopping\n");
+			break;
 		}
 		logverbose("opt: %s, carg = %d\n", argv[*carg], *carg);
 		if(argv[*carg][1] == '-') {
