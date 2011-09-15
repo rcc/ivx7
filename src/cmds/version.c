@@ -44,14 +44,19 @@ CMDHANDLER(version)
 	} else if(dict_has_key(opts, "pretty")) {
 		printf("Version: ");
 	}
-	printf("%s\n", SCMVERSION);
+	if(dict_has_key(opts, "branch")) {
+		printf("%s (%s)\n", SCMVERSION, SCMBRANCH);
+	} else {
+		printf("%s\n", SCMVERSION);
+	}
 
 	return args;
 }
 
 START_CMD_OPTS(version_opts)
 	CMD_OPT(pretty, 'p', "pretty", "print version with context")
-	CMD_OPT(date,   'd', "date", "print build date")
+	CMD_OPT(date,   'd', "date",   "print build date")
+	CMD_OPT(branch, 'b', "branch", "show the SCM branch")
 END_CMD_OPTS;
 
 APPCMD_OPT(version, &version, "print the version", "usage: version", NULL,

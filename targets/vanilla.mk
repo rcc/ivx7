@@ -21,10 +21,9 @@ SNOW_SOURCES +=	lib/threadpool.c \
 LIBRARIES := readline
 
 # Version
-SCMVERSION := $(shell git describe --tags --dirty=+ 2>/dev/null || \
-		git rev-parse --short=16 HEAD 2>/dev/null || \
-	    	echo "UNKNOWN")
+include buildsystem/git.mk
 OPTIONS += SCMVERSION='"$(SCMVERSION)"'
+OPTIONS += SCMBRANCH='"$(SCMBRANCH)"'
 CPPFLAGS += -DBUILD_DATE='"$(shell date)"'
 
 # Options
