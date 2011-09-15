@@ -43,18 +43,18 @@
 #include <readline/history.h>
 
 /* shell colors */
-#define COLOR_NO	"\x1b[00;00m"
-#define COLOR_BR 	"\x1b[00;01m"
-#define COLOR_RD 	"\x1b[00;31m"
-#define COLOR_GR 	"\x1b[00;32m"
-#define COLOR_YL 	"\x1b[00;33m"
-#define COLOR_BL 	"\x1b[00;34m"
-#define COLOR_MG 	"\x1b[00;35m"
-#define COLOR_CY 	"\x1b[00;36m"
+#define COLOR_NO	"\1\e[00;00m\2"
+#define COLOR_BR 	"\1\e[00;01m\2"
+#define COLOR_RD 	"\1\e[00;31m\2"
+#define COLOR_GR 	"\1\e[00;32m\2"
+#define COLOR_YL 	"\1\e[00;33m\2"
+#define COLOR_BL 	"\1\e[00;34m\2"
+#define COLOR_MG 	"\1\e[00;35m\2"
+#define COLOR_CY 	"\1\e[00;36m\2"
 
 /* shell prompt */
 #ifndef CMDS_SHELL_PROMPT
-#define CMDS_SHELL_PROMPT	COLOR_CY __TARGET__ COLOR_YL " $ " COLOR_NO
+#define CMDS_SHELL_PROMPT	__TARGET__ " $ "
 #endif /* CMDS_SHELL_PROMPT */
 
 CMDHANDLER(shell_handler)
@@ -77,5 +77,5 @@ CMDHANDLER(shell_handler)
 }
 APPCMD(shell, &shell_handler,
 	"enter a command shell",
-	"usage: script",
+	"usage: shell",
 	NULL);
