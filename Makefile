@@ -26,7 +26,12 @@ TARGETDIR := targets
 # Build Target List
 TARGETS := $(basename $(notdir $(wildcard $(TARGETDIR)/*.mk)))
 
+ifeq ($(TARGETMK),)
 .DEFAULT_GOAL := help
+else
+.DEFAULT_GOAL := buildtarget
+endif
+
 .PHONY : help
 help :
 	@echo "usage: make <target[.config]>"
@@ -37,15 +42,22 @@ help :
 
 all : $(TARGETS)
 
+# <target> rule (all configs)
 .PHONY : $(TARGETS)
 $(TARGETS) :
 	$(Q)$(MAKE) -f buildsystem/target.mk \
 		TARGETMK="$(TARGETDIR)/$@.mk"
 
+# <target>.<config> rule
 $(addsuffix .%,$(TARGETS)) :
 	$(Q)$(MAKE) -f buildsystem/target.mk \
 		CONFIG=$(call EXTRACT_CONFIG,$@) \
 		TARGETMK="$(TARGETDIR)/$(call EXTRACT_TARGET,$@).mk"
+
+# Rule for situations where environment is passed in
+.PHONY : buildtarget
+buildtarget :
+	$(Q)$(MAKE) -f buildsystem/target.mk
 
 ### Utility Rules ###
 .PHONY : clean
