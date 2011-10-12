@@ -16,6 +16,11 @@ endif
 
 include $(TARGETMK)
 
+GOAL :=
+ifeq ($(INSTALL),1)
+GOAL := install
+endif
+
 # Make sure there is at least one config
 ifeq ($(words $(CONFIGS)),0)
 $(error Must specify at least one config in target makefile)
@@ -30,6 +35,7 @@ $(CONFIGS) :
 	$(Q)$(MAKE) -f buildsystem/main.mk \
 		TARGETMK="$(TARGETMK)" \
 		TARGET=$(TARGET) \
-		CONFIG=$@
+		CONFIG=$@ \
+		$(GOAL)
 	$(call OUTPUTINFO,DONE,$(TARGET).$@)
 	@echo
