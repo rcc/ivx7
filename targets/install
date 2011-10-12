@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Target result passed in as $1
+
 INSTALLDIR=${DESTDIR:-/usr/bin}
 if [ -w "$INSTALLDIR" ]; then
 	CPCMD="cp -v"

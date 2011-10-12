@@ -1,5 +1,4 @@
-# Output Name
-TARGET := cocoa
+CONFIGS := debug release
 
 # Sources
 SOURCES :=	src/entry.m \
@@ -27,19 +26,20 @@ CPPFLAGS += -DBUILD_DATE='"$(shell date)"'
 # Options
 OPTIONS += LOG_WITH_NSLOG
 
-# Configurations (the first one is the default)
-CONFIGS := debug release
+# Release
+ifeq ($(CONFIG),release)
+# Options
+OPTIONS += MAX_LOGLEVEL=3 DEFAULT_LOGLEVEL=2
+# Flags
+CFLAGS += -O2
+endif
 
-# Configuration Specific Options
-RELEASE_OPTIONS := CONFIG_RELEASE
-RELEASE_OPTIONS += MAX_LOGLEVEL=3 DEFAULT_LOGLEVEL=2
+# Config
+ifeq ($(CONFIG),debug)
+# Options
+OPTIONS += MAX_LOGLEVEL=5 DEFAULT_LOGLEVEL=4
+# Flags
+CFLAGS += -O0 -g
+endif
 
-DEBUG_OPTIONS := CONFIG_DEBUG
-DEBUG_OPTIONS += MAX_LOGLEVEL=5 DEFAULT_LOGLEVEL=4
-
-# Configuration Specific Flags
-RELEASE_CFLAGS := -O2
-RELEASE_CXXFLAGS := $(RELEASE_CFLAGS)
-
-DEBUG_CFLAGS := -O0 -g
-DEBUG_CXXFLAGS := $(DEBUG_CFLAGS)
+INSTALL_SCRIPT = targets/install

@@ -1,29 +1,7 @@
 include buildsystem/func.mk
 
 # Host OS
-HOSTOS := $(call TOUPPER,$(call USCORESUB,$(shell uname -s)))
-
-# Set default flags
-CPPFLAGS := -Iinclude -Isrc
-CFLAGS := -Wall -Werror
-CXXFLAGS := $(CFLAGS)
-ASFLAGS :=
-LDFLAGS :=
-
-# include after default flags so config.mk can append to them
-#    first check for command line MKTARGET flag
-ifneq ($(MKTARGET),)
-include $(MKTARGET)
-
-#    otherwise check for the presence of a linked target.mk
-else ifneq ($(strip $(wildcard target.mk)),)
-include target.mk
-
-#    otherwise build every target in targets/ directory
-else
-MKTARGETS=$(wildcard targets/*.mk)
-endif
-
+export HOSTOS := $(call TOUPPER,$(call USCORESUB,$(shell uname -s)))
 
 # Verbose Option
 ifeq ($(VERBOSE),1)
@@ -34,87 +12,43 @@ export Q := @
 export VERBOSE := 0
 endif
 
-# Default Install Script
-INSTALL_SCRIPT = targets/$(TARGET).install
-
-ifdef MKTARGETS
-.PHONY : alltargets
-all_targets clean install : $(MKTARGETS)
-	$(call OUTPUTINFO,DONE,$@)
-
-targets/% : FORCE
-	$(call OUTPUTINFO,TARGET,$@)
-	$(Q)$(MAKE) MKTARGET=$@ $(MAKECMDGOALS)
-	$(Q)echo
-
-FORCE:
-
-else
-
-# Add all the libraries defined in config.mk to LDLIBS
-LDLIBS := $(addprefix -l,$(LIBRARIES))
-
-# Add all the frameworks defined in config.mk to LDFLAGS (This is only for OSX)
-ifeq ($(HOSTOS),DARWIN)
-LDFLAGS += $(addprefix -framework ,$(FRAMEWORKS))
-endif
-
-# Configuration
-ifeq ($(words $(CONFIGS)),0)
-$(error Must specify at least one config in target makefile (MKTARGET))
-endif
-ifeq ($(CONFIG),)
-CONFIG := $(word 1,$(CONFIGS))
-endif
-ifeq ($(findstring $(CONFIG),$(CONFIGS)),)
-$(error Invalid config specified)
-endif
-OPTIONS += $($(call TOUPPER,$(CONFIG))_OPTIONS)
-SOURCES += $($(call TOUPPER,$(CONFIG))_SOURCES)
-CPPFLAGS += $($(call TOUPPER,$(CONFIG))_CPPFLAGS)
-CFLAGS += $($(call TOUPPER,$(CONFIG))_CFLAGS)
-CXXFLAGS += $($(call TOUPPER,$(CONFIG))_CXXFLAGS)
-ASFLAGS += $($(call TOUPPER,$(CONFIG))_ASFLAGS)
-LDFLAGS += $($(call TOUPPER,$(CONFIG))_LDFLAGS)
-
 # Machine Name and Tool Versions
-MACHINE := $(call USCORESUB,$(shell uname -sm))
-CCNAME := $(call USCORESUB,$(notdir $(realpath $(shell which $(CC)))))
+export MACHINE := $(call USCORESUB,$(shell uname -sm))
+export CCNAME := $(call USCORESUB,$(notdir $(realpath $(shell which $(CC)))))
 
 # Build Directory
-BUILDDIR := buildresults/$(TARGET)/$(MACHINE)/$(CCNAME)/$(CONFIG)
+BUILDDIR_ROOT := buildresults
+export BUILDDIR := $(BUILDDIR_ROOT)/$(MACHINE)/$(CCNAME)
 
-# Add in the target name and host OS
-OPTIONS += __TARGET__='"$(TARGET)"' __HOST_$(HOSTOS)__
+# Target Directory
+TARGETDIR := targets
 
-# Add in the options
-CPPFLAGS += $(addprefix -D,$(OPTIONS))
+# Build Target List
+TARGETS := $(basename $(notdir $(wildcard $(TARGETDIR)/*.mk)))
 
-# Include the dependencies
-ifneq ($(MAKECMDGOALS),clean)
-sinclude $(addprefix $(BUILDDIR)/,$(call CONVERTEXT, d, $(SOURCES)))
-endif
+.DEFAULT_GOAL := help
+.PHONY : help
+help :
+	@echo "usage: make <target[.config]>"
+	@echo "       make all"
+	@echo "       make clean"
+	@echo "targets:"
+	$(call PRINTLIST,$(TARGETS), * )
 
-### Main Rule ###
-.DEFAULT_GOAL := $(BUILDDIR)/$(TARGET)
-$(BUILDDIR)/$(TARGET) : \
-		$(addprefix $(BUILDDIR)/,$(call CONVERTEXT, o, $(SOURCES)))
-	$(call OUTPUTINFO,LINK,$@)
-	$(call OUTPUTINFO,CONFIG,$(CONFIG))
-	@mkdir -p $(@D)
-	$(Q)$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+all : $(TARGETS)
+
+.PHONY : $(TARGETS)
+$(TARGETS) :
+	$(Q)$(MAKE) -f buildsystem/target.mk \
+		TARGETMK="$(TARGETDIR)/$@.mk"
+
+$(addsuffix .%,$(TARGETS)) :
+	$(Q)$(MAKE) -f buildsystem/target.mk \
+		CONFIG=$(call EXTRACT_CONFIG,$@) \
+		TARGETMK="$(TARGETDIR)/$(call EXTRACT_TARGET,$@).mk"
 
 ### Utility Rules ###
 .PHONY : clean
 clean :
-	-rm -rf buildresults/$(TARGET)
-
-.PHONY : install
-install : $(BUILDDIR)/$(TARGET)
-	$(call OUTPUTINFO,INSTALL,$<)
-	$(Q)$(INSTALL_SCRIPT) $<
-
-include buildsystem/autodep.mk
-include buildsystem/rules.mk
-
-endif # ifdef $(MKTARGETS)
+	$(Q)-rm -rf $(BUILDDIR_ROOT)
+	$(call OUTPUTINFO,CLEAN,$(BUILDDIR_ROOT))

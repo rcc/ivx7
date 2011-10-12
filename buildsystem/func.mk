@@ -24,3 +24,6 @@ OUTPUTINFO = @echo "[$1],$2" | \
 		}'
 
 PRINTLIST = @echo $1 | awk '{for(ii=1;ii<=NF;ii++){print "$2" $$ii;}}'
+
+EXTRACT_TARGET = $(basename $(1))
+EXTRACT_CONFIG = $(patsubst .%,%,$(suffix $(1)))
