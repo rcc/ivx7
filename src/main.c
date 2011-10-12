@@ -31,7 +31,7 @@
  * official policies, either expressed or implied, of Robert C. Curtis.
  */
 
-#include "vanilla.h"
+#include "app.h"
 #include <prjutil.h>
 #include <logging.h>
 #include <cmds.h>

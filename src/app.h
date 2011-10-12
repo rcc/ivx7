@@ -31,12 +31,12 @@
  * official policies, either expressed or implied, of Robert C. Curtis.
  */
 
-#ifndef I__VANILLA_H__
-	#define I__VANILLA_H__
+#ifndef I__APP_H__
+	#define I__APP_H__
 
 struct appdata_priv {
 };
 
 #define APPDATA		((struct appdata_priv *)appdata)
 
-#endif /* I__VANILLA_H__ */
+#endif /* I__APP_H__ */
