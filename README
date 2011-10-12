@@ -17,46 +17,32 @@ are under `targets'; one for a vanilla C project, and one for a Cocoa
 project. Targets can support multiple build configs, such as debug
 and release.
 
-The target makefile can be specified on the make command line or
-it can be linked to `target.mk'.
+Running make alone will provide a help and list of detected targets.
 
 ::
 
-    $ make MKTARGET=targets/vanilla.mk 
-    [CC]            src/vanilla.c
-    [CC]            lib/getline.c
-    [CC]            lib/cmds.c
-    [CC]            lib/cmds_script.c
-    [CC]            lib/cmds_shell.c
-    [LINK]          buildresults/vanilla/Darwin_i386/gcc_4_2/debug/vanilla
-    [CONFIG]        debug
-
-Configs can also be specified on the command line. By default, the
-first config in the CONFIGS list is used.
-
-::
-
-    $ make MKTARGET=targets/cocoa.mk CONFIG=release
-    [OBJCC]         src/cocoa.m
-    [CC]            lib/getline.c
-    [CC]            lib/cmds.c
-    [CC]            lib/cmds_script.c
-    [CC]            lib/cmds_shell.c
-    [LINK]          buildresults/cocoa/Darwin_i386/gcc_4_2/release/cocoa
-    [CONFIG]        release
+    $ make
+    usage: make <target[.config]>
+           make TARGETMK=<target makefile> [CONFIG=<config>]
+           make all
+           make clean
+    other options:
+           VERBOSE    setting this to 1 enables verbose output
+           INSTALL    setting this to 1 runs the install script for
+                      each goal specified
+    targets:
+     * cocoa
+     * vanilla
 
 Target Makefiles
 ++++++++++++++++
 
 TARGET
-    The name of the output executable. __TARGET__ is defined as the
-    string version of this.
+    The target makefiles basename is used to create this variable unless
+    it is defined in the environment.
 
 SOURCES
     List of all sources to compile for the target.
-
-<CONFIG>_SOURCES
-    Configuration specific sources.
 
 LIBRARIES
     List of all required libraries to link against. Each library
@@ -68,11 +54,8 @@ OPTIONS
     Global build options for all configurations. Each option becomes
     a -D<option> style flag.
 
-<CONFIG>_OPTIONS
-    Configuration specific options.
-
 FRAMEWORKS
-    List of frameworks to build against. (Obj-C)
+    List of frameworks to build against. (Obj-C / OS X)
 
 All flags can be appended to in the target makefile as well. For
 example, `CPPFLAGS += <flag>'

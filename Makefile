@@ -35,8 +35,13 @@ endif
 .PHONY : help
 help :
 	@echo "usage: make <target[.config]>"
+	@echo "       make TARGETMK=<target makefile> [CONFIG=<config>]"
 	@echo "       make all"
 	@echo "       make clean"
+	@echo "other options:"
+	@echo "       VERBOSE    setting this to 1 enables verbose output"
+	@echo "       INSTALL    setting this to 1 runs the install script for"
+	@echo "                  each goal specified"
 	@echo "targets:"
 	$(call PRINTLIST,$(TARGETS), * )
 
