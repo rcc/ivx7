@@ -38,7 +38,7 @@ Target Makefiles
 ++++++++++++++++
 
 TARGET
-    The target makefiles basename is used to create this variable unless
+    The target makefile's basename is used to create this variable unless
     it is defined in the environment.
 
 SOURCES
