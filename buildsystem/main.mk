@@ -7,7 +7,10 @@ CXXFLAGS = $(CFLAGS)
 ASFLAGS :=
 LDFLAGS :=
 OPTIONS :=
-ANALYZE_FLAGS := -analyzer-viz-egraph-graphviz -analyzer-opt-analyze-headers -analyzer-inline-call -analyzer-output=html
+ANALYZE_FLAGS :=	-analyzer-viz-egraph-graphviz \
+			-analyzer-opt-analyze-headers \
+			-analyzer-inline-call \
+			-analyzer-output=html
 
 ifeq ($(TARGET),)
 $(error no TARGET defined)
