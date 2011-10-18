@@ -2,6 +2,7 @@ CONFIGS := debug release snow
 
 # Sources
 SOURCES :=	src/main.c \
+		src/prepost.c \
 		lib/logging.c \
 		lib/getline.c \
 		lib/dict.c \

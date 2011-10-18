@@ -2,6 +2,7 @@ CONFIGS := debug release
 
 # Sources
 SOURCES :=	src/entry.m \
+		src/prepost.c \
 		src/AppMgr.m \
 		lib/logging.c \
 		lib/getline.c \

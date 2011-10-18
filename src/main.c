@@ -58,21 +58,8 @@ const char *default_cmds[] = {
 	"help",
 };
 
-/*
- * Pre-command Functions
- * 	These functions get run before any commands are processed. They should
- * 	return 0 on success.
- */
-int (*precmdfuncs[])(struct appdata_priv *priv) = {
-};
-
-/*
- * Post-command Functions
- * 	These functions get run after all commands are processed. They should
- * 	return 0 on success.
- */
-int (*postcmdfuncs[])(struct appdata_priv *priv) = {
-};
+extern int (*precmdfuncs[])(struct appdata_priv *priv);
+extern int (*postcmdfuncs[])(struct appdata_priv *priv);
 
 int main(int argc, const char * argv[])
 {
@@ -96,7 +83,7 @@ int main(int argc, const char * argv[])
 	logverbose("Command: %s\n", cmdname);
 
 	/* run the pre-command functions */
-	for(i = 0; i < ARRAY_SIZE(precmdfuncs); i++) {
+	for(i = 0; precmdfuncs[i]; i++) {
 		logverbose("running pre-command function %d\n", i);
 		if(precmdfuncs[i](&apppriv) != 0) {
 			logerror("pre-command function %d returned error\n", i);
@@ -124,7 +111,7 @@ int main(int argc, const char * argv[])
 	}
 
 	/* run the post-command functions */
-	for(i = 0; i < ARRAY_SIZE(postcmdfuncs); i++) {
+	for(i = 0; postcmdfuncs[i]; i++) {
 		logverbose("running post-command function %d\n", i);
 		if(postcmdfuncs[i](&apppriv) != 0) {
 			logerror("post-command function %d returned error\n",
