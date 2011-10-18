@@ -73,7 +73,9 @@
 
 /* LOGINFO */
 #if MAX_LOGLEVEL >= LOGLEVEL_INFO
-#define loginfo(fmt, args...)		_log(LOGLEVEL_INFO, fmt, ## args)
+#define loginfo(fmt, args...)		_log(LOGLEVEL_INFO, \
+						"[I] %s(%d): " fmt, \
+						__FUNCTION__, __LINE__, ## args)
 #else
 #define loginfo(fmt, args...)
 #endif
