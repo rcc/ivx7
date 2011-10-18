@@ -7,6 +7,7 @@ CXXFLAGS = $(CFLAGS)
 ASFLAGS :=
 LDFLAGS :=
 OPTIONS :=
+ANALYZE_FLAGS := -analyzer-viz-egraph-graphviz -analyzer-opt-analyze-headers -analyzer-inline-call -analyzer-output=html
 
 ifeq ($(TARGET),)
 $(error no TARGET defined)
@@ -49,6 +50,10 @@ $(BUILDDIR)/$(TARGET) : \
 	$(call OUTPUTINFO,LINK,$@)
 	@mkdir -p $(@D)
 	$(Q)$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
+ifeq ($(ANALYZE),1)
+	$(call OUTPUTINFO,ANALYZE,generating report)
+	$(Q)buildsystem/gen_analyzer_report $(BUILDDIR)
+endif
 
 ### Utility Rules ###
 ifneq ($(INSTALL_SCRIPT),)

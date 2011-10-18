@@ -42,6 +42,7 @@ help :
 	@echo "       VERBOSE    setting this to 1 enables verbose output"
 	@echo "       INSTALL    setting this to 1 runs the install script for"
 	@echo "                  each goal specified"
+	@echo "       ANALYZE    run static analysis (only works with clang)"
 	@echo "targets:"
 	$(call PRINTLIST,$(TARGETS), * )
 

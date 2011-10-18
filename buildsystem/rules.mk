@@ -3,6 +3,12 @@ $(BUILDDIR)/%.o : %.c
 	$(call OUTPUTINFO,CC,$<)
 	$(Q)[ -d "$(@D)" ] || mkdir -p "$(@D)"
 	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) -c -o $@ $<
+ifeq ($(ANALYZE),1)
+	$(call OUTPUTINFO,ANALYZE,$<)
+	$(Q)$(CC) $(CPPFLAGS) $(CFLAGS) \
+		$(addprefix -Xanalyzer ,$(ANALYZE_FLAGS)) --analyze \
+		-o $@.analyze $<
+endif
 
 $(BUILDDIR)/%.o : %.m
 	$(call OUTPUTINFO,OBJCC,$<)
