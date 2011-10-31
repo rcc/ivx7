@@ -130,6 +130,17 @@
 /******************************************************************************/
 
 /*******************************************************************************
+ * __unused
+ * 	unused attribute
+ */
+#ifndef __unused
+#ifdef __GNUC__
+#define __unused	__attribute__((unused))
+#endif
+#endif
+/******************************************************************************/
+
+/*******************************************************************************
  * __printf_check
  * 	attribute for printf style functions. istr is the 1 based index of the
  * 	format string. iarg is the 1 based index of the arguments.
