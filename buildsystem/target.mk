@@ -4,9 +4,7 @@ ifeq ($(TARGETMK),)
 $(error TARGETMK not defined)
 endif
 
-ifeq ($(TARGET),)
-TARGET=$(basename $(notdir $(TARGETMK)))
-endif
+TARGET ?= $(basename $(notdir $(TARGETMK)))
 
 ifeq ($(CONFIG),)
 .DEFAULT_GOAL := all
