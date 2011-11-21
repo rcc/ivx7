@@ -29,7 +29,7 @@ OPTIONS += SCMVERSION='"$(SCMVERSION)"'
 OPTIONS += SCMBRANCH='"$(SCMBRANCH)"'
 CPPFLAGS += -DBUILD_DATE='"$(shell date)"'
 
-# Release
+# Release Config
 ifeq ($(CONFIG),release)
 # Options
 OPTIONS += MAX_LOGLEVEL=3 DEFAULT_LOGLEVEL=2
@@ -37,7 +37,7 @@ OPTIONS += MAX_LOGLEVEL=3 DEFAULT_LOGLEVEL=2
 CFLAGS += -O2
 endif
 
-# Config
+# Debug Config
 ifeq ($(CONFIG),debug)
 # Options
 OPTIONS += MAX_LOGLEVEL=5 DEFAULT_LOGLEVEL=4
@@ -45,7 +45,7 @@ OPTIONS += MAX_LOGLEVEL=5 DEFAULT_LOGLEVEL=4
 CFLAGS += -O0 -g
 endif
 
-# Snow
+# Snow Config
 ifeq ($(CONFIG),snow)
 # Options
 OPTIONS += MAX_LOGLEVEL=5 DEFAULT_LOGLEVEL=4

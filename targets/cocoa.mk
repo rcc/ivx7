@@ -27,7 +27,7 @@ CPPFLAGS += -DBUILD_DATE='"$(shell date)"'
 # Options
 OPTIONS += LOG_WITH_NSLOG
 
-# Release
+# Release Config
 ifeq ($(CONFIG),release)
 # Options
 OPTIONS += MAX_LOGLEVEL=3 DEFAULT_LOGLEVEL=2
@@ -35,7 +35,7 @@ OPTIONS += MAX_LOGLEVEL=3 DEFAULT_LOGLEVEL=2
 CFLAGS += -O2
 endif
 
-# Config
+# Debug Config
 ifeq ($(CONFIG),debug)
 # Options
 OPTIONS += MAX_LOGLEVEL=5 DEFAULT_LOGLEVEL=4
