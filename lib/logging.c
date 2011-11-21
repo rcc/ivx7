@@ -77,7 +77,7 @@ static void __constructor _init_logging(void)
 	}
 }
 
-#ifdef WITH_NO_CMDS
+#ifndef WITH_NO_CMDS
 /* Some commands to handle changing logging behavior during run-time */
 CMDHANDLER(setloglevel)
 {
