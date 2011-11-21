@@ -46,3 +46,8 @@ $(BUILDDIR)/%.o : %.s
 	$(call OUTPUTINFO,AR,$@)
 	$(Q)[ -d "$(@D)" ] || mkdir -p "$(@D)"
 	$(Q)$(AR) crs $@ $^
+
+%.dylib :
+	$(call OUTPUTINFO,DYLIB,$@)
+	$(Q)[ -d "$(@D)" ] || mkdir -p "$(@D)"
+	$(Q)$(CC) -dynamiclib $(LDFLAGS) $^ $(LDLIBS) -o $@

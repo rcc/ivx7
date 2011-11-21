@@ -77,6 +77,7 @@ static void __constructor _init_logging(void)
 	}
 }
 
+#if !WITH_NO_CMDS
 /* Some commands to handle changing logging behavior during run-time */
 CMDHANDLER(setloglevel)
 {
@@ -107,3 +108,4 @@ APPCMD(loglevel, &setloglevel, "set the log level",
 		"  4 - DEBUG\n"
 		"  5 - VERBOSE",
 		NULL);
+#endif /* !WITH_NO_CMDS */

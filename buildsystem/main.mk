@@ -47,9 +47,13 @@ CPPFLAGS += $(addprefix -D,$(OPTIONS))
 sinclude $(addprefix $(BUILDDIR)/,$(call CONVERTEXT, d, $(SOURCES)))
 
 ### Main Rule ###
-.DEFAULT_GOAL := $(BUILDDIR)/$(TARGET)
-$(BUILDDIR)/$(TARGET) : \
+TARGET_TYPE := $(strip $(TARGET_TYPE))
+.DEFAULT_GOAL := $(BUILDDIR)/$(TARGET)$(TARGET_TYPE)
+$(BUILDDIR)/$(TARGET)$(TARGET_TYPE) : \
 		$(addprefix $(BUILDDIR)/,$(call CONVERTEXT, o, $(SOURCES)))
+
+# Standard type targets
+$(BUILDDIR)/$(TARGET) :
 	$(call OUTPUTINFO,LINK,$@)
 	@mkdir -p $(@D)
 	$(Q)$(CC) $(LDFLAGS) $^ $(LDLIBS) -o $@
@@ -61,7 +65,7 @@ endif
 ### Utility Rules ###
 ifneq ($(INSTALL_SCRIPT),)
 .PHONY : install
-install : $(BUILDDIR)/$(TARGET)
+install : $(BUILDDIR)/$(TARGET)$(TARGET_TYPE)
 	$(call OUTPUTINFO,INSTALL,$<)
 	$(Q)$(INSTALL_SCRIPT) $<
 endif
