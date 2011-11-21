@@ -17,7 +17,7 @@ export MACHINE := $(call USCORESUB,$(shell uname -sm))
 export CCNAME := $(call USCORESUB,$(notdir $(realpath $(shell which $(CC)))))
 
 # Build Directory
-BUILDDIR_ROOT := buildresults
+export BUILDDIR_ROOT := buildresults
 export BUILDDIR := $(BUILDDIR_ROOT)/$(MACHINE)/$(CCNAME)
 
 # Target Directory
