@@ -54,7 +54,7 @@ struct threadpool {
 	 *
 	 * These members need to be filled by the owner of the thread pool.
 	 * They should be filled after the call to threadpool_init() since
-	 * it zeros the structure.
+	 * it sets defaults.
 	 */
 	struct {
 		unsigned int max_threads;

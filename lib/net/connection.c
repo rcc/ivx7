@@ -121,8 +121,8 @@ void net_close_connection(struct net_connection *c)
 
 void net_deinit_connection(struct net_connection *c)
 {
-	pthread_mutex_lock(&c->cx_lock);
 	pthread_mutex_lock(&c->rxb.lock);
+	pthread_mutex_lock(&c->cx_lock);
 	if(c->rxb.buf) {
 		free(c->rxb.buf);
 		c->rxb.buf = NULL;

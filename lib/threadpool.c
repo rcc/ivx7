@@ -245,12 +245,12 @@ void threadpool_queue_work(struct threadpool *pool, struct list_head *work)
 int threadpool_is_work_done(struct threadpool *pool)
 {
 	int ret;
-	pthread_mutex_lock(&pool->pool_lock);
 	pthread_mutex_lock(&pool->queue_lock);
+	pthread_mutex_lock(&pool->pool_lock);
 	ret = (!pool->work_count &&
 			(pool->idle_threads == pool->pool_thread_count));
-	pthread_mutex_unlock(&pool->queue_lock);
 	pthread_mutex_unlock(&pool->pool_lock);
+	pthread_mutex_unlock(&pool->queue_lock);
 	return ret;
 }
 
