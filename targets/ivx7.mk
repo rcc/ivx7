@@ -1,4 +1,4 @@
-CONFIGS := debug release snow
+CONFIGS := debug release
 
 # Sources
 SOURCES :=	src/main.c \
@@ -10,15 +10,6 @@ SOURCES :=	src/main.c \
 		lib/cmds_script.c \
 		lib/cmds_shell.c \
 		src/cmds/version.c \
-
-ifeq ($(CONFIG),snow)
-SOURCES +=	lib/threadpool.c \
-		lib/net/util.c \
-		lib/net/pkv.c \
-		lib/net/connection.c \
-		lib/net/listen.c \
-
-endif
 
 # Libraries
 LIBRARIES := readline
@@ -41,15 +32,6 @@ endif
 ifeq ($(CONFIG),debug)
 # Options
 OPTIONS += MAX_LOGLEVEL=5 DEFAULT_LOGLEVEL=4
-# Flags
-CFLAGS += -O0 -g
-endif
-
-# Snow Config
-ifeq ($(CONFIG),snow)
-# Options
-OPTIONS += MAX_LOGLEVEL=5 DEFAULT_LOGLEVEL=4
-OPTIONS += THREADPOOLTESTCMD NETCONNECTIONTESTCMD
 # Flags
 CFLAGS += -O0 -g
 endif
