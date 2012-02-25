@@ -12,8 +12,12 @@ SOURCES :=	src/main.c \
 		lib/cmds_shell.c \
 		lib/serial/serial.c \
 		lib/serial/device_chooser.c \
+		lib/hexdump.c \
+		lib/timelib.c \
+		src/vx7if/vx7if.c \
 		src/cmds/version.c \
 		src/cmds/device.c \
+		src/cmds/clone.c \
 
 # Libraries
 LIBRARIES := readline
@@ -30,7 +34,7 @@ CPPFLAGS += -DBUILD_DATE='"$(shell date)"'
 # Release Config
 ifeq ($(CONFIG),release)
 # Options
-OPTIONS += MAX_LOGLEVEL=3 DEFAULT_LOGLEVEL=2
+OPTIONS += MAX_LOGLEVEL=4 DEFAULT_LOGLEVEL=3
 # Flags
 CFLAGS += -O2
 endif
