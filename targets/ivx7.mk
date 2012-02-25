@@ -3,16 +3,23 @@ CONFIGS := debug release
 # Sources
 SOURCES :=	src/main.c \
 		src/prepost.c \
+		src/ivx7_app.c \
 		lib/logging.c \
 		lib/getline.c \
 		lib/dict.c \
 		lib/cmds.c \
 		lib/cmds_script.c \
 		lib/cmds_shell.c \
+		lib/serial/serial.c \
+		lib/serial/device_chooser.c \
 		src/cmds/version.c \
+		src/cmds/device.c \
 
 # Libraries
 LIBRARIES := readline
+
+# Frameworks
+FRAMEWORKS := CoreFoundation IOKit
 
 # Version
 include buildsystem/git.mk

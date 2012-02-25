@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Robert C. Curtis. All rights reserved.
+ * Copyright 2012 Robert C. Curtis. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,24 +32,23 @@
  */
 
 #include "app.h"
-#include <prjutil.h>
+#include <logging.h>
+#include <string.h>
 
-/*
- * Pre-command Functions
- * 	These functions get run before any commands are processed. They should
- * 	return 0 on success.
- */
-int (*precmdfuncs[])(struct appdata_priv *priv) = {
-	&ivx7_init,
-	NULL
-};
+int ivx7_init(struct appdata_priv *priv)
+{
+	memset(priv, 0, sizeof(*priv));
 
-/*
- * Post-command Functions
- * 	These functions get run after all commands are processed. They should
- * 	return 0 on success.
- */
-int (*postcmdfuncs[])(struct appdata_priv *priv) = {
-	&ivx7_deinit,
-	NULL
-};
+	return 0;
+}
+
+int ivx7_deinit(struct appdata_priv *priv)
+{
+	if(priv->dev) {
+		logverbose("closing serial device\n");
+		serial_close(priv->dev);
+		priv->dev = NULL;
+	}
+
+	return 0;
+}

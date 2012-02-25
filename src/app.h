@@ -31,12 +31,18 @@
  * official policies, either expressed or implied, of Robert C. Curtis.
  */
 
+#include <serial/serial.h>
+
 #ifndef I__APP_H__
 	#define I__APP_H__
 
 struct appdata_priv {
+	struct serial_device *dev;
 };
 
 #define APPDATA		((struct appdata_priv *)appdata)
+
+int ivx7_init(struct appdata_priv *priv);
+int ivx7_deinit(struct appdata_priv *priv);
 
 #endif /* I__APP_H__ */
