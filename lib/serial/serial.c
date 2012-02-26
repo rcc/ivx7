@@ -176,11 +176,15 @@ struct serial_device *serial_open(const char *device_path, uint32_t baud,
 		goto error_exit;
 	}
 	/* Disable canonicalize, echo, and signals */
-	options.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+	options.c_lflag &= ~(ICANON | ECHO | ECHOE | ECHOK | ECHONL | ISIG |
+			IEXTEN);
 	/* Disable output processing */
 	options.c_oflag &= ~OPOST;
 	options.c_cc[VMIN] = 0;
 	options.c_cc[VTIME] = 1;
+
+	/* Turn off some input flags */
+	options.c_iflag &= ~(INLCR | IGNCR | ICRNL | IGNBRK);
 
 	if(baud != 0) {
 		options.c_ispeed = baud;
