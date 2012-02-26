@@ -41,7 +41,7 @@
 #define VX7_CHECKSUM		0x3F52
 
 #ifndef VX7_INTER_BYTE_DELAY
-#define VX7_INTER_BYTE_DELAY	14000
+#define VX7_INTER_BYTE_DELAY	8000
 #endif
 
 /*********************************** Data ***********************************/
