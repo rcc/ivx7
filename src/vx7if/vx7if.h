@@ -37,23 +37,17 @@
 #ifndef I__VX7IF_H__
 	#define I__VX7IF_H__
 
-#define VX7_CLONE_SIZE	16211
-#define VX7_CHECKSUM	0x3F52
+#define VX7_CLONE_SIZE		16211
+#define VX7_CHECKSUM		0x3F52
 
-/* FUNCTION:    vx7if_device_ready
- *
- * + DESCRIPTION:
- *   - checks if a device is ready for communication
- *
- * + PARAMETERS:
- *   + struct serial_device *dev
- *     - open serial device
- *
- * + RETURNS: int
- *   - boolean
- */
-int vx7if_device_ready(struct serial_device *dev);
+#ifndef VX7_INTER_BYTE_DELAY
+#define VX7_INTER_BYTE_DELAY	14000
+#endif
 
+/*********************************** Data ***********************************/
+uint8_t vx7if_checksum(const uint8_t *clonebuf);
+
+/******************************* Communication ******************************/
 /* FUNCTION:    vx7if_clone_receive
  *
  * + DESCRIPTION:
@@ -69,5 +63,21 @@ int vx7if_device_ready(struct serial_device *dev);
  *   - size of data, -1 on error
  */
 ssize_t vx7if_clone_receive(struct serial_device *dev, uint8_t *buf);
+
+/* FUNCTION:    vx7if_clone_send
+ *
+ * + DESCRIPTION:
+ *   - send a clone file to a device
+ *
+ * + PARAMETERS:
+ *   + struct serial_device *dev
+ *     - open serial device
+ *   + uint8_t *buf
+ *     - clone buffer
+ *
+ * + RETURNS: int
+ *   - 0 on success, -1 on failure
+ */
+int vx7if_clone_send(struct serial_device *dev, const uint8_t *buf);
 
 #endif /* I__VX7IF_H__ */

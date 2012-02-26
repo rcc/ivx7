@@ -72,9 +72,6 @@ CMDHANDLER(clonerx)
 
 	printf("Power on device while holding [MON]\n");
 	printf("Screen should read \"CLONE\"\n");
-
-	while(!vx7if_device_ready(APPDATA->dev));
-
 	printf("Press [BAND]\n");
 
 	if((l = vx7if_clone_receive(APPDATA->dev, buf)) > 0) {
@@ -103,3 +100,66 @@ END_CMD_OPTS;
 APPCMD_OPT(clonerx, &clonerx, "read configuration from device",
 		"usage: clonerx [OPTIONS] <output file>",
 		NULL, clonerx_opts);
+
+CMDHANDLER(clonetx)
+{
+	int ret = 1;
+	void *buf;
+	FILE *in;
+
+	if(APPDATA->dev == NULL) {
+		logerror("no open device\n");
+		return -1;
+	}
+
+	if(argc < 1) {
+		logerror("must specify input filename\n");
+		return -1;
+	}
+
+	/* Open input file */
+	if((in = fopen(argv[0], "r")) == NULL) {
+		logerror("could not open input file: %s\n", strerror(errno));
+		return -1;
+	}
+	/* Allocate clone buffer */
+	if((buf = malloc(VX7_CLONE_SIZE)) == NULL) {
+		logerror("could not allocate buffer: %s\n", strerror(errno));
+		fclose(in);
+		return -1;
+	}
+
+	/* Read file */
+	if(fread(buf, 1, VX7_CLONE_SIZE, in) != VX7_CLONE_SIZE) {
+		logerror("invalid read size\n");
+		ret = -1;
+		goto exit;
+	}
+
+	printf("Power on device while holding [MON]\n");
+	printf("Screen should read \"CLONE\"\n");
+	printf("Press [V/M]\n");
+	printf("Screen should read \"CLONE WAIT\"\n");
+	printf("press 'p' then enter: ");
+	while(getc(stdin) != 'p');
+
+	if(vx7if_clone_send(APPDATA->dev, buf) != 0) {
+		logerror("clone error\n");
+		ret = -1;
+		goto exit;
+	} else {
+		printf("Complete\n");
+	}
+
+exit:
+	free(buf);
+	fclose(in);
+	return ret;
+}
+
+START_CMD_OPTS(clonetx_opts)
+END_CMD_OPTS;
+
+APPCMD_OPT(clonetx, &clonetx, "send configuration to device",
+		"usage: clonetx [OPTIONS] <input file>",
+		NULL, clonetx_opts);

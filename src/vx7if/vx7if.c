@@ -37,11 +37,12 @@
 #include <logging.h>
 #include <serial/serial.h>
 #include <timelib.h>
+#include <unistd.h>
 
 #include <stddef.h>
 
 /*********************************** Data ***********************************/
-uint8_t vx7if_checksum(uint8_t *clonebuf)
+uint8_t vx7if_checksum(const uint8_t *clonebuf)
 {
 	size_t i;
 	uint8_t sum;
@@ -52,6 +53,23 @@ uint8_t vx7if_checksum(uint8_t *clonebuf)
 }
 
 /******************************* Communication ******************************/
+static int vx7if_wait_for_ack(struct serial_device *dev)
+{
+	const uint8_t ack = 0x06;
+	uint8_t b = 0;
+	struct timeval s;
+
+	gettimeofday(&s, NULL);
+	while(!time_has_elapsed_us(&s, 200 * 1000)) {
+		if(serial_read(dev, &b, sizeof(b)) > 0) {
+			break;
+		}
+	}
+	logdebug("ack took %u ms\n", (uint32_t)(time_elapsed_us(&s) / 1000));
+
+	return (b == ack) ? 0 : -1;
+}
+
 static int vx7if_ack(struct serial_device *dev)
 {
 	const uint8_t ack = 0x06;
@@ -59,19 +77,13 @@ static int vx7if_ack(struct serial_device *dev)
 	struct timeval s;
 
 	serial_flush(dev);
-	serial_write(dev, &ack, 1);
+	if(serial_write(dev, &ack, 1) != 1)
+		return -1;
 	gettimeofday(&s, NULL);
 	while((serial_read(dev, &b, sizeof(b)) == 0) &&
 			!time_has_elapsed_us(&s, 200 * 1000));
 
 	return (b == ack) ? 0 : -1;
-}
-
-int vx7if_device_ready(struct serial_device *dev)
-{
-	if(vx7if_ack(dev) == 0)
-		return 1;
-	return 0;
 }
 
 ssize_t vx7if_clone_receive(struct serial_device *dev, uint8_t *buf)
@@ -128,4 +140,58 @@ ssize_t vx7if_clone_receive(struct serial_device *dev, uint8_t *buf)
 	}
 
 	return (ssize_t)i;
+}
+
+int vx7if_clone_send(struct serial_device *dev, const uint8_t *buf)
+{
+	size_t i;
+	struct timeval s;
+
+	serial_flush(dev);
+
+	if(vx7if_checksum(buf) != buf[VX7_CHECKSUM]) {
+		logerror("invalid checksum\n");
+		return -1;
+	}
+
+	for(i = 0; i < VX7_CLONE_SIZE; i++) {
+		uint8_t b;
+
+		/* Write bytes */
+		if(serial_write(dev, buf + i, 1) != 1) {
+			logerror("send error\n");
+			return -1;
+		}
+		/* Handle echoed bytes */
+		b = ~buf[i];
+		gettimeofday(&s, NULL);
+		while((serial_read(dev, &b, 1) == 0) &&
+				!time_has_elapsed_us(&s, 200 * 1000));
+		if(b != buf[i]) {
+			logwarn("echo byte mismatch (%02x != %02x)\n",
+					b, buf[i]);
+		}
+
+		/* Handle the two acks that happen after the first 10
+		 * then 8 bytes.
+		 */
+		if(i == 9 || i == 17) {
+			if(vx7if_wait_for_ack(dev) != 0) {
+				logerror("ack failed\n");
+				return -1;
+			}
+		}
+
+		/* Progress */
+		if((i % 1000) == 0) {
+			loginfo("%u%% complete\n", (uint32_t)i * 100 /
+					(VX7_CLONE_SIZE - 1));
+		}
+
+		usleep(VX7_INTER_BYTE_DELAY);
+	}
+
+	loginfo("%u%% complete\n", (uint32_t)i * 100 / (VX7_CLONE_SIZE - 1));
+
+	return 0;
 }
