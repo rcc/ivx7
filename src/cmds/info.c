@@ -33,6 +33,7 @@
 
 #include <app.h>
 #include <cmds.h>
+#include <hexdump.h>
 #include <vx7if/vx7if.h>
 
 #include <stdio.h>
@@ -40,76 +41,12 @@
 #include <string.h>
 #include <errno.h>
 
-CMDHANDLER(clonerx)
-{
-	int ret = 1;
-	struct vx7_clone_data *clone;
-	ssize_t l;
-	FILE *out;
-
-	if(APPDATA->dev == NULL) {
-		logerror("no open device\n");
-		return -1;
-	}
-
-	if(argc < 1) {
-		logerror("must specify output filename\n");
-		return -1;
-	}
-
-	/* Open output file */
-	if((out = fopen(argv[0], "w")) == NULL) {
-		logerror("could not open output file: %s\n", strerror(errno));
-		return -1;
-	}
-	/* Allocate clone buffer */
-	if((clone = malloc(sizeof(*clone))) == NULL) {
-		logerror("could not allocate buffer: %s\n", strerror(errno));
-		fclose(out);
-		return -1;
-	}
-
-	printf("Power on device while holding [MON]\n");
-	printf("Screen should read \"CLONE\"\n");
-	printf("Press [BAND]\n");
-
-	if((l = vx7if_clone_receive(APPDATA->dev, clone)) > 0) {
-		printf("Writing file...\n");
-		if(fwrite(clone, 1, l, out) != l) {
-			logerror("error writing file: %s\n", strerror(errno));
-			ret = -1;
-			goto exit;
-		}
-		printf("Complete\n");
-	} else {
-		logerror("error receiving from device\n");
-		ret = -1;
-		goto exit;
-	}
-
-exit:
-	free(clone);
-	fclose(out);
-	return ret;
-}
-
-START_CMD_OPTS(clonerx_opts)
-END_CMD_OPTS;
-
-APPCMD_OPT(clonerx, &clonerx, "read configuration from device",
-		"usage: clonerx [OPTIONS] <output file>",
-		NULL, clonerx_opts);
-
-CMDHANDLER(clonetx)
+CMDHANDLER(cloneinfo)
 {
 	int ret = 1;
 	struct vx7_clone_data *clone;
 	FILE *in;
-
-	if(APPDATA->dev == NULL) {
-		logerror("no open device\n");
-		return -1;
-	}
+	int i, j;
 
 	if(argc < 1) {
 		logerror("must specify input filename\n");
@@ -121,7 +58,7 @@ CMDHANDLER(clonetx)
 		logerror("could not open input file: %s\n", strerror(errno));
 		return -1;
 	}
-	/* Allocate clone buffer */
+	/* Allocate clone data buffer */
 	if((clone = malloc(sizeof(*clone))) == NULL) {
 		logerror("could not allocate buffer: %s\n", strerror(errno));
 		fclose(in);
@@ -135,19 +72,33 @@ CMDHANDLER(clonetx)
 		goto exit;
 	}
 
-	printf("Power on device while holding [MON]\n");
-	printf("Screen should read \"CLONE\"\n");
-	printf("Press [V/M]\n");
-	printf("Screen should read \"CLONE WAIT\"\n");
-	printf("press 'p' then enter: ");
-	while(getc(stdin) != 'p');
+	/* Size */
+	printf("Clone size: %u (0x%x) bytes\n",
+			(uint32_t)sizeof(*clone),
+			(uint32_t)sizeof(*clone));
 
-	if(vx7if_clone_send(APPDATA->dev, clone) != 0) {
-		logerror("clone error\n");
-		ret = -1;
+	/* Checksum */
+	if(vx7if_checksum(clone) != clone->checksum) {
+		printf("Checksum is invalid (%02x != %02x)\n", clone->checksum,
+				vx7if_checksum(clone));
 		goto exit;
 	} else {
-		printf("Complete\n");
+		printf("Checksum is valid: %02x\n", clone->checksum);
+	}
+
+	/* Memory Locations */
+	/* Regular */
+	for(i = 0; i < ARRAY_SIZE(clone->regular); i++) {
+		if(clone->regular[i].unknown0 != 0xFF) {
+			printf("M%03d: ", i + 1);
+			for(j = 0; j < ARRAY_SIZE(clone->regular[i].tag); j++) {
+				printf("%c", vx2ascii(clone->regular[i].tag[j],
+						clone->regular[i].charset));
+			}
+			printf("\n");
+			hexdump(stdout, &clone->regular[i],
+					sizeof(clone->regular[0]));
+		}
 	}
 
 exit:
@@ -156,9 +107,9 @@ exit:
 	return ret;
 }
 
-START_CMD_OPTS(clonetx_opts)
+START_CMD_OPTS(cloneinfo_opts)
 END_CMD_OPTS;
 
-APPCMD_OPT(clonetx, &clonetx, "send configuration to device",
-		"usage: clonetx [OPTIONS] <input file>",
-		NULL, clonetx_opts);
+APPCMD_OPT(cloneinfo, &cloneinfo, "display information for a clone file",
+		"usage: cloneinfo [OPTIONS] <input file>",
+		NULL, cloneinfo_opts);

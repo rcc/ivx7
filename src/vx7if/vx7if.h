@@ -31,21 +31,67 @@
  * official policies, either expressed or implied, of Robert C. Curtis.
  */
 
+#include "vxcharset.h"
+
 #include <serial/serial.h>
+#include <prjutil.h>
+#include <stdint.h>
 #include <stddef.h>
 
 #ifndef I__VX7IF_H__
 	#define I__VX7IF_H__
-
-#define VX7_CLONE_SIZE		16211
-#define VX7_CHECKSUM		0x3F52
 
 #ifndef VX7_INTER_BYTE_DELAY
 #define VX7_INTER_BYTE_DELAY	8000
 #endif
 
 /*********************************** Data ***********************************/
-uint8_t vx7if_checksum(const uint8_t *clonebuf);
+struct vx7_mem_entry {
+	uint8_t unknown0;
+	uint8_t power_level__step;
+	uint8_t freq_100M_10M;
+	uint8_t freq_1M_100K;
+	uint8_t freq_10K_1K;
+	uint8_t mode;
+	uint8_t tag[8];
+	uint8_t unknown14;
+	uint8_t tx_freq_100M_10M;
+	uint8_t tx_freq_1M_100K;
+	uint8_t tx_freq_10K_1K;
+	uint8_t tone_freq;
+	uint8_t dcs_code;
+	uint8_t ctcss_dcs;
+	uint8_t charset;
+} __packed;
+
+struct vx7_clone_data {
+	uint8_t _resv0[0x1322];
+	struct vx7_mem_entry regular[450];
+	struct vx7_mem_entry one_touch[10];
+	struct vx7_mem_entry pms[40];
+	uint8_t _resv1[312];
+	uint8_t checksum;
+} __packed;
+
+/* Stop myself from making stupid mistakes when editing vx7_clone_data
+ * structure.
+ */
+static int __unused
+_vx7_clone_data_size_check[((sizeof(struct vx7_clone_data) == 16211) ? 0 : -1)];
+
+/* FUNCTION:    vx7if_checksum
+ *
+ * + DESCRIPTION:
+ *   - calculate clone checksum
+ *
+ * + PARAMETERS:
+ *   + const struct vx7_clone_data *clone
+ *     - clone data
+ *
+ * + RETURNS: uint8_t
+ *   - checksum
+ */
+uint8_t vx7if_checksum(const struct vx7_clone_data *clone);
 
 /******************************* Communication ******************************/
 /* FUNCTION:    vx7if_clone_receive
@@ -56,13 +102,14 @@ uint8_t vx7if_checksum(const uint8_t *clonebuf);
  * + PARAMETERS:
  *   + struct serial_device *dev
  *     - open serial device
- *   + uint8_t *buf
- *     - buffer to store clone data. should be at least VX_CLONE_SIZE
+ *   + struct vx7_clone_data *clone
+ *     - buffer to store clone data
  *
  * + RETURNS: ssize_t
  *   - size of data, -1 on error
  */
-ssize_t vx7if_clone_receive(struct serial_device *dev, uint8_t *buf);
+ssize_t vx7if_clone_receive(struct serial_device *dev,
+		struct vx7_clone_data *clone);
 
 /* FUNCTION:    vx7if_clone_send
  *
@@ -72,12 +119,13 @@ ssize_t vx7if_clone_receive(struct serial_device *dev, uint8_t *buf);
  * + PARAMETERS:
  *   + struct serial_device *dev
  *     - open serial device
- *   + uint8_t *buf
- *     - clone buffer
+ *   + struct vx7_clone_data *clone
+ *     - clone data
  *
  * + RETURNS: int
  *   - 0 on success, -1 on failure
  */
-int vx7if_clone_send(struct serial_device *dev, const uint8_t *buf);
+int vx7if_clone_send(struct serial_device *dev,
+		const struct vx7_clone_data *clone);
 
 #endif /* I__VX7IF_H__ */

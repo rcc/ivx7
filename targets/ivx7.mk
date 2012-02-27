@@ -15,9 +15,11 @@ SOURCES :=	src/main.c \
 		lib/hexdump.c \
 		lib/timelib.c \
 		src/vx7if/vx7if.c \
+		src/vx7if/vxcharset.c \
 		src/cmds/version.c \
 		src/cmds/device.c \
 		src/cmds/clone.c \
+		src/cmds/info.c \
 
 # Libraries
 LIBRARIES := readline

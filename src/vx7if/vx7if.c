@@ -42,12 +42,13 @@
 #include <stddef.h>
 
 /*********************************** Data ***********************************/
-uint8_t vx7if_checksum(const uint8_t *clonebuf)
+uint8_t vx7if_checksum(const struct vx7_clone_data *clone)
 {
 	size_t i;
 	uint8_t sum;
 
-	for(i = 0, sum = 0; i < VX7_CHECKSUM; sum += clonebuf[i++]);
+	for(i = 0, sum = 0; i < offsetof(struct vx7_clone_data, checksum);
+			sum += ((uint8_t *)clone)[i++]);
 
 	return sum;
 }
@@ -86,7 +87,8 @@ static int vx7if_ack(struct serial_device *dev)
 	return (b == ack) ? 0 : -1;
 }
 
-ssize_t vx7if_clone_receive(struct serial_device *dev, uint8_t *buf)
+ssize_t vx7if_clone_receive(struct serial_device *dev,
+		struct vx7_clone_data *clone)
 {
 	size_t i = 0;
 	ssize_t r;
@@ -96,7 +98,7 @@ ssize_t vx7if_clone_receive(struct serial_device *dev, uint8_t *buf)
 
 	gettimeofday(&s, NULL);
 
-	while(i < VX7_CLONE_SIZE &&
+	while(i < sizeof(*clone) &&
 			(i == 0 || !time_has_elapsed_us(&s, 500 * 1000))) {
 
 		/* Handle the two acks that happen after the first 10
@@ -110,7 +112,7 @@ ssize_t vx7if_clone_receive(struct serial_device *dev, uint8_t *buf)
 		}
 
 		/* Rx bytes */
-		if((r = serial_read(dev, &buf[i], 1)) > 0) {
+		if((r = serial_read(dev, (uint8_t *)clone + i, 1)) > 0) {
 			gettimeofday(&s, NULL);
 			i++;
 		} else if(r < 0) {
@@ -119,20 +121,20 @@ ssize_t vx7if_clone_receive(struct serial_device *dev, uint8_t *buf)
 		}
 
 		if(((i % 1000) == 0 && i) || i == 1) {
-			loginfo("%u%% complete\n", (uint32_t)i * 100 /
-					(VX7_CLONE_SIZE - 1));
+			loginfo("%u%% complete\n", (uint32_t)(i * 100 /
+					(sizeof(*clone) - 1)));
 		}
 	}
 
-	loginfo("%u%% complete\n", (uint32_t)i * 100 / (VX7_CLONE_SIZE - 1));
+	loginfo("%u%% complete\n", (uint32_t)(i * 100 / (sizeof(*clone) - 1)));
 	loginfo("received %u bytes from device\n", (uint32_t)i);
 
-	if(i != VX7_CLONE_SIZE) {
+	if(i != sizeof(*clone)) {
 		logerror("did not receive enough bytes from the device\n");
 		return -1;
 	}
 
-	if(vx7if_checksum(buf) != buf[VX7_CHECKSUM]) {
+	if(vx7if_checksum(clone) != clone->checksum) {
 		logerror("invalid checksum\n");
 		return -1;
 	} else {
@@ -142,23 +144,25 @@ ssize_t vx7if_clone_receive(struct serial_device *dev, uint8_t *buf)
 	return (ssize_t)i;
 }
 
-int vx7if_clone_send(struct serial_device *dev, const uint8_t *buf)
+int vx7if_clone_send(struct serial_device *dev,
+		const struct vx7_clone_data *clone)
 {
 	size_t i;
 	struct timeval s;
+	uint8_t *buf = (uint8_t *)clone;
 
 	serial_flush(dev);
 
-	if(vx7if_checksum(buf) != buf[VX7_CHECKSUM]) {
+	if(vx7if_checksum(clone) != clone->checksum) {
 		logerror("invalid checksum\n");
 		return -1;
 	}
 
-	for(i = 0; i < VX7_CLONE_SIZE; i++) {
+	for(i = 0; i < sizeof(*clone); i++) {
 		uint8_t b;
 
 		/* Write bytes */
-		if(serial_write(dev, buf + i, 1) != 1) {
+		if(serial_write(dev, (uint8_t *)clone + i, 1) != 1) {
 			logerror("send error\n");
 			return -1;
 		}
@@ -184,14 +188,14 @@ int vx7if_clone_send(struct serial_device *dev, const uint8_t *buf)
 
 		/* Progress */
 		if((i % 1000) == 0) {
-			loginfo("%u%% complete\n", (uint32_t)i * 100 /
-					(VX7_CLONE_SIZE - 1));
+			loginfo("%u%% complete\n", (uint32_t)(i * 100 /
+					(sizeof(*clone) - 1)));
 		}
 
 		usleep(VX7_INTER_BYTE_DELAY);
 	}
 
-	loginfo("%u%% complete\n", (uint32_t)i * 100 / (VX7_CLONE_SIZE - 1));
+	loginfo("%u%% complete\n", (uint32_t)(i * 100 / (sizeof(*clone) - 1)));
 
 	return 0;
 }
