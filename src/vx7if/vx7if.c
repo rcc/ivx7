@@ -53,6 +53,32 @@ uint8_t vx7if_checksum(const struct vx7_clone_data *clone)
 	return sum;
 }
 
+enum vx7_mem_status vx7if_mem_entry_status(struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type)
+{
+	uint8_t f;
+
+	if(type == VX7_MEM_ONETOUCH)
+		index += 450;
+	else if(type == VX7_MEM_PMS)
+		index += 450 + 10;
+
+	if((index / 2) >= ARRAY_SIZE(clone->mem_flag_table))
+		return VX7_MEM_INVALID;
+
+	f = clone->mem_flag_table[index / 2];
+
+	if(index & 1)
+		f >>= 4;
+
+	if((f & 0x3) == 1)
+		return VX7_MEM_MASKED;
+	else if((f & 0x3) == 3)
+		return VX7_MEM_VALID;
+	else
+		return VX7_MEM_INVALID;
+}
+
 /******************************* Communication ******************************/
 static int vx7if_wait_for_ack(struct serial_device *dev)
 {

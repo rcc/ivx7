@@ -65,11 +65,13 @@ struct vx7_mem_entry {
 } __packed;
 
 struct vx7_clone_data {
-	uint8_t _resv0[0x1322];
+	uint8_t _resv0[0x1202];
+	uint8_t mem_flag_table[250];
+	uint8_t _resv1[38];
 	struct vx7_mem_entry regular[450];
 	struct vx7_mem_entry one_touch[10];
 	struct vx7_mem_entry pms[40];
-	uint8_t _resv1[312];
+	uint8_t _resv2[312];
 	uint8_t checksum;
 } __packed;
 
@@ -78,6 +80,18 @@ struct vx7_clone_data {
  */
 static int __unused
 _vx7_clone_data_size_check[((sizeof(struct vx7_clone_data) == 16211) ? 0 : -1)];
+
+/* Memory type enum. */
+enum vx7_mem_type {
+	VX7_MEM_REGULAR = 0,
+	VX7_MEM_ONETOUCH = 1,
+	VX7_MEM_PMS = 2,
+};
+enum vx7_mem_status {
+	VX7_MEM_INVALID = 0,
+	VX7_MEM_MASKED,
+	VX7_MEM_VALID,
+};
 
 /* FUNCTION:    vx7if_checksum
  *
@@ -92,6 +106,9 @@ _vx7_clone_data_size_check[((sizeof(struct vx7_clone_data) == 16211) ? 0 : -1)];
  *   - checksum
  */
 uint8_t vx7if_checksum(const struct vx7_clone_data *clone);
+
+enum vx7_mem_status vx7if_mem_entry_status(struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type);
 
 /******************************* Communication ******************************/
 /* FUNCTION:    vx7if_clone_receive

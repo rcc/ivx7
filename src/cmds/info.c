@@ -89,12 +89,16 @@ CMDHANDLER(cloneinfo)
 	/* Memory Locations */
 	/* Regular */
 	for(i = 0; i < ARRAY_SIZE(clone->regular); i++) {
-		if(clone->regular[i].unknown0 != 0xFF) {
+		enum vx7_mem_status s = vx7if_mem_entry_status(clone, i,
+				VX7_MEM_REGULAR);
+		if(s == VX7_MEM_VALID || s == VX7_MEM_MASKED) {
 			printf("M%03d: ", i + 1);
 			for(j = 0; j < ARRAY_SIZE(clone->regular[i].tag); j++) {
 				printf("%c", vx2ascii(clone->regular[i].tag[j],
 						clone->regular[i].charset));
 			}
+			if(s == VX7_MEM_MASKED)
+				printf(" [MASKED]");
 			printf("\n");
 			hexdump(stdout, &clone->regular[i],
 					sizeof(clone->regular[0]));
