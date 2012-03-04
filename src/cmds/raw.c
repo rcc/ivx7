@@ -39,7 +39,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 
 
 CMDHANDLER(dump)
@@ -55,3 +54,66 @@ CMDHANDLER(dump)
 }
 
 APPCMD(dump, &dump, "hexdump a clone", "usage: dump", NULL);
+
+CMDHANDLER(raw)
+{
+	int ret = 1;
+
+	if(APPDATA->clone == NULL) {
+		logerror("no loaded clone\n");
+		return -1;
+	}
+
+	if(argc < 1) {
+		logerror("invalid usage\n");
+		return -1;
+	}
+
+	/* Read */
+	if(strcmp("read", argv[0]) == 0) {
+		uint32_t addr;
+
+		if(argc < 2) {
+			logerror("invalid usage\n");
+			return -1;
+		}
+		ret = 2;
+
+		if((addr = (uint32_t)strtoul(argv[1], NULL, 0)) >=
+				sizeof(*APPDATA->clone)) {
+			logerror("address out of range\n");
+			return -1;
+		}
+
+		printf("0x%02X\n", ((uint8_t *)(APPDATA->clone))[addr]);
+
+	/* Write */
+	} else if(strcmp("write", argv[0]) == 0) {
+		uint32_t addr;
+
+		if(argc < 3) {
+			logerror("invalid usage\n");
+			return -1;
+		}
+		ret = 3;
+
+		if((addr = (uint32_t)strtoul(argv[1], NULL, 0)) >=
+				sizeof(*APPDATA->clone)) {
+			logerror("address out of range\n");
+			return -1;
+		}
+
+		((uint8_t *)(APPDATA->clone))[addr] =
+			(uint8_t)strtoul(argv[2], NULL, 0);
+
+	} else {
+		logerror("invalid operation\n");
+		return -1;
+	}
+
+	return ret;
+}
+
+APPCMD(raw, &raw, "raw read and write operations",
+		"usage: raw <read> <addr>\n"
+		"       raw <write> <addr> <val>", NULL);
