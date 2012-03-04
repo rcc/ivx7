@@ -38,6 +38,7 @@
 
 struct appdata_priv {
 	struct serial_device *dev;
+	struct vx7_clone_data *clone;
 };
 
 #define APPDATA		((struct appdata_priv *)appdata)

@@ -19,6 +19,7 @@ SOURCES :=	src/main.c \
 		src/cmds/version.c \
 		src/cmds/device.c \
 		src/cmds/clone.c \
+		src/cmds/io.c \
 		src/cmds/info.c \
 
 # Libraries

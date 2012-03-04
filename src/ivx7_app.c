@@ -34,6 +34,7 @@
 #include "app.h"
 #include <logging.h>
 #include <string.h>
+#include <stdlib.h>
 
 int ivx7_init(struct appdata_priv *priv)
 {
@@ -49,6 +50,9 @@ int ivx7_deinit(struct appdata_priv *priv)
 		serial_close(priv->dev);
 		priv->dev = NULL;
 	}
+
+	if(priv->clone)
+		free(priv->clone);
 
 	return 0;
 }
