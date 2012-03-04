@@ -33,7 +33,6 @@
 
 #include <app.h>
 #include <cmds.h>
-#include <hexdump.h>
 #include <vx7if/vx7if.h>
 
 #include <stdio.h>
@@ -65,48 +64,13 @@ static void print_memory_entry(const struct vx_mem_entry *e)
 
 CMDHANDLER(cloneinfo)
 {
-	int ret = 1;
-	struct vx7_clone_data *clone;
-	FILE *in;
 	int i;
 	struct vx_mem_entry e;
+	struct vx7_clone_data *clone = APPDATA->clone;
 
-	if(argc < 1) {
-		logerror("must specify input filename\n");
+	if(clone == NULL) {
+		logerror("no loaded clone\n");
 		return -1;
-	}
-
-	/* Open input file */
-	if((in = fopen(argv[0], "r")) == NULL) {
-		logerror("could not open input file: %s\n", strerror(errno));
-		return -1;
-	}
-	/* Allocate clone data buffer */
-	if((clone = malloc(sizeof(*clone))) == NULL) {
-		logerror("could not allocate buffer: %s\n", strerror(errno));
-		fclose(in);
-		return -1;
-	}
-
-	/* Read file */
-	if(fread(clone, 1, sizeof(*clone), in) != sizeof(*clone)) {
-		logerror("invalid read size\n");
-		ret = -1;
-		goto exit;
-	}
-
-	/* Size */
-	printf("Clone size: %u (0x%x) bytes\n",
-			(uint32_t)sizeof(*clone),
-			(uint32_t)sizeof(*clone));
-
-	/* Checksum */
-	if(vx7if_checksum(clone) != clone->checksum) {
-		printf("Checksum is invalid (%02x != %02x)\n", clone->checksum,
-				vx7if_checksum(clone));
-		goto exit;
-	} else {
-		printf("Checksum is valid: %02x\n", clone->checksum);
 	}
 
 	/* Memory Locations */
@@ -135,15 +99,12 @@ CMDHANDLER(cloneinfo)
 		}
 	}
 
-exit:
-	free(clone);
-	fclose(in);
-	return ret;
+	return 0;
 }
 
 START_CMD_OPTS(cloneinfo_opts)
 END_CMD_OPTS;
 
-APPCMD_OPT(info, &cloneinfo, "display information for a clone file",
-		"usage: info [OPTIONS] <input file>",
+APPCMD_OPT(info, &cloneinfo, "display information for a clone",
+		"usage: info [OPTIONS]",
 		NULL, cloneinfo_opts);
