@@ -41,12 +41,35 @@
 #include <string.h>
 #include <errno.h>
 
+static void print_memory_entry(const struct vx_mem_entry *e)
+{
+	printf("%s : %s", e->name, e->tag);
+	if(e->flag_status == MEMFLAG_STATUS_MASKED)
+		printf(" [HIDDEN]");
+	if(e->flag_preferential)
+		printf(" [PREFERENTIAL]");
+	if(e->flag_skip)
+		printf(" [SKIP]");
+	printf("\n");
+	printf("  Freq:      %u\n", e->freq_hz);
+	printf("  Tx Freq:   %u\n", e->tx_freq_hz);
+	printf("  Freq Step: %u\n", e->freq_step);
+	printf("  Tx Mode:   %s\n", e->tx_mode);
+	printf("  Power:     %s\n", e->tx_pwr);
+	printf("  Rx Mode:   %s\n", e->rx_mode);
+	printf("  Squelch:   %s\n", e->squelch);
+	printf("  CTCSS:     %u (tenth Hz)\n", e->ctcss_tenth_hz);
+	printf("  DCS:       %03u\n", e->dcs);
+	printf("\n");
+}
+
 CMDHANDLER(cloneinfo)
 {
 	int ret = 1;
 	struct vx7_clone_data *clone;
 	FILE *in;
-	int i, j;
+	int i;
+	struct vx_mem_entry e;
 
 	if(argc < 1) {
 		logerror("must specify input filename\n");
@@ -89,19 +112,26 @@ CMDHANDLER(cloneinfo)
 	/* Memory Locations */
 	/* Regular */
 	for(i = 0; i < ARRAY_SIZE(clone->regular); i++) {
-		enum vx7_mem_status s = vx7if_mem_entry_status(clone, i,
-				VX7_MEM_REGULAR);
-		if(s == VX7_MEM_VALID || s == VX7_MEM_MASKED) {
-			printf("M%03d: ", i + 1);
-			for(j = 0; j < ARRAY_SIZE(clone->regular[i].tag); j++) {
-				printf("%c", vx2ascii(clone->regular[i].tag[j],
-						clone->regular[i].charset));
-			}
-			if(s == VX7_MEM_MASKED)
-				printf(" [MASKED]");
-			printf("\n");
-			hexdump(stdout, &clone->regular[i],
-					sizeof(clone->regular[0]));
+		if(vx7if_mem_entry_valid(clone, i, VX7_MEM_REGULAR)) {
+			if(vx7if_mem_entry(clone, &e, i, VX7_MEM_REGULAR) != 0)
+				continue;
+			print_memory_entry(&e);
+		}
+	}
+	/* PMS */
+	for(i = 0; i < ARRAY_SIZE(clone->pms); i++) {
+		if(vx7if_mem_entry_valid(clone, i, VX7_MEM_PMS)) {
+			if(vx7if_mem_entry(clone, &e, i, VX7_MEM_PMS) != 0)
+				continue;
+			print_memory_entry(&e);
+		}
+	}
+	/* One Touch */
+	for(i = 0; i < ARRAY_SIZE(clone->one_touch); i++) {
+		if(vx7if_mem_entry_valid(clone, i, VX7_MEM_ONETOUCH)) {
+			if(vx7if_mem_entry(clone, &e, i, VX7_MEM_ONETOUCH) != 0)
+				continue;
+			print_memory_entry(&e);
 		}
 	}
 

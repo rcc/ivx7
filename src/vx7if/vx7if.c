@@ -37,9 +37,60 @@
 #include <logging.h>
 #include <serial/serial.h>
 #include <timelib.h>
-#include <unistd.h>
 
+#include <unistd.h>
 #include <stddef.h>
+#include <string.h>
+#include <stdio.h>
+
+#ifndef VX7_INTER_BYTE_DELAY
+#define VX7_INTER_BYTE_DELAY	8000
+#endif
+
+/* CTCSS Table in tenths of Hz */
+static const uint16_t ctcss_table[] = {
+	670,	693,	719,	744,	770,	797,	825,	854,	885,
+	915,	948,	974,	1000,	1035,	1072,	1109,	1148,	1188,
+	1230,	1273,	1318,	1365,	1413,	1462,	1514,	1567,	1598,
+	1622,	1655,	1679,	1713,	1738,	1773,	1799,	1835,	1862,
+	1899,	1928,	1966,	1995,	2035,	2065,	2107,	2181,	2257,
+	2291,	2336,	2418,	2503,	2541,
+};
+
+static const uint16_t dcs_table[] = {
+	23,	25,	26,	31,	32,	36,	43,	47,	51,
+	53,	54,	65,	71,	72,	73,	74,	114,	115,
+	116,	122,	125,	131,	132,	134,	143,	145,	152,
+	155,	156,	162,	165,	172,	174,	205,	212,	223,
+	225,	226,	243,	244,	245,	246,	251,	252,	255,
+	261,	263,	265,	266,	271,	274,	306,	311,	315,
+	325,	331,	332,	343,	346,	351,	356,	364,	365,
+	371,	411,	412,	413,	423,	431,	432,	445,	446,
+	452,	454,	455,	462,	464,	465,	466,	503,	506,
+	516,	523,	526,	532,	546,	565,	606,	612,	624,
+	627,	631,	632,	654,	662,	664,	703,	712,	723,
+	731,	732,	734,	743,	754,
+};
+
+const char *txpwr_table[] = {
+	"L1", "L2", "L3", "HI",
+};
+
+const char *txmode_table[] = {
+	"SIMP", "-RPT", "+RPT", "INDTX",
+};
+
+static const uint32_t freqstep_table[] = {
+	5000, 10000, 12500, 15000, 20000, 25000, 50000, 100000, 9000,
+};
+
+const char *rxmode_table[] = {
+	"N-FM", "AM", "W-FM",
+};
+
+const char *squelch_table[] = {
+	"NONE", "TONE", "TONE SQL", "DCS",
+};
 
 /*********************************** Data ***********************************/
 uint8_t vx7if_checksum(const struct vx7_clone_data *clone)
@@ -53,30 +104,177 @@ uint8_t vx7if_checksum(const struct vx7_clone_data *clone)
 	return sum;
 }
 
-enum vx7_mem_status vx7if_mem_entry_status(struct vx7_clone_data *clone,
+static uint8_t vx7if_mem_entry_flag(struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type)
 {
 	uint8_t f;
 
-	if(type == VX7_MEM_ONETOUCH)
-		index += 450;
-	else if(type == VX7_MEM_PMS)
-		index += 450 + 10;
+	switch(type) {
+	case VX7_MEM_REGULAR:
+		if(index >= MEMORY_REGULAR_COUNT) {
+			logerror("index out of range\n");
+			return BF(MEMFLAG_STATUS, MEMFLAG_STATUS_INVALID);
+		}
+		break;
+	case VX7_MEM_ONETOUCH:
+		if(index >= MEMORY_ONETOUCH_COUNT) {
+			logerror("index out of range\n");
+			return BF(MEMFLAG_STATUS, MEMFLAG_STATUS_INVALID);
+		}
+		index += MEMORY_REGULAR_COUNT;
+		break;
+	case VX7_MEM_PMS:
+		if(index >= MEMORY_PMS_COUNT) {
+			logerror("index out of range\n");
+			return BF(MEMFLAG_STATUS, MEMFLAG_STATUS_INVALID);
+		}
+		index += MEMORY_REGULAR_COUNT + MEMORY_ONETOUCH_COUNT;
+		break;
+	default:
+		return BF(MEMFLAG_STATUS, MEMFLAG_STATUS_INVALID);
+	}
 
-	if((index / 2) >= ARRAY_SIZE(clone->mem_flag_table))
-		return VX7_MEM_INVALID;
-
+	/* Two entries per byte */
 	f = clone->mem_flag_table[index / 2];
 
+	/* Odd indices are in upper nibble */
 	if(index & 1)
 		f >>= 4;
 
-	if((f & 0x3) == 1)
-		return VX7_MEM_MASKED;
-	else if((f & 0x3) == 3)
-		return VX7_MEM_VALID;
-	else
-		return VX7_MEM_INVALID;
+	return (f & 0xF);
+}
+
+int vx7if_mem_entry_valid(struct vx7_clone_data *clone, uint32_t index,
+		enum vx7_mem_type type)
+{
+	uint8_t f = vx7if_mem_entry_flag(clone, index, type);
+
+	/* A memory location is valid if it's valid or masked (hidden). */
+	if(GETBF(MEMFLAG_STATUS, f) == MEMFLAG_STATUS_VALID)
+		return 1;
+	if(GETBF(MEMFLAG_STATUS, f) == MEMFLAG_STATUS_MASKED)
+		return 1;
+
+	/* Invalid memory location */
+	return 0;
+}
+
+int vx7if_mem_entry(struct vx7_clone_data *clone, struct vx_mem_entry *entry,
+		uint32_t index, enum vx7_mem_type type)
+{
+	int i;
+	uint8_t f = vx7if_mem_entry_flag(clone, index, type);
+	struct _vx7_mem_entry *m;
+
+	memset(entry, 0, sizeof(*entry));
+
+	/* Flags */
+	entry->flag_status = GETBF(MEMFLAG_STATUS, f);
+	entry->flag_skip = GETBF(MEMFLAG_SKIP, f);
+	entry->flag_preferential = GETBF(MEMFLAG_PREFERRED, f);
+
+	/* Name */
+	switch(type) {
+	case VX7_MEM_REGULAR:
+		if(index >= MEMORY_REGULAR_COUNT) {
+			logerror("index out of range\n");
+			return -1;
+		}
+		m = &clone->regular[index];
+		snprintf(&entry->name[0], sizeof(entry->name), "M%03u",
+				index + 1);
+		break;
+	case VX7_MEM_ONETOUCH:
+		if(index >= MEMORY_ONETOUCH_COUNT) {
+			logerror("index out of range\n");
+			return -1;
+		}
+		m = &clone->one_touch[index];
+		snprintf(&entry->name[0], sizeof(entry->name), "OTM%u",
+				(index < 9) ? (index + 1) : 0);
+		break;
+	case VX7_MEM_PMS:
+		if(index >= MEMORY_PMS_COUNT) {
+			logerror("index out of range\n");
+			return -1;
+		}
+		m = &clone->pms[index];
+		snprintf(&entry->name[0], sizeof(entry->name), "PMS_%c%02u",
+				(index & 1) ? 'U' : 'L', index / 2);
+		break;
+	default:
+		return -1;
+	}
+
+	/* Tag */
+	for(i = 0; i < sizeof(m->tag); i++) {
+		entry->tag[i] = vx2ascii(m->tag[i], m->charset);
+	}
+
+	/* Frequency */
+	entry->freq_hz = 100000000 * ((m->freq_100M_10M >> 4) & 0xF);
+	entry->freq_hz += 10000000 * ((m->freq_100M_10M >> 0) & 0xF);
+	entry->freq_hz +=  1000000 * ((m->freq_1M_100K >> 4) & 0xF);
+	entry->freq_hz +=   100000 * ((m->freq_1M_100K >> 0) & 0xF);
+	entry->freq_hz +=    10000 * ((m->freq_10K_1K >> 4) & 0xF);
+	entry->freq_hz +=     1000 * ((m->freq_10K_1K >> 0) & 0xF);
+	if(m->freq_10K_1K == 0x12)
+		entry->freq_hz += 500;
+
+	entry->tx_freq_hz = 100000000 * ((m->tx_freq_100M_10M >> 4) & 0xF);
+	entry->tx_freq_hz += 10000000 * ((m->tx_freq_100M_10M >> 0) & 0xF);
+	entry->tx_freq_hz +=  1000000 * ((m->tx_freq_1M_100K >> 4) & 0xF);
+	entry->tx_freq_hz +=   100000 * ((m->tx_freq_1M_100K >> 0) & 0xF);
+	entry->tx_freq_hz +=    10000 * ((m->tx_freq_10K_1K >> 4) & 0xF);
+	entry->tx_freq_hz +=     1000 * ((m->tx_freq_10K_1K >> 0) & 0xF);
+	if(m->tx_freq_10K_1K == 0x12)
+		entry->tx_freq_hz += 500;
+
+	/* Frequency Step */
+	if(GETBF(MEM_FREQSTEP, m->pwr__step) < ARRAY_SIZE(freqstep_table)) {
+		entry->freq_step = freqstep_table[
+			GETBF(MEM_FREQSTEP, m->pwr__step)];
+	}
+
+	/* Tx Power */
+	if(GETBF(MEM_TXPOWER, m->pwr__step) < ARRAY_SIZE(txpwr_table)) {
+		strncpy(&entry->tx_pwr[0],
+				txpwr_table[GETBF(MEM_TXPOWER, m->pwr__step)],
+				sizeof(entry->tx_pwr));
+	}
+
+	/* Tx Mode */
+	if(GETBF(MEM_TXMODE, m->pwr__step) < ARRAY_SIZE(txmode_table)) {
+		strncpy(&entry->tx_mode[0],
+				txmode_table[GETBF(MEM_TXMODE, m->pwr__step)],
+				sizeof(entry->tx_mode));
+	}
+
+	/* Rx Mode */
+	if(GETBF(MEM_RXMODE, m->mode) < ARRAY_SIZE(rxmode_table)) {
+		strncpy(&entry->rx_mode[0],
+				rxmode_table[GETBF(MEM_RXMODE, m->mode)],
+				sizeof(entry->rx_mode));
+	}
+
+	/* Squelch */
+	if(GETBF(MEM_SQUELCH, m->ctcss_dcs) < ARRAY_SIZE(squelch_table)) {
+		strncpy(&entry->squelch[0],
+				squelch_table[GETBF(MEM_RXMODE, m->ctcss_dcs)],
+				sizeof(entry->squelch));
+	}
+
+	/* CTCSS */
+	if(m->tone_freq < ARRAY_SIZE(ctcss_table)) {
+		entry->ctcss_tenth_hz = ctcss_table[m->tone_freq];
+	}
+
+	/* DCS */
+	if(m->dcs_code < ARRAY_SIZE(dcs_table)) {
+		entry->dcs = dcs_table[m->dcs_code];
+	}
+
+	return 0;
 }
 
 /******************************* Communication ******************************/

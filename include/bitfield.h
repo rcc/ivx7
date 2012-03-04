@@ -54,11 +54,9 @@
 
 #ifndef INSERTBF
 #define INSERTBF(bfdef, bfval, targetval)	\
-	do { \
-		(targetval) = ((targetval) \
+	(targetval) = ((targetval) \
 			& ~(((1 << _BFSIZE(bfdef)) - 1) << _BFSHIFT(bfdef))) \
-			| BF(bfdef, bfval); \
-	} while(0)
+		| BF(bfdef, bfval);
 #endif
 
 #ifndef GETBF

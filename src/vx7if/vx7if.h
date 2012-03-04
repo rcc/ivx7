@@ -32,6 +32,7 @@
  */
 
 #include "vxcharset.h"
+#include "vx7_clone_data.h"
 
 #include <serial/serial.h>
 #include <prjutil.h>
@@ -41,58 +42,7 @@
 #ifndef I__VX7IF_H__
 	#define I__VX7IF_H__
 
-#ifndef VX7_INTER_BYTE_DELAY
-#define VX7_INTER_BYTE_DELAY	8000
-#endif
-
 /*********************************** Data ***********************************/
-struct vx7_mem_entry {
-	uint8_t unknown0;
-	uint8_t power_level__step;
-	uint8_t freq_100M_10M;
-	uint8_t freq_1M_100K;
-	uint8_t freq_10K_1K;
-	uint8_t mode;
-	uint8_t tag[8];
-	uint8_t unknown14;
-	uint8_t tx_freq_100M_10M;
-	uint8_t tx_freq_1M_100K;
-	uint8_t tx_freq_10K_1K;
-	uint8_t tone_freq;
-	uint8_t dcs_code;
-	uint8_t ctcss_dcs;
-	uint8_t charset;
-} __packed;
-
-struct vx7_clone_data {
-	uint8_t _resv0[0x1202];
-	uint8_t mem_flag_table[250];
-	uint8_t _resv1[38];
-	struct vx7_mem_entry regular[450];
-	struct vx7_mem_entry one_touch[10];
-	struct vx7_mem_entry pms[40];
-	uint8_t _resv2[312];
-	uint8_t checksum;
-} __packed;
-
-/* Stop myself from making stupid mistakes when editing vx7_clone_data
- * structure.
- */
-static int __unused
-_vx7_clone_data_size_check[((sizeof(struct vx7_clone_data) == 16211) ? 0 : -1)];
-
-/* Memory type enum. */
-enum vx7_mem_type {
-	VX7_MEM_REGULAR = 0,
-	VX7_MEM_ONETOUCH = 1,
-	VX7_MEM_PMS = 2,
-};
-enum vx7_mem_status {
-	VX7_MEM_INVALID = 0,
-	VX7_MEM_MASKED,
-	VX7_MEM_VALID,
-};
-
 /* FUNCTION:    vx7if_checksum
  *
  * + DESCRIPTION:
@@ -107,7 +57,44 @@ enum vx7_mem_status {
  */
 uint8_t vx7if_checksum(const struct vx7_clone_data *clone);
 
-enum vx7_mem_status vx7if_mem_entry_status(struct vx7_clone_data *clone,
+/* FUNCTION:    vx7if_mem_entry_valid
+ *
+ * + DESCRIPTION:
+ *   - check if a memory entry is valid
+ *
+ * + PARAMETERS:
+ *   + struct vx7_clone_data *clone
+ *     - clone data
+ *   + uint32_t index
+ *     - memory index
+ *   + enum vx7_mem_type type
+ *     - memory type
+ *
+ * + RETURNS: int
+ *   - boolean
+ */
+int vx7if_mem_entry_valid(struct vx7_clone_data *clone, uint32_t index,
+		enum vx7_mem_type type);
+
+/* FUNCTION:    vx7if_mem_entry
+ *
+ * + DESCRIPTION:
+ *   - read a memory entry into the abstracted data type
+ *
+ * + PARAMETERS:
+ *   + struct vx7_clone_data *clone
+ *     - clone data
+ *   + struct vx_mem_entry *entry
+ *     - memory entry abstracted data type
+ *   + uint32_t index
+ *     - memory index
+ *   + enum vx7_mem_type type
+ *     - memory type
+ *
+ * + RETURNS: int
+ *   - 0 on success, -1 otherwise
+ */
+int vx7if_mem_entry(struct vx7_clone_data *clone, struct vx_mem_entry *entry,
 		uint32_t index, enum vx7_mem_type type);
 
 /******************************* Communication ******************************/
