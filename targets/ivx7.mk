@@ -20,7 +20,6 @@ SOURCES :=	src/main.c \
 		src/cmds/device.c \
 		src/cmds/clone.c \
 		src/cmds/info.c \
-		src/cmds/tsv.c \
 
 # Libraries
 LIBRARIES := readline
