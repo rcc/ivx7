@@ -144,6 +144,6 @@ exit:
 START_CMD_OPTS(cloneinfo_opts)
 END_CMD_OPTS;
 
-APPCMD_OPT(cloneinfo, &cloneinfo, "display information for a clone file",
-		"usage: cloneinfo [OPTIONS] <input file>",
+APPCMD_OPT(info, &cloneinfo, "display information for a clone file",
+		"usage: info [OPTIONS] <input file>",
 		NULL, cloneinfo_opts);
