@@ -34,73 +34,24 @@
 #include <app.h>
 #include <cmds.h>
 #include <vx7if/vx7if.h>
+#include <hexdump.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
 
-static void print_memory_entry(const struct vx_mem_entry *e)
-{
-	printf("%s : %s", e->name, e->tag);
-	if(e->flag_status == MEMFLAG_STATUS_MASKED)
-		printf(" [HIDDEN]");
-	if(e->flag_preferential)
-		printf(" [PREFERENTIAL]");
-	if(e->flag_skip)
-		printf(" [SKIP]");
-	printf("\n");
-	printf("  Freq:      %u\n", e->freq_hz);
-	printf("  Tx Freq:   %u\n", e->tx_freq_hz);
-	printf("  Freq Step: %u\n", e->freq_step);
-	printf("  Tx Mode:   %s\n", e->tx_mode);
-	printf("  Power:     %s\n", e->tx_pwr);
-	printf("  Rx Mode:   %s\n", e->rx_mode);
-	printf("  Squelch:   %s\n", e->squelch);
-	printf("  CTCSS:     %u (tenth Hz)\n", e->ctcss_tenth_hz);
-	printf("  DCS:       %03u\n", e->dcs);
-	printf("\n");
-}
 
-CMDHANDLER(cloneinfo)
+CMDHANDLER(dump)
 {
-	int i;
-	struct vx_mem_entry e;
-	struct vx7_clone_data *clone = APPDATA->clone;
-
-	if(clone == NULL) {
+	if(APPDATA->clone == NULL) {
 		logerror("no loaded clone\n");
 		return -1;
 	}
 
-	/* Memory Locations */
-	/* Regular */
-	for(i = 0; i < ARRAY_SIZE(clone->regular); i++) {
-		if(vx7if_mem_entry_valid(clone, i, VX7_MEM_REGULAR)) {
-			if(vx7if_mem_entry(clone, &e, i, VX7_MEM_REGULAR) != 0)
-				continue;
-			print_memory_entry(&e);
-		}
-	}
-	/* PMS */
-	for(i = 0; i < ARRAY_SIZE(clone->pms); i++) {
-		if(vx7if_mem_entry_valid(clone, i, VX7_MEM_PMS)) {
-			if(vx7if_mem_entry(clone, &e, i, VX7_MEM_PMS) != 0)
-				continue;
-			print_memory_entry(&e);
-		}
-	}
-	/* One Touch */
-	for(i = 0; i < ARRAY_SIZE(clone->one_touch); i++) {
-		if(vx7if_mem_entry_valid(clone, i, VX7_MEM_ONETOUCH)) {
-			if(vx7if_mem_entry(clone, &e, i, VX7_MEM_ONETOUCH) != 0)
-				continue;
-			print_memory_entry(&e);
-		}
-	}
+	hexdump(stdout, APPDATA->clone, sizeof(*APPDATA->clone));
 
 	return 0;
 }
 
-APPCMD(info, &cloneinfo, "display information for a clone",
-		"usage: info", NULL);
+APPCMD(dump, &dump, "hexdump a clone", "usage: dump", NULL);

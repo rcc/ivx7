@@ -87,12 +87,9 @@ exit:
 	return ret;
 }
 
-START_CMD_OPTS(load_opts)
-END_CMD_OPTS;
-
-APPCMD_OPT(load, &load, "load a clone file",
-		"usage: load [OPTIONS] <clone file>",
-		NULL, load_opts);
+APPCMD(load, &load, "load a clone file",
+		"usage: load <clone file>",
+		NULL);
 
 CMDHANDLER(save)
 {
@@ -131,9 +128,6 @@ exit:
 	return ret;
 }
 
-START_CMD_OPTS(save_opts)
-END_CMD_OPTS;
-
-APPCMD_OPT(save, &save, "save a clone file",
-		"usage: save [OPTIONS] <clone file>",
-		NULL, save_opts);
+APPCMD(save, &save, "save a clone file",
+		"usage: save <clone file>",
+		NULL);

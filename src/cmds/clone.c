@@ -93,12 +93,9 @@ exit:
 	return ret;
 }
 
-START_CMD_OPTS(clonerx_opts)
-END_CMD_OPTS;
-
-APPCMD_OPT(clonerx, &clonerx, "read configuration from device",
-		"usage: clonerx [OPTIONS] <output file>",
-		NULL, clonerx_opts);
+APPCMD(clonerx, &clonerx, "read configuration from device",
+		"usage: clonerx <output file>",
+		NULL);
 
 CMDHANDLER(clonetx)
 {
@@ -156,9 +153,6 @@ exit:
 	return ret;
 }
 
-START_CMD_OPTS(clonetx_opts)
-END_CMD_OPTS;
-
-APPCMD_OPT(clonetx, &clonetx, "send configuration to device",
-		"usage: clonetx [OPTIONS] <input file>",
-		NULL, clonetx_opts);
+APPCMD(clonetx, &clonetx, "send configuration to device",
+		"usage: clonetx <input file>",
+		NULL);

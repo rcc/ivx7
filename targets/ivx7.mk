@@ -21,6 +21,7 @@ SOURCES :=	src/main.c \
 		src/cmds/clone.c \
 		src/cmds/io.c \
 		src/cmds/info.c \
+		src/cmds/raw.c \
 
 # Libraries
 LIBRARIES := readline
