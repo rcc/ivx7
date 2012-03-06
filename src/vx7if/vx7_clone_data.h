@@ -75,19 +75,19 @@ struct vx_mem_entry {
 	uint16_t dcs;
 };
 
-#define MEMORY_REGULAR_COUNT		450
-#define MEMORY_ONETOUCH_COUNT		10
-#define MEMORY_PMS_COUNT		40
+#define VX7_MEM_REGULAR_COUNT		450
+#define VX7_MEM_ONETOUCH_COUNT		10
+#define VX7_MEM_PMS_COUNT		40
 
 /* Main Clone Data Structure */
 struct vx7_clone_data {
 	uint8_t _resv0[0x1202];
-	uint8_t mem_flag_table[(MEMORY_REGULAR_COUNT + MEMORY_ONETOUCH_COUNT +
-			MEMORY_PMS_COUNT) / 2];
+	uint8_t mem_flag_table[(VX7_MEM_REGULAR_COUNT + VX7_MEM_ONETOUCH_COUNT +
+			VX7_MEM_PMS_COUNT) / 2];
 	uint8_t _resv1[38];
-	struct vx7_mem_entry regular[MEMORY_REGULAR_COUNT];
-	struct vx7_mem_entry one_touch[MEMORY_ONETOUCH_COUNT];
-	struct vx7_mem_entry pms[MEMORY_PMS_COUNT];
+	struct vx7_mem_entry regular[VX7_MEM_REGULAR_COUNT];
+	struct vx7_mem_entry one_touch[VX7_MEM_ONETOUCH_COUNT];
+	struct vx7_mem_entry pms[VX7_MEM_PMS_COUNT];
 	uint8_t _resv2[312];
 	uint8_t checksum;
 } __packed;
@@ -102,12 +102,15 @@ _vx7_clone_data_size_check[((sizeof(struct vx7_clone_data) == 16211) ? 0 : -1)];
 
 /* Memory Flag Table */
 #define MEMFLAG_STATUS							2 : 0
+#define MEMFLAG_STATUS_ODD						2 : 4
 #	define MEMFLAG_STATUS_INVALID		0x0
 #	define MEMFLAG_STATUS_MASKED		0x1
 #	define MEMFLAG_STATUS_UNKNOWN		0x2
 #	define MEMFLAG_STATUS_VALID		0x3
 #define MEMFLAG_SKIP							1 : 2
+#define MEMFLAG_SKIP_ODD						1 : 6
 #define MEMFLAG_PREFERRED						1 : 3
+#define MEMFLAG_PREFERRED_ODD						1 : 7
 
 /* Memory Entries */
 #define MEM_TXPOWER							2 : 6

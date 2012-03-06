@@ -104,41 +104,51 @@ uint8_t vx7if_checksum(const struct vx7_clone_data *clone)
 	return sum;
 }
 
+static int32_t vx7if_mem_entry_flag_index(uint32_t index,
+		enum vx7_mem_type type)
+{
+	switch(type) {
+	case VX7_MEM_REGULAR:
+		if(index >= VX7_MEM_REGULAR_COUNT) {
+			logerror("index out of range\n");
+			return -1;
+		}
+		return index;
+
+	case VX7_MEM_ONETOUCH:
+		if(index >= VX7_MEM_ONETOUCH_COUNT) {
+			logerror("index out of range\n");
+			return -1;
+		}
+		return index + VX7_MEM_REGULAR_COUNT;
+
+	case VX7_MEM_PMS:
+		if(index >= VX7_MEM_PMS_COUNT) {
+			logerror("index out of range\n");
+			return -1;
+		}
+		return index + VX7_MEM_REGULAR_COUNT + VX7_MEM_ONETOUCH_COUNT;
+
+	default:
+		return -1;
+	}
+}
+
 static uint8_t vx7if_mem_entry_flag(const struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type)
 {
 	uint8_t f;
+	int32_t i;
 
-	switch(type) {
-	case VX7_MEM_REGULAR:
-		if(index >= MEMORY_REGULAR_COUNT) {
-			logerror("index out of range\n");
-			return BF(MEMFLAG_STATUS, MEMFLAG_STATUS_INVALID);
-		}
-		break;
-	case VX7_MEM_ONETOUCH:
-		if(index >= MEMORY_ONETOUCH_COUNT) {
-			logerror("index out of range\n");
-			return BF(MEMFLAG_STATUS, MEMFLAG_STATUS_INVALID);
-		}
-		index += MEMORY_REGULAR_COUNT;
-		break;
-	case VX7_MEM_PMS:
-		if(index >= MEMORY_PMS_COUNT) {
-			logerror("index out of range\n");
-			return BF(MEMFLAG_STATUS, MEMFLAG_STATUS_INVALID);
-		}
-		index += MEMORY_REGULAR_COUNT + MEMORY_ONETOUCH_COUNT;
-		break;
-	default:
+	if((i = vx7if_mem_entry_flag_index(index, type)) < 0) {
 		return BF(MEMFLAG_STATUS, MEMFLAG_STATUS_INVALID);
 	}
 
 	/* Two entries per byte */
-	f = clone->mem_flag_table[index / 2];
+	f = clone->mem_flag_table[i / 2];
 
 	/* Odd indices are in upper nibble */
-	if(index & 1)
+	if(i & 1)
 		f >>= 4;
 
 	return (f & 0xF);
@@ -177,7 +187,7 @@ int vx7if_mem_entry_info(const struct vx7_clone_data *clone,
 	/* Name */
 	switch(type) {
 	case VX7_MEM_REGULAR:
-		if(index >= MEMORY_REGULAR_COUNT) {
+		if(index >= VX7_MEM_REGULAR_COUNT) {
 			logerror("index out of range\n");
 			return -1;
 		}
@@ -186,7 +196,7 @@ int vx7if_mem_entry_info(const struct vx7_clone_data *clone,
 				index + 1);
 		break;
 	case VX7_MEM_ONETOUCH:
-		if(index >= MEMORY_ONETOUCH_COUNT) {
+		if(index >= VX7_MEM_ONETOUCH_COUNT) {
 			logerror("index out of range\n");
 			return -1;
 		}
@@ -195,7 +205,7 @@ int vx7if_mem_entry_info(const struct vx7_clone_data *clone,
 				(index < 9) ? (index + 1) : 0);
 		break;
 	case VX7_MEM_PMS:
-		if(index >= MEMORY_PMS_COUNT) {
+		if(index >= VX7_MEM_PMS_COUNT) {
 			logerror("index out of range\n");
 			return -1;
 		}
@@ -286,7 +296,7 @@ int vx7if_mem_entry_with_name(const char *name, uint32_t *index,
 	case 'M':
 		*type = VX7_MEM_REGULAR;
 		*index = (uint32_t)strtoul(&name[1], NULL, 10);
-		if(*index > MEMORY_REGULAR_COUNT || *index < 1) {
+		if(*index > VX7_MEM_REGULAR_COUNT || *index < 1) {
 			logerror("index out of range\n");
 			return -1;
 		}
@@ -301,7 +311,7 @@ int vx7if_mem_entry_with_name(const char *name, uint32_t *index,
 			return -1;
 		}
 		*index = (uint32_t)strtoul(&name[3], NULL, 10);
-		if(*index >= MEMORY_ONETOUCH_COUNT) {
+		if(*index >= VX7_MEM_ONETOUCH_COUNT) {
 			logerror("index out of range\n");
 			return -1;
 		}
@@ -328,7 +338,7 @@ int vx7if_mem_entry_with_name(const char *name, uint32_t *index,
 			logerror("invalid memory entry name\n");
 			return -1;
 		}
-		if(*index >= MEMORY_PMS_COUNT) {
+		if(*index >= VX7_MEM_PMS_COUNT) {
 			logerror("index out of range\n");
 			return -1;
 		}
@@ -341,16 +351,71 @@ int vx7if_mem_entry_with_name(const char *name, uint32_t *index,
 	return 0;
 }
 
-struct vx7_mem_entry *vx7if_mem_entry(const struct vx7_clone_data *clone,
+struct vx7_mem_entry *vx7if_mem_entry(struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type)
 {
-	return NULL;
+	struct vx7_mem_entry *e = NULL;
+
+	switch(type) {
+	case VX7_MEM_REGULAR:
+		if(index >= VX7_MEM_REGULAR_COUNT) {
+			logerror("index out of range\n");
+		} else {
+			e = &clone->regular[index];
+		}
+		break;
+	case VX7_MEM_ONETOUCH:
+		if(index >= VX7_MEM_ONETOUCH_COUNT) {
+			logerror("index out of range\n");
+		} else {
+			e = &clone->one_touch[index];
+		}
+		break;
+	case VX7_MEM_PMS:
+		if(index >= VX7_MEM_PMS_COUNT) {
+			logerror("index out of range\n");
+		} else {
+			e = &clone->pms[index];
+		}
+		break;
+	default:
+		break;
+	}
+
+	return e;
 }
 
 int vx7if_mem_entry_set_status(struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type,
 		enum vx7_mem_status status)
 {
+	int32_t i;
+	uint8_t s;
+
+	if((i = vx7if_mem_entry_flag_index(index, type)) < 0) {
+		return -1;
+	}
+
+	switch(status) {
+	case VX7_MEMSTATUS_INVALID:
+		s = MEMFLAG_STATUS_INVALID;
+		break;
+	case VX7_MEMSTATUS_HIDDEN:
+		s = MEMFLAG_STATUS_MASKED;
+		break;
+	case VX7_MEMSTATUS_VALID:
+		s = MEMFLAG_STATUS_VALID;
+		break;
+	default:
+		return -1;
+	}
+
+	if(i & 1) {
+		INSERTBF(MEMFLAG_STATUS_ODD, s, clone->mem_flag_table[i / 2]);
+	} else {
+		INSERTBF(MEMFLAG_STATUS, s, clone->mem_flag_table[i / 2]);
+	}
+
 	return 0;
 }
 

@@ -119,7 +119,7 @@ int vx7if_mem_entry_info(const struct vx7_clone_data *clone,
 int vx7if_mem_entry_with_name(const char *name, uint32_t *index,
 		enum vx7_mem_type *type);
 
-struct vx7_mem_entry *vx7if_mem_entry(const struct vx7_clone_data *clone,
+struct vx7_mem_entry *vx7if_mem_entry(struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type);
 
 int vx7if_mem_entry_set_status(struct vx7_clone_data *clone,

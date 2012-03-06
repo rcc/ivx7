@@ -79,9 +79,36 @@ APPCMD_OPT(memedit, &memedit, "edit a memory location",
 
 CMDHANDLER(meminvalidate)
 {
+	uint32_t i;
+
 	if(APPDATA->clone == NULL) {
 		logerror("no loaded clone\n");
 		return -1;
+	}
+
+	/* Regular */
+	for(i = 0; i < VX7_MEM_REGULAR_COUNT; i++) {
+		if(vx7if_mem_entry_set_status(APPDATA->clone, i,
+					VX7_MEM_REGULAR, VX7_MEMSTATUS_INVALID)
+				!= 0) {
+			return -1;
+		}
+	}
+	/* PMS */
+	for(i = 0; i < VX7_MEM_PMS_COUNT; i++) {
+		if(vx7if_mem_entry_set_status(APPDATA->clone, i,
+					VX7_MEM_PMS, VX7_MEMSTATUS_INVALID)
+				!= 0) {
+			return -1;
+		}
+	}
+	/* One Touch */
+	for(i = 0; i < VX7_MEM_ONETOUCH_COUNT; i++) {
+		if(vx7if_mem_entry_set_status(APPDATA->clone, i,
+					VX7_MEM_ONETOUCH, VX7_MEMSTATUS_INVALID)
+				!= 0) {
+			return -1;
+		}
 	}
 
 	return 0;
