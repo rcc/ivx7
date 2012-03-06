@@ -39,7 +39,7 @@
 #include <timelib.h>
 
 #include <unistd.h>
-#include <stddef.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
 
@@ -104,7 +104,7 @@ uint8_t vx7if_checksum(const struct vx7_clone_data *clone)
 	return sum;
 }
 
-static uint8_t vx7if_mem_entry_flag(struct vx7_clone_data *clone,
+static uint8_t vx7if_mem_entry_flag(const struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type)
 {
 	uint8_t f;
@@ -144,7 +144,7 @@ static uint8_t vx7if_mem_entry_flag(struct vx7_clone_data *clone,
 	return (f & 0xF);
 }
 
-int vx7if_mem_entry_valid(struct vx7_clone_data *clone, uint32_t index,
+int vx7if_mem_entry_valid(const struct vx7_clone_data *clone, uint32_t index,
 		enum vx7_mem_type type)
 {
 	uint8_t f = vx7if_mem_entry_flag(clone, index, type);
@@ -159,12 +159,13 @@ int vx7if_mem_entry_valid(struct vx7_clone_data *clone, uint32_t index,
 	return 0;
 }
 
-int vx7if_mem_entry(struct vx7_clone_data *clone, struct vx_mem_entry *entry,
+int vx7if_mem_entry_info(const struct vx7_clone_data *clone,
+		struct vx_mem_entry *entry,
 		uint32_t index, enum vx7_mem_type type)
 {
 	int i;
 	uint8_t f = vx7if_mem_entry_flag(clone, index, type);
-	struct _vx7_mem_entry *m;
+	const struct vx7_mem_entry *m;
 
 	memset(entry, 0, sizeof(*entry));
 
@@ -200,7 +201,7 @@ int vx7if_mem_entry(struct vx7_clone_data *clone, struct vx_mem_entry *entry,
 		}
 		m = &clone->pms[index];
 		snprintf(&entry->name[0], sizeof(entry->name), "PMS_%c%02u",
-				(index & 1) ? 'U' : 'L', index / 2);
+				(index & 1) ? 'U' : 'L', index / 2 + 1);
 		break;
 	default:
 		return -1;
@@ -275,6 +276,101 @@ int vx7if_mem_entry(struct vx7_clone_data *clone, struct vx_mem_entry *entry,
 	}
 
 	return 0;
+}
+
+int vx7if_mem_entry_with_name(const char *name, uint32_t *index,
+		enum vx7_mem_type *type)
+{
+	switch(name[0]) {
+	/* Regular: M### */
+	case 'M':
+		*type = VX7_MEM_REGULAR;
+		*index = (uint32_t)strtoul(&name[1], NULL, 10);
+		if(*index > MEMORY_REGULAR_COUNT || *index < 1) {
+			logerror("index out of range\n");
+			return -1;
+		}
+		/* Zero based index */
+		(*index)--;
+		break;
+	/* One Touch: OTM# */
+	case 'O':
+		*type = VX7_MEM_ONETOUCH;
+		if(strlen(name) != 4) {
+			logerror("invalid memory entry name\n");
+			return -1;
+		}
+		*index = (uint32_t)strtoul(&name[3], NULL, 10);
+		if(*index >= MEMORY_ONETOUCH_COUNT) {
+			logerror("index out of range\n");
+			return -1;
+		}
+		/* 1 = 0, 2 = 1, ..., 9 = 8, 0 = 9 */
+		if(*index == 0)
+			*index = 9;
+		else
+			(*index)--;
+		break;
+	/* PMS: PMS_[LU]## */
+	case 'P':
+		*type = VX7_MEM_PMS;
+		if(strlen(name) < 6) {
+			logerror("invalid memory entry name\n");
+			return -1;
+		}
+		*index = (uint32_t)strtoul(&name[5], NULL, 10);
+		*index = (*index - 1) * 2;
+		if(name[4] == 'L') {
+			*index += 0;
+		} else if(name[4] == 'U') {
+			*index += 1;
+		} else {
+			logerror("invalid memory entry name\n");
+			return -1;
+		}
+		if(*index >= MEMORY_PMS_COUNT) {
+			logerror("index out of range\n");
+			return -1;
+		}
+		break;
+	default:
+		logerror("invalid memory entry name\n");
+		return -1;
+	}
+
+	return 0;
+}
+
+struct vx7_mem_entry *vx7if_mem_entry(const struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type)
+{
+	return NULL;
+}
+
+int vx7if_mem_entry_set_status(struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type,
+		enum vx7_mem_status status)
+{
+	return 0;
+}
+
+enum vx7_mem_status vx7if_mem_entry_get_status(
+		const struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type)
+{
+	return VX7_MEMSTATUS_INVALID;
+}
+
+int vx7if_mem_entry_set_flag(struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type, enum vx7_mem_flag flag)
+{
+	return 0;
+}
+
+enum vx7_mem_flag vx7if_mem_entry_get_flag(const struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type)
+{
+	return VX7_MEMFLAG_NORMAL;
 }
 
 /******************************* Communication ******************************/

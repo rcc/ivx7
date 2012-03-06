@@ -42,6 +42,24 @@
 #ifndef I__VX7IF_H__
 	#define I__VX7IF_H__
 
+enum vx7_mem_type {
+	VX7_MEM_REGULAR = 0,
+	VX7_MEM_ONETOUCH,
+	VX7_MEM_PMS,
+};
+
+enum vx7_mem_status {
+	VX7_MEMSTATUS_INVALID = 0,
+	VX7_MEMSTATUS_HIDDEN,
+	VX7_MEMSTATUS_VALID,
+};
+
+enum vx7_mem_flag {
+	VX7_MEMFLAG_NORMAL = 0,
+	VX7_MEMFLAG_PREFERRED,
+	VX7_MEMFLAG_SKIP,
+};
+
 /*********************************** Data ***********************************/
 /* FUNCTION:    vx7if_checksum
  *
@@ -73,7 +91,7 @@ uint8_t vx7if_checksum(const struct vx7_clone_data *clone);
  * + RETURNS: int
  *   - boolean
  */
-int vx7if_mem_entry_valid(struct vx7_clone_data *clone, uint32_t index,
+int vx7if_mem_entry_valid(const struct vx7_clone_data *clone, uint32_t index,
 		enum vx7_mem_type type);
 
 /* FUNCTION:    vx7if_mem_entry
@@ -94,7 +112,26 @@ int vx7if_mem_entry_valid(struct vx7_clone_data *clone, uint32_t index,
  * + RETURNS: int
  *   - 0 on success, -1 otherwise
  */
-int vx7if_mem_entry(struct vx7_clone_data *clone, struct vx_mem_entry *entry,
+int vx7if_mem_entry_info(const struct vx7_clone_data *clone,
+		struct vx_mem_entry *entry,
+		uint32_t index, enum vx7_mem_type type);
+
+int vx7if_mem_entry_with_name(const char *name, uint32_t *index,
+		enum vx7_mem_type *type);
+
+struct vx7_mem_entry *vx7if_mem_entry(const struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type);
+
+int vx7if_mem_entry_set_status(struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type,
+		enum vx7_mem_status status);
+enum vx7_mem_status vx7if_mem_entry_get_status(
+		const struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type);
+
+int vx7if_mem_entry_set_flag(struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type, enum vx7_mem_flag flag);
+enum vx7_mem_flag vx7if_mem_entry_get_flag(const struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type);
 
 /******************************* Communication ******************************/

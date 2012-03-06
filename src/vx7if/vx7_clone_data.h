@@ -39,7 +39,7 @@
 	#define I__VX7_CLONE_DATA_H__
 
 /* Memory Entry */
-struct _vx7_mem_entry {
+struct vx7_mem_entry {
 	uint8_t unknown0;
 	uint8_t pwr__step;
 	uint8_t freq_100M_10M;
@@ -85,9 +85,9 @@ struct vx7_clone_data {
 	uint8_t mem_flag_table[(MEMORY_REGULAR_COUNT + MEMORY_ONETOUCH_COUNT +
 			MEMORY_PMS_COUNT) / 2];
 	uint8_t _resv1[38];
-	struct _vx7_mem_entry regular[MEMORY_REGULAR_COUNT];
-	struct _vx7_mem_entry one_touch[MEMORY_ONETOUCH_COUNT];
-	struct _vx7_mem_entry pms[MEMORY_PMS_COUNT];
+	struct vx7_mem_entry regular[MEMORY_REGULAR_COUNT];
+	struct vx7_mem_entry one_touch[MEMORY_ONETOUCH_COUNT];
+	struct vx7_mem_entry pms[MEMORY_PMS_COUNT];
 	uint8_t _resv2[312];
 	uint8_t checksum;
 } __packed;
@@ -99,12 +99,6 @@ static int __unused
 _vx7_clone_data_size_check[((sizeof(struct vx7_clone_data) == 16211) ? 0 : -1)];
 
 /********************************** Memory **********************************/
-
-enum vx7_mem_type {
-	VX7_MEM_REGULAR = 0,
-	VX7_MEM_ONETOUCH,
-	VX7_MEM_PMS,
-};
 
 /* Memory Flag Table */
 #define MEMFLAG_STATUS							2 : 0

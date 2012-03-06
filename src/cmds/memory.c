@@ -38,69 +38,54 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 
-static void print_memory_entry(const struct vx_mem_entry *e)
+
+CMDHANDLER(memedit)
 {
-	printf("%s : %s", e->name, e->tag);
-	if(e->flag_status == MEMFLAG_STATUS_MASKED)
-		printf(" [HIDDEN]");
-	if(e->flag_preferential)
-		printf(" [PREFERENTIAL]");
-	if(e->flag_skip)
-		printf(" [SKIP]");
-	printf("\n");
-	printf("  Freq:      %u\n", e->freq_hz);
-	printf("  Tx Freq:   %u\n", e->tx_freq_hz);
-	printf("  Freq Step: %u\n", e->freq_step);
-	printf("  Tx Mode:   %s\n", e->tx_mode);
-	printf("  Power:     %s\n", e->tx_pwr);
-	printf("  Rx Mode:   %s\n", e->rx_mode);
-	printf("  Squelch:   %s\n", e->squelch);
-	printf("  CTCSS:     %u (tenth Hz)\n", e->ctcss_tenth_hz);
-	printf("  DCS:       %03u\n", e->dcs);
-	printf("\n");
-}
+	uint32_t memidx;
+	enum vx7_mem_type memtype;
 
-CMDHANDLER(cloneinfo)
-{
-	int i;
-	struct vx_mem_entry e;
-	struct vx7_clone_data *clone = APPDATA->clone;
-
-	if(clone == NULL) {
+	if(APPDATA->clone == NULL) {
 		logerror("no loaded clone\n");
 		return -1;
 	}
 
-	/* Memory Locations */
-	/* Regular */
-	for(i = 0; i < ARRAY_SIZE(clone->regular); i++) {
-		if(vx7if_mem_entry_valid(clone, i, VX7_MEM_REGULAR)) {
-			if(vx7if_mem_entry_info(clone, &e, i, VX7_MEM_REGULAR) != 0)
-				continue;
-			print_memory_entry(&e);
-		}
+	if(argc < 1) {
+		logerror("invalid usage\n");
+		return -1;
 	}
-	/* PMS */
-	for(i = 0; i < ARRAY_SIZE(clone->pms); i++) {
-		if(vx7if_mem_entry_valid(clone, i, VX7_MEM_PMS)) {
-			if(vx7if_mem_entry_info(clone, &e, i, VX7_MEM_PMS) != 0)
-				continue;
-			print_memory_entry(&e);
-		}
+
+	if(vx7if_mem_entry_with_name(argv[0], &memidx, &memtype) != 0) {
+		logerror("invalid memory name\n");
+		return -1;
 	}
-	/* One Touch */
-	for(i = 0; i < ARRAY_SIZE(clone->one_touch); i++) {
-		if(vx7if_mem_entry_valid(clone, i, VX7_MEM_ONETOUCH)) {
-			if(vx7if_mem_entry_info(clone, &e, i, VX7_MEM_ONETOUCH) != 0)
-				continue;
-			print_memory_entry(&e);
-		}
+
+	logdebug("Memory Type: %d, Memory Index: %u\n", (int)memtype, memidx);
+
+	return 1;
+}
+
+START_CMD_OPTS(memedit_opts)
+END_CMD_OPTS;
+
+APPCMD_OPT(memedit, &memedit, "edit a memory location",
+		"usage: memedit [options] <memory location>\n"
+		"  Memory Locations:\n"
+		"    M001, M002, ..., M449, M450\n"
+		"    OTM1, OTM2, ..., OTM9, OTM0\n"
+		"    PMS_L01, PMS_U01, ..., PMS_L20, PMS_U20",
+		NULL, memedit_opts);
+
+
+CMDHANDLER(meminvalidate)
+{
+	if(APPDATA->clone == NULL) {
+		logerror("no loaded clone\n");
+		return -1;
 	}
 
 	return 0;
 }
 
-APPCMD(info, &cloneinfo, "display information for a clone",
-		"usage: info", NULL);
+APPCMD(meminvalidate, &meminvalidate, "invalidate all memory locations",
+		"usage: meminvalidate", NULL);
