@@ -423,18 +423,71 @@ enum vx7_mem_status vx7if_mem_entry_get_status(
 		const struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type)
 {
-	return VX7_MEMSTATUS_INVALID;
+	uint8_t f = vx7if_mem_entry_flag(clone, index, type);
+
+	switch(GETBF(MEMFLAG_STATUS, f)) {
+		case MEMFLAG_STATUS_MASKED:
+			return VX7_MEMSTATUS_HIDDEN;
+		case MEMFLAG_STATUS_VALID:
+			return VX7_MEMSTATUS_VALID;
+		default:
+			return VX7_MEMSTATUS_INVALID;
+	}
 }
 
 int vx7if_mem_entry_set_flag(struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type, enum vx7_mem_flag flag)
 {
+	int32_t i;
+
+	if((i = vx7if_mem_entry_flag_index(index, type)) < 0) {
+		return -1;
+	}
+
+	if(i & 1) {
+		INSERTBF(MEMFLAG_SKIP_ODD, 0,
+				clone->mem_flag_table[i / 2]);
+		INSERTBF(MEMFLAG_PREFERRED_ODD, 0,
+				clone->mem_flag_table[i / 2]);
+		if(flag == VX7_MEMFLAG_PREFERRED) {
+			INSERTBF(MEMFLAG_PREFERRED_ODD, 1,
+					clone->mem_flag_table[i / 2]);
+		} else if(flag == VX7_MEMFLAG_SKIP) {
+			INSERTBF(MEMFLAG_SKIP_ODD, 1,
+					clone->mem_flag_table[i / 2]);
+		} else {
+			logerror("invalid flag\n");
+			return -1;
+		}
+	} else {
+		INSERTBF(MEMFLAG_SKIP, 0, clone->mem_flag_table[i / 2]);
+		INSERTBF(MEMFLAG_PREFERRED, 0, clone->mem_flag_table[i / 2]);
+		if(flag == VX7_MEMFLAG_PREFERRED) {
+			INSERTBF(MEMFLAG_PREFERRED, 1,
+					clone->mem_flag_table[i / 2]);
+		} else if(flag == VX7_MEMFLAG_SKIP) {
+			INSERTBF(MEMFLAG_SKIP, 1,
+					clone->mem_flag_table[i / 2]);
+		} else {
+			logerror("invalid flag\n");
+			return -1;
+		}
+	}
+
 	return 0;
 }
 
 enum vx7_mem_flag vx7if_mem_entry_get_flag(const struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type)
 {
+	uint8_t f = vx7if_mem_entry_flag(clone, index, type);
+
+	if(GETBF(MEMFLAG_PREFERRED, f)) {
+		return VX7_MEMFLAG_PREFERRED;
+	} else if(GETBF(MEMFLAG_SKIP, f)) {
+		return VX7_MEMFLAG_SKIP;
+	}
+
 	return VX7_MEMFLAG_NORMAL;
 }
 

@@ -93,6 +93,11 @@ CMDHANDLER(meminvalidate)
 				!= 0) {
 			return -1;
 		}
+		if(vx7if_mem_entry_set_flag(APPDATA->clone, i,
+					VX7_MEM_REGULAR, VX7_MEMFLAG_NORMAL)
+				!= 0) {
+			return -1;
+		}
 	}
 	/* PMS */
 	for(i = 0; i < VX7_MEM_PMS_COUNT; i++) {
@@ -101,11 +106,21 @@ CMDHANDLER(meminvalidate)
 				!= 0) {
 			return -1;
 		}
+		if(vx7if_mem_entry_set_flag(APPDATA->clone, i,
+					VX7_MEM_PMS, VX7_MEMFLAG_NORMAL)
+				!= 0) {
+			return -1;
+		}
 	}
 	/* One Touch */
 	for(i = 0; i < VX7_MEM_ONETOUCH_COUNT; i++) {
 		if(vx7if_mem_entry_set_status(APPDATA->clone, i,
 					VX7_MEM_ONETOUCH, VX7_MEMSTATUS_INVALID)
+				!= 0) {
+			return -1;
+		}
+		if(vx7if_mem_entry_set_flag(APPDATA->clone, i,
+					VX7_MEM_ONETOUCH, VX7_MEMFLAG_NORMAL)
 				!= 0) {
 			return -1;
 		}
