@@ -32,6 +32,7 @@
  */
 
 #include "vx7if.h"
+#include "vx7_clone_data.h"
 
 #include <prjutil.h>
 #include <logging.h>
@@ -77,7 +78,7 @@ const char *txpwr_table[] = {
 };
 
 const char *txmode_table[] = {
-	"SIMP", "-RPT", "+RPT", "INDTX",
+	"SIMPLEX", "-RPT", "+RPT", "INDEP_TX",
 };
 
 static const uint32_t freqstep_table[] = {
@@ -89,7 +90,7 @@ const char *rxmode_table[] = {
 };
 
 const char *squelch_table[] = {
-	"NONE", "TONE", "TONE SQL", "DCS",
+	"NONE", "TONE", "TONE_SQL", "DCS",
 };
 
 /*********************************** Data ***********************************/
@@ -543,8 +544,13 @@ int vx7if_mem_entry_set_defaults(struct vx7_mem_entry *e)
 	if(e == NULL)
 		return -1;
 
-	vx7if_mem_entry_set_tag(e, "");
+	e->unknown14 = 0;
+	e->unknown0 = 0;
+
 	//freq = vx7if_mem_entry_get_freq(e);
+
+	e->charset = 0;
+	vx7if_mem_entry_set_tag(e, "");
 
 	return 0;
 }

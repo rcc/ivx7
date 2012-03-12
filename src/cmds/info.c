@@ -34,6 +34,7 @@
 #include <app.h>
 #include <cmds.h>
 #include <vx7if/vx7if.h>
+#include <vx7if/vx7_clone_data.h>
 
 #include <stdio.h>
 #include <stdlib.h>
