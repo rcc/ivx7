@@ -37,5 +37,6 @@
 	#define I__VXCHARSET_H__
 
 char vx2ascii(uint8_t tagbyte, int charset);
+uint8_t ascii2vx(char c, int charset);
 
 #endif /* I__VXCHARSET_H__ */

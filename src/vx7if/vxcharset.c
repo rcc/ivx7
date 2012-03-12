@@ -80,3 +80,18 @@ char vx2ascii(uint8_t tagbyte, int charset)
 		return '.';
 	}
 }
+
+uint8_t ascii2vx(char c, int charset)
+{
+	size_t i;
+	uint8_t b = 10;
+
+	for(i = (256 * charset); i < 256 + (256 * charset); i++) {
+		if(vxcharset[i] == c) {
+			b = i;
+			break;
+		}
+	}
+
+	return b;
+}

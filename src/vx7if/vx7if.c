@@ -543,7 +543,35 @@ int vx7if_mem_entry_set_defaults(struct vx7_mem_entry *e)
 	if(e == NULL)
 		return -1;
 
+	vx7if_mem_entry_set_tag(e, "");
 	//freq = vx7if_mem_entry_get_freq(e);
+
+	return 0;
+}
+
+int vx7if_mem_entry_set_tag(struct vx7_mem_entry *e, const char *tag)
+{
+	int i;
+
+	e->charset = 0;
+
+	for(i = 0; i < sizeof(e->tag) && tag && tag[i]; i++) {
+		e->tag[i] = ascii2vx(tag[i], e->charset);
+	}
+	for(; i < sizeof(e->tag); i++) {
+		e->tag[i] = ascii2vx(' ', e->charset);
+	}
+
+	return 0;
+}
+
+int vx7if_mem_entry_get_tag(const struct vx7_mem_entry *e, char *tag)
+{
+	int i;
+
+	for(i = 0; i < sizeof(e->tag); i++) {
+		tag[i] = vx2ascii(e->tag[i], e->charset);
+	}
 
 	return 0;
 }

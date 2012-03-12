@@ -143,6 +143,10 @@ uint32_t vx7if_mem_entry_get_freq(const struct vx7_mem_entry *e);
 /* Defaults */
 int vx7if_mem_entry_set_defaults(struct vx7_mem_entry *e);
 
+/* Tag */
+int vx7if_mem_entry_set_tag(struct vx7_mem_entry *e, const char *tag);
+int vx7if_mem_entry_get_tag(const struct vx7_mem_entry *e, char *tag);
+
 /******************************* Communication ******************************/
 /* FUNCTION:    vx7if_clone_receive
  *

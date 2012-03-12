@@ -116,10 +116,18 @@ CMDHANDLER(memedit)
 			return -1;
 	}
 
+	/* Handle Tag */
+	if(dict_has_key(opts, "tag")) {
+		if(vx7if_mem_entry_set_tag(e, dict_str_for_key(opts, "tag"))
+				!= 0)
+			return -1;
+	}
+
 	return 1;
 }
 
 START_CMD_OPTS(memedit_opts)
+	CMD_OPT(tag, '\0', "tag", "set station name")
 	CMD_OPT(freq, '\0', "freq", "set station frequency in Hz")
 	CMD_OPT(skip, '\0', "skip", "skip station during scan")
 	CMD_OPT(prefer, '\0', "prefer", "make station preferred")
