@@ -1,0 +1,20 @@
+memedit --tag=FRS_01 --freq=462562000 --txpwr=L1 --skip M401
+memedit --tag=FRS_02 --freq=462587000 --txpwr=L1 --skip M402
+memedit --tag=FRS_03 --freq=462612500 --txpwr=L1 --skip M403
+memedit --tag=FRS_04 --freq=462637000 --txpwr=L1 --skip M404
+memedit --tag=FRS_05 --freq=462662000 --txpwr=L1 --skip M405
+memedit --tag=FRS_06 --freq=462687000 --txpwr=L1 --skip M406
+memedit --tag=FRS_07 --freq=462712500 --txpwr=L1 --skip M407
+memedit --tag=FRS_08 --freq=467562000 --txpwr=L1 --skip M408
+memedit --tag=FRS_09 --freq=467587000 --txpwr=L1 --skip M409
+memedit --tag=FRS_10 --freq=467612500 --txpwr=L1 --skip M410
+memedit --tag=FRS_11 --freq=467637000 --txpwr=L1 --skip M411
+memedit --tag=FRS_12 --freq=467662000 --txpwr=L1 --skip M412
+memedit --tag=FRS_13 --freq=467687000 --txpwr=L1 --skip M413
+memedit --tag=FRS_14 --freq=467712500 --txpwr=L1 --skip M414
+
+memedit --tag=MURS_1 --freq=151820000 --txpwr=L3 --skip M415
+memedit --tag=MURS_2 --freq=151880000 --txpwr=L3 --skip M416
+memedit --tag=MURS_3 --freq=151940000 --txpwr=L3 --skip M417
+memedit --tag=MURS_4 --freq=154570000 --txpwr=L3 --skip M418
+memedit --tag=MURS_5 --freq=154600000 --txpwr=L3 --skip M419

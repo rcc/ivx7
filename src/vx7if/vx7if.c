@@ -455,7 +455,7 @@ int vx7if_mem_entry_set_flag(struct vx7_clone_data *clone,
 		} else if(flag == VX7_MEMFLAG_SKIP) {
 			INSERTBF(MEMFLAG_SKIP_ODD, 1,
 					clone->mem_flag_table[i / 2]);
-		} else {
+		} else if(flag != VX7_MEMFLAG_NORMAL) {
 			logerror("invalid flag\n");
 			return -1;
 		}
@@ -468,7 +468,7 @@ int vx7if_mem_entry_set_flag(struct vx7_clone_data *clone,
 		} else if(flag == VX7_MEMFLAG_SKIP) {
 			INSERTBF(MEMFLAG_SKIP, 1,
 					clone->mem_flag_table[i / 2]);
-		} else {
+		} else if(flag != VX7_MEMFLAG_NORMAL) {
 			logerror("invalid flag\n");
 			return -1;
 		}
@@ -489,6 +489,71 @@ enum vx7_mem_flag vx7if_mem_entry_get_flag(const struct vx7_clone_data *clone,
 	}
 
 	return VX7_MEMFLAG_NORMAL;
+}
+
+int vx7if_mem_entry_set_freq(struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type, uint32_t freq)
+{
+	struct vx7_mem_entry *m = vx7if_mem_entry(clone, index, type);
+
+	if(m == NULL)
+		return -1;
+
+	logdebug("setting freq %u\n", freq);
+
+	m->freq_100M_10M = 	((freq / 100000000) & 0xF) << 4;
+	freq %= 100000000;
+	m->freq_100M_10M |=	((freq / 10000000) & 0xF);
+	freq %= 10000000;
+	m->freq_1M_100K = 	((freq / 1000000) & 0xF) << 4;
+	freq %= 1000000;
+	m->freq_1M_100K |=	((freq / 100000) & 0xF);
+	freq %= 100000;
+	m->freq_10K_1K = 	((freq / 10000) & 0xF) << 4;
+	freq %= 10000;
+	m->freq_10K_1K |=	((freq / 1000) & 0xF);
+	/* freq %= 1000; */
+
+	return 0;
+}
+
+uint32_t vx7if_mem_entry_get_freq(struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type)
+{
+	uint32_t freq = 0;
+	struct vx7_mem_entry *m = vx7if_mem_entry(clone, index, type);
+
+	if(m == NULL)
+		return 0;
+
+	freq = 100000000 * ((m->freq_100M_10M >> 4) & 0xF);
+	freq += 10000000 * ((m->freq_100M_10M >> 0) & 0xF);
+	freq +=  1000000 * ((m->freq_1M_100K >> 4) & 0xF);
+	freq +=   100000 * ((m->freq_1M_100K >> 0) & 0xF);
+	freq +=    10000 * ((m->freq_10K_1K >> 4) & 0xF);
+	freq +=     1000 * ((m->freq_10K_1K >> 0) & 0xF);
+	if(m->freq_10K_1K == 0x12)
+		freq += 500;
+
+	return freq;
+}
+
+int vx7if_mem_entry_set_defaults(struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type)
+{
+	struct vx7_mem_entry *m = vx7if_mem_entry(clone, index, type);
+#if 0
+	uint32_t freq = 0;
+	uint32_t tx_freq = 0;
+	uint32_t freq_step = 0;
+#endif
+
+	if(m == NULL)
+		return -1;
+
+	//freq = vx7if_mem_entry_get_freq(clone, index, type);
+
+	return 0;
 }
 
 /******************************* Communication ******************************/

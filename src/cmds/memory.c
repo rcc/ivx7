@@ -39,16 +39,28 @@
 #include <stdlib.h>
 #include <string.h>
 
+static int get_uint_opt(const char *opt, uint32_t *val, struct dictionary *opts)
+{
+	const char *str = dict_str_for_key(opts, opt);
+	if((str == NULL) || (strlen(str) == 0)) {
+		return -1;
+	}
+	*val = (uint32_t)strtol(str, NULL, 0);
+	return 0;
+}
 
 CMDHANDLER(memedit)
 {
+	struct vx7_clone_data *clone;
 	uint32_t memidx;
 	enum vx7_mem_type memtype;
+	int new = 0;
 
 	if(APPDATA->clone == NULL) {
 		logerror("no loaded clone\n");
 		return -1;
 	}
+	clone = APPDATA->clone;
 
 	if(argc < 1) {
 		logerror("invalid usage\n");
@@ -62,10 +74,39 @@ CMDHANDLER(memedit)
 
 	logdebug("Memory Type: %d, Memory Index: %u\n", (int)memtype, memidx);
 
+	/* If it's a new entry, enable it */
+	if(!vx7if_mem_entry_valid(clone, memidx, memtype)) {
+		new = 1;
+		vx7if_mem_entry_set_status(clone, memidx, memtype,
+				VX7_MEMSTATUS_VALID);
+		vx7if_mem_entry_set_flag(clone, memidx, memtype,
+				VX7_MEMFLAG_NORMAL);
+	}
+
+	/* Handle frequency */
+	if(dict_has_key(opts, "freq")) {
+		uint32_t freq;
+		if(get_uint_opt("freq", &freq, opts) != 0) {
+			logerror("must specify frequency value\n");
+			return -1;
+		}
+		if(vx7if_mem_entry_set_freq(clone, memidx, memtype, freq) != 0)
+			return -1;
+	}
+
+	/* If it's a new entry, set the defaults now that the frequency is
+	 * set.
+	 */
+	if(new) {
+		if(vx7if_mem_entry_set_defaults(clone, memidx, memtype) != 0)
+			return -1;
+	}
+
 	return 1;
 }
 
 START_CMD_OPTS(memedit_opts)
+	CMD_OPT(freq, '\0', "freq", "set station frequency in Hz")
 END_CMD_OPTS;
 
 APPCMD_OPT(memedit, &memedit, "edit a memory location",

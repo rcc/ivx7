@@ -134,6 +134,14 @@ int vx7if_mem_entry_set_flag(struct vx7_clone_data *clone,
 enum vx7_mem_flag vx7if_mem_entry_get_flag(const struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type);
 
+int vx7if_mem_entry_set_freq(struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type, uint32_t freq);
+uint32_t vx7if_mem_entry_get_freq(struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type);
+
+int vx7if_mem_entry_set_defaults(struct vx7_clone_data *clone,
+		uint32_t index, enum vx7_mem_type type);
+
 /******************************* Communication ******************************/
 /* FUNCTION:    vx7if_clone_receive
  *
