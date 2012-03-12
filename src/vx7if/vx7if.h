@@ -122,6 +122,7 @@ int vx7if_mem_entry_with_name(const char *name, uint32_t *index,
 struct vx7_mem_entry *vx7if_mem_entry(struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type);
 
+/* Status */
 int vx7if_mem_entry_set_status(struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type,
 		enum vx7_mem_status status);
@@ -129,18 +130,18 @@ enum vx7_mem_status vx7if_mem_entry_get_status(
 		const struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type);
 
+/* Flags */
 int vx7if_mem_entry_set_flag(struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type, enum vx7_mem_flag flag);
 enum vx7_mem_flag vx7if_mem_entry_get_flag(const struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type);
 
-int vx7if_mem_entry_set_freq(struct vx7_clone_data *clone,
-		uint32_t index, enum vx7_mem_type type, uint32_t freq);
-uint32_t vx7if_mem_entry_get_freq(struct vx7_clone_data *clone,
-		uint32_t index, enum vx7_mem_type type);
+/* Frequency */
+int vx7if_mem_entry_set_freq(struct vx7_mem_entry *e, uint32_t freq);
+uint32_t vx7if_mem_entry_get_freq(const struct vx7_mem_entry *e);
 
-int vx7if_mem_entry_set_defaults(struct vx7_clone_data *clone,
-		uint32_t index, enum vx7_mem_type type);
+/* Defaults */
+int vx7if_mem_entry_set_defaults(struct vx7_mem_entry *e);
 
 /******************************* Communication ******************************/
 /* FUNCTION:    vx7if_clone_receive

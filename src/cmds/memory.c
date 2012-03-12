@@ -52,6 +52,7 @@ static int get_uint_opt(const char *opt, uint32_t *val, struct dictionary *opts)
 CMDHANDLER(memedit)
 {
 	struct vx7_clone_data *clone;
+	struct vx7_mem_entry *e;
 	uint32_t memidx;
 	enum vx7_mem_type memtype;
 	int new = 0;
@@ -71,8 +72,10 @@ CMDHANDLER(memedit)
 		logerror("invalid memory name\n");
 		return -1;
 	}
-
 	logdebug("Memory Type: %d, Memory Index: %u\n", (int)memtype, memidx);
+	if((e = vx7if_mem_entry(clone, memidx, memtype)) == NULL) {
+		return -1;
+	}
 
 	/* If it's a new entry, enable it */
 	if(!vx7if_mem_entry_valid(clone, memidx, memtype)) {
@@ -90,7 +93,7 @@ CMDHANDLER(memedit)
 			logerror("must specify frequency value\n");
 			return -1;
 		}
-		if(vx7if_mem_entry_set_freq(clone, memidx, memtype, freq) != 0)
+		if(vx7if_mem_entry_set_freq(e, freq) != 0)
 			return -1;
 	}
 
@@ -98,7 +101,18 @@ CMDHANDLER(memedit)
 	 * set.
 	 */
 	if(new) {
-		if(vx7if_mem_entry_set_defaults(clone, memidx, memtype) != 0)
+		if(vx7if_mem_entry_set_defaults(e) != 0)
+			return -1;
+	}
+
+	/* Handle flags */
+	if(dict_has_key(opts, "skip")) {
+		if(vx7if_mem_entry_set_flag(clone, memidx, memtype,
+					VX7_MEMFLAG_SKIP) != 0)
+			return -1;
+	} else if(dict_has_key(opts, "prefer")) {
+		if(vx7if_mem_entry_set_flag(clone, memidx, memtype,
+					VX7_MEMFLAG_PREFERRED) != 0)
 			return -1;
 	}
 
@@ -107,6 +121,8 @@ CMDHANDLER(memedit)
 
 START_CMD_OPTS(memedit_opts)
 	CMD_OPT(freq, '\0', "freq", "set station frequency in Hz")
+	CMD_OPT(skip, '\0', "skip", "skip station during scan")
+	CMD_OPT(prefer, '\0', "prefer", "make station preferred")
 END_CMD_OPTS;
 
 APPCMD_OPT(memedit, &memedit, "edit a memory location",
