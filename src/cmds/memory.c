@@ -123,6 +123,13 @@ CMDHANDLER(memedit)
 			return -1;
 	}
 
+	/* Handle Tx Power */
+	if(dict_has_key(opts, "txpwr")) {
+		if(vx7if_mem_entry_set_txpwr(e, dict_str_for_key(opts, "txpwr"))
+				!= 0)
+			return -1;
+	}
+
 	return 1;
 }
 
@@ -131,6 +138,7 @@ START_CMD_OPTS(memedit_opts)
 	CMD_OPT(freq, '\0', "freq", "set station frequency in Hz")
 	CMD_OPT(skip, '\0', "skip", "skip station during scan")
 	CMD_OPT(prefer, '\0', "prefer", "make station preferred")
+	CMD_OPT(txpwr, '\0', "txpwr", "set transmit power (L1, L2, L3, HI)")
 END_CMD_OPTS;
 
 APPCMD_OPT(memedit, &memedit, "edit a memory location",

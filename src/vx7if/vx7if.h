@@ -204,14 +204,13 @@ enum vx7_mem_flag vx7if_mem_entry_get_flag(const struct vx7_clone_data *clone,
 int vx7if_mem_entry_set_freq(struct vx7_mem_entry *e, uint32_t freq);
 uint32_t vx7if_mem_entry_get_freq(const struct vx7_mem_entry *e);
 
-/* TODO */
 /* Tx Frequency */
 int vx7if_mem_entry_set_txfreq(struct vx7_mem_entry *e, uint32_t freq);
 uint32_t vx7if_mem_entry_get_txfreq(const struct vx7_mem_entry *e);
 
 /* Frequency Step */
 int vx7if_mem_entry_set_freq_step(struct vx7_mem_entry *e, uint32_t freq);
-uint32_t vx7if_mem_entry_get_freq_set(const struct vx7_mem_entry *e);
+uint32_t vx7if_mem_entry_get_freq_step(const struct vx7_mem_entry *e);
 
 /* Tx Mode */
 int vx7if_mem_entry_set_txmode(struct vx7_mem_entry *e, const char *mode);
@@ -229,6 +228,7 @@ const char *vx7if_mem_entry_get_rxmode(const struct vx7_mem_entry *e);
 int vx7if_mem_entry_set_squelch(struct vx7_mem_entry *e, const char *squelch);
 const char *vx7if_mem_entry_get_squelch(const struct vx7_mem_entry *e);
 
+/* TODO */
 /* CTCSS */
 int vx7if_mem_entry_set_ctcss(struct vx7_mem_entry *e, uint16_t tenth_hz);
 uint16_t vx7if_mem_entry_get_ctcss(const struct vx7_mem_entry *e);

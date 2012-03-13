@@ -273,7 +273,7 @@ int vx7if_mem_entry_info(const struct vx7_clone_data *clone,
 	/* Squelch */
 	if(GETBF(MEM_SQUELCH, m->ctcss_dcs) < ARRAY_SIZE(squelch_table)) {
 		strncpy(&entry->squelch[0],
-				squelch_table[GETBF(MEM_RXMODE, m->ctcss_dcs)],
+				squelch_table[GETBF(MEM_SQUELCH, m->ctcss_dcs)],
 				sizeof(entry->squelch));
 	}
 
@@ -387,6 +387,7 @@ struct vx7_mem_entry *vx7if_mem_entry(struct vx7_clone_data *clone,
 	return e;
 }
 
+/* Status */
 int vx7if_mem_entry_set_status(struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type,
 		enum vx7_mem_status status)
@@ -437,6 +438,7 @@ enum vx7_mem_status vx7if_mem_entry_get_status(
 	}
 }
 
+/* Flags */
 int vx7if_mem_entry_set_flag(struct vx7_clone_data *clone,
 		uint32_t index, enum vx7_mem_type type, enum vx7_mem_flag flag)
 {
@@ -493,6 +495,7 @@ enum vx7_mem_flag vx7if_mem_entry_get_flag(const struct vx7_clone_data *clone,
 	return VX7_MEMFLAG_NORMAL;
 }
 
+/* Frequency */
 int vx7if_mem_entry_set_freq(struct vx7_mem_entry *e, uint32_t freq)
 {
 	if(e == NULL)
@@ -533,28 +536,251 @@ uint32_t vx7if_mem_entry_get_freq(const struct vx7_mem_entry *e)
 	return freq;
 }
 
-int vx7if_mem_entry_set_defaults(struct vx7_mem_entry *e)
+/* Tx Frequency */
+int vx7if_mem_entry_set_txfreq(struct vx7_mem_entry *e, uint32_t freq)
 {
-#if 0
-	uint32_t freq = 0;
-	uint32_t tx_freq = 0;
-	uint32_t freq_step = 0;
-#endif
-
 	if(e == NULL)
 		return -1;
 
-	e->unknown14 = 0;
-	e->unknown0 = 0;
-
-	//freq = vx7if_mem_entry_get_freq(e);
-
-	e->charset = 0;
-	vx7if_mem_entry_set_tag(e, "");
+	e->tx_freq_100M_10M = 	((freq / 100000000) & 0xF) << 4;
+	freq %= 100000000;
+	e->tx_freq_100M_10M |=	((freq / 10000000) & 0xF);
+	freq %= 10000000;
+	e->tx_freq_1M_100K = 	((freq / 1000000) & 0xF) << 4;
+	freq %= 1000000;
+	e->tx_freq_1M_100K |=	((freq / 100000) & 0xF);
+	freq %= 100000;
+	e->tx_freq_10K_1K = 	((freq / 10000) & 0xF) << 4;
+	freq %= 10000;
+	e->tx_freq_10K_1K |=	((freq / 1000) & 0xF);
+	/* freq %= 1000; */
 
 	return 0;
 }
 
+uint32_t vx7if_mem_entry_get_txfreq(const struct vx7_mem_entry *e)
+{
+	uint32_t freq = 0;
+
+	if(e == NULL)
+		return 0;
+
+	freq = 100000000 * ((e->tx_freq_100M_10M >> 4) & 0xF);
+	freq += 10000000 * ((e->tx_freq_100M_10M >> 0) & 0xF);
+	freq +=  1000000 * ((e->tx_freq_1M_100K >> 4) & 0xF);
+	freq +=   100000 * ((e->tx_freq_1M_100K >> 0) & 0xF);
+	freq +=    10000 * ((e->tx_freq_10K_1K >> 4) & 0xF);
+	freq +=     1000 * ((e->tx_freq_10K_1K >> 0) & 0xF);
+	if(e->tx_freq_10K_1K == 0x12)
+		freq += 500;
+
+	return freq;
+}
+
+/* Frequency Step */
+int vx7if_mem_entry_set_freq_step(struct vx7_mem_entry *e, uint32_t freq)
+{
+	int i;
+
+	for(i = 0; i < ARRAY_SIZE(freqstep_table); i++) {
+		if(freqstep_table[i] == freq) {
+			INSERTBF(MEM_FREQSTEP, i, e->pwr__step);
+			return 0;
+		}
+	}
+
+	logerror("invalid frequency step: %u\n", freq);
+	return -1;
+}
+
+uint32_t vx7if_mem_entry_get_freq_step(const struct vx7_mem_entry *e)
+{
+	uint32_t step = 0;
+
+	if(GETBF(MEM_FREQSTEP, e->pwr__step) < ARRAY_SIZE(freqstep_table)) {
+		step = freqstep_table[GETBF(MEM_FREQSTEP, e->pwr__step)];
+	} else {
+		logerror("invalid frequency step in memory entry\n");
+	}
+
+	return step;
+}
+
+/* Tx Mode */
+int vx7if_mem_entry_set_txmode(struct vx7_mem_entry *e, const char *mode)
+{
+	int i;
+
+	for(i = 0; i < ARRAY_SIZE(txmode_table); i++) {
+		if(strcmp(txmode_table[i], mode) == 0) {
+			INSERTBF(MEM_TXMODE, i, e->pwr__step);
+			return 0;
+		}
+	}
+
+	logerror("invalid tx mode: %s\n", mode);
+	return -1;
+}
+
+const char *vx7if_mem_entry_get_txmode(const struct vx7_mem_entry *e)
+{
+	const char *mode = NULL;
+
+	if(GETBF(MEM_TXMODE, e->pwr__step) < ARRAY_SIZE(txmode_table)) {
+		mode = txmode_table[GETBF(MEM_TXMODE, e->pwr__step)];
+	} else {
+		logerror("invalid tx mode in memory entry\n");
+	}
+
+	return mode;
+}
+
+/* Tx Power */
+int vx7if_mem_entry_set_txpwr(struct vx7_mem_entry *e, const char *pwr)
+{
+	int i;
+
+	for(i = 0; i < ARRAY_SIZE(txpwr_table); i++) {
+		if(strcmp(txpwr_table[i], pwr) == 0) {
+			INSERTBF(MEM_TXPOWER, i, e->pwr__step);
+			return 0;
+		}
+	}
+
+	logerror("invalid tx power: %s\n", pwr);
+	return -1;
+}
+
+const char *vx7if_mem_entry_get_txpwr(const struct vx7_mem_entry *e)
+{
+	const char *pwr = NULL;
+
+	if(GETBF(MEM_TXPOWER, e->pwr__step) < ARRAY_SIZE(txpwr_table)) {
+		pwr = txpwr_table[GETBF(MEM_TXPOWER, e->pwr__step)];
+	} else {
+		logerror("invalid tx power in memory entry\n");
+	}
+
+	return pwr;
+}
+
+/* Rx Mode */
+int vx7if_mem_entry_set_rxmode(struct vx7_mem_entry *e, const char *mode)
+{
+	int i;
+
+	for(i = 0; i < ARRAY_SIZE(rxmode_table); i++) {
+		if(strcmp(rxmode_table[i], mode) == 0) {
+			e->mode = 0x30 | BF(MEM_RXMODE, i);
+			return 0;
+		}
+	}
+
+	logerror("invalid rx mode: %s\n", mode);
+	return -1;
+}
+
+const char *vx7if_mem_entry_get_rxmode(const struct vx7_mem_entry *e)
+{
+	const char *mode = NULL;
+
+	if(GETBF(MEM_RXMODE, e->mode) < ARRAY_SIZE(rxmode_table)) {
+		mode = rxmode_table[GETBF(MEM_RXMODE, e->mode)];
+	} else {
+		logerror("invalid rx mode in memory entry\n");
+	}
+
+	return mode;
+}
+
+/* Squelch */
+int vx7if_mem_entry_set_squelch(struct vx7_mem_entry *e, const char *squelch)
+{
+	int i;
+
+	for(i = 0; i < ARRAY_SIZE(squelch_table); i++) {
+		if(strcmp(squelch_table[i], squelch) == 0) {
+			e->ctcss_dcs = BF(MEM_SQUELCH, i);
+			return 0;
+		}
+	}
+
+	logerror("invalid squelch mode: %s\n", squelch);
+	return -1;
+}
+
+const char *vx7if_mem_entry_get_squelch(const struct vx7_mem_entry *e)
+{
+	const char *sql = NULL;
+
+	if(GETBF(MEM_SQUELCH, e->ctcss_dcs) < ARRAY_SIZE(squelch_table)) {
+		sql = squelch_table[GETBF(MEM_SQUELCH, e->ctcss_dcs)];
+	} else {
+		logerror("invalid squelch mode in memory entry\n");
+	}
+
+	return sql;
+}
+
+/* CTCSS */
+int vx7if_mem_entry_set_ctcss(struct vx7_mem_entry *e, uint16_t tenth_hz)
+{
+	int i;
+
+	for(i = 0; i < ARRAY_SIZE(ctcss_table); i++) {
+		if(ctcss_table[i] == tenth_hz) {
+			e->tone_freq = i;
+			return 0;
+		}
+	}
+
+	logerror("invalid ctcss frequency: %u\n", tenth_hz);
+	return -1;
+}
+
+uint16_t vx7if_mem_entry_get_ctcss(const struct vx7_mem_entry *e)
+{
+	uint16_t tenth_hz = 0;
+
+	if(e->tone_freq < ARRAY_SIZE(ctcss_table)) {
+		tenth_hz = ctcss_table[e->tone_freq];
+	} else {
+		logerror("invalid ctcss frequency in memory entry\n");
+	}
+
+	return tenth_hz;
+}
+
+/* DCS */
+int vx7if_mem_entry_set_dcs(struct vx7_mem_entry *e, uint16_t dcs)
+{
+	int i;
+
+	for(i = 0; i < ARRAY_SIZE(dcs_table); i++) {
+		if(dcs_table[i] == dcs) {
+			e->dcs_code = i;
+			return 0;
+		}
+	}
+
+	logerror("invalid dcs code: %u\n", dcs);
+	return -1;
+}
+
+uint16_t vx7if_mem_entry_get_dcs(const struct vx7_mem_entry *e)
+{
+	uint16_t dcs = 0;
+
+	if(e->dcs_code < ARRAY_SIZE(dcs_table)) {
+		dcs = dcs_table[e->dcs_code];
+	} else {
+		logerror("invalid dcs code in memory entry\n");
+	}
+
+	return dcs;
+}
+
+/* Tag */
 int vx7if_mem_entry_set_tag(struct vx7_mem_entry *e, const char *tag)
 {
 	int i;
@@ -578,6 +804,48 @@ int vx7if_mem_entry_get_tag(const struct vx7_mem_entry *e, char *tag)
 	for(i = 0; i < sizeof(e->tag); i++) {
 		tag[i] = vx2ascii(e->tag[i], e->charset);
 	}
+
+	return 0;
+}
+
+/* Defaults */
+int vx7if_mem_entry_set_defaults(struct vx7_mem_entry *e)
+{
+	uint32_t freq = 0;
+	uint32_t tx_freq = 0;
+
+	if(e == NULL)
+		return -1;
+
+	freq = vx7if_mem_entry_get_freq(e);
+	if(freq < 144000000) {
+		/* 50MHz */
+		tx_freq = 1000000;
+	} else if(freq < 222000000) {
+		/* 144MHz */
+		tx_freq = 600000;
+	} else if(freq < 420000000) {
+		/* 222MHz */
+		tx_freq = 1600000;
+	} else {
+		/* 420MHz */
+		tx_freq = 5000000;
+	}
+	vx7if_mem_entry_set_freq_step(e, 20000);
+	vx7if_mem_entry_set_txfreq(e, tx_freq);
+	e->unknown0 = 0x05;
+	e->unknown14 = 0;
+
+
+	e->charset = 0;
+	vx7if_mem_entry_set_tag(e, "");
+
+	vx7if_mem_entry_set_txmode(e, "SIMPLEX");
+	vx7if_mem_entry_set_txpwr(e, "HI");
+	vx7if_mem_entry_set_rxmode(e, "N-FM");
+	vx7if_mem_entry_set_squelch(e, "NONE");
+	vx7if_mem_entry_set_ctcss(e, 1000);
+	vx7if_mem_entry_set_dcs(e, 255);
 
 	return 0;
 }
