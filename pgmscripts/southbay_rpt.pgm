@@ -19,3 +19,29 @@ memedit --tag=LPRCWINS --freq=442900000 --txmode=+RPT --squelch=TONE --ctcss=162
 # Location: Mt. Umunhum
 # Owner:    Lockheed ARC
 memedit --tag=WA6GFY --freq=443775000 --txmode=+RPT --squelch=TONE --ctcss=1000 M004
+
+# Black Mountain Repeater (70cm)
+# Location: Black Mountain (220 and 2m sites are at Castle Rock)
+# Owner: http://www.k6fb.com/k6fbsite.html
+# Call: K6FB
+memedit --tag=K6FB_440 --freq=442575000 --txmode=+RPT --squelch=TONE --ctcss=1000 M005
+memedit --tag=K6FB_220 --freq=223880000 --txmode=-RPT --squelch=TONE --ctcss=1000 --skip M006
+memedit --tag=K6FB_2m --freq=145450000 --txmode=-RPT --squelch=TONE --ctcss=1000 M007
+
+# W6SMQ 
+# Location: San Jose
+# Owner: Unknown
+# Notes: Affiliated with ARES/RACES (also, open system)
+memedit --tag=W6SMQ --freq=440100000 --txmode=+RPT --squelch=TONE --ctcss=1273 M008
+
+# SVECS (Silicon Valley Emergency Communication System)
+# Location: San Jose
+# Owner: AA6BT
+# Notes: Not for general use, AFAIK. Might be closed - seems mostly operated around ARES/RACES stuff
+memedit --tag=SVECS --freq=146115000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1000 M009
+
+# CONDOR system in San Jose
+# Location: San Jose (Mt. Hamilton)
+# Owner: WB6BRU
+# Notes: Seems to be an open system - linked - emergency communications takes precedence, of course
+memedit --tag=CONDOR --freq=224600000 --txmode=-RPT --squelch=TONE --ctcss=1567 M010
