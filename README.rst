@@ -20,3 +20,21 @@ Installation
 ++++++++++++
 
 make INSTALL=1 ivx7.release
+
+--------
+Examples
+--------
+
+Creating a new clone file using a template and pgm scripts::
+
+    ivx7 load template.vx7 \
+        script pgmscripts/defaults.pgm \
+        script pgmscripts/simplex.pgm \
+        script pgmscripts/southbay_rpt.pgm \
+        script pgmscripts/carla.pgm \
+        script pgmscripts/frs_murs.pgm \
+        save new.vx7
+
+Getting info about a clone file::
+
+    ivx7 load new.vx7 info
