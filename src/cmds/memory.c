@@ -45,7 +45,8 @@ static int get_uint_opt(const char *opt, uint32_t *val, struct dictionary *opts)
 	if((str == NULL) || (strlen(str) == 0)) {
 		return -1;
 	}
-	*val = (uint32_t)strtol(str, NULL, 0);
+	// Assume all numbers are base 10
+	*val = (uint32_t)strtol(str, NULL, 10);
 	return 0;
 }
 

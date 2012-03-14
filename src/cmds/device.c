@@ -53,7 +53,7 @@ CMDHANDLER(device)
 			logerror("must specify baud value\n");
 			return -1;
 		}
-		baud = (uint32_t)strtol(val, NULL, 0);
+		baud = (uint32_t)strtol(val, NULL, 10);
 	}
 
 	/* Get device path */

@@ -63,7 +63,7 @@ static const struct cmd *lookup_cmd(const char *name,
 
 static int tokenize_cmd_string(char *argstr, char **argv, size_t max_args)
 {
-	char *tok, *brkt;
+	char *tok, *brkt=NULL;
 	char *sep = " \t";
 	size_t i;
 
