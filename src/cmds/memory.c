@@ -147,7 +147,7 @@ CMDHANDLER(memedit)
 	/* Handle Tx Frequency */
 	if(dict_has_key(opts, "txfreq")) {
 		uint32_t freq;
-		if(get_uint_opt("txreq", &freq, opts) != 0) {
+		if(get_uint_opt("txfreq", &freq, opts) != 0) {
 			logerror("must specify tx frequency value\n");
 			return -1;
 		}
