@@ -123,6 +123,13 @@ CMDHANDLER(memedit)
 			return -1;
 	}
 
+	/* Handle Rx Mode */
+	if(dict_has_key(opts, "rxmode")) {
+		if(vx7if_mem_entry_set_rxmode(e,
+					dict_str_for_key(opts, "rxmode")) != 0)
+			return -1;
+	}
+
 	/* Handle Tx Power */
 	if(dict_has_key(opts, "txpwr")) {
 		if(vx7if_mem_entry_set_txpwr(e, dict_str_for_key(opts, "txpwr"))
@@ -130,15 +137,92 @@ CMDHANDLER(memedit)
 			return -1;
 	}
 
+	/* Handle Tx Mode */
+	if(dict_has_key(opts, "txmode")) {
+		if(vx7if_mem_entry_set_txmode(e,
+					dict_str_for_key(opts, "txmode")) != 0)
+			return -1;
+	}
+
+	/* Handle Tx Frequency */
+	if(dict_has_key(opts, "txfreq")) {
+		uint32_t freq;
+		if(get_uint_opt("txreq", &freq, opts) != 0) {
+			logerror("must specify tx frequency value\n");
+			return -1;
+		}
+		if(vx7if_mem_entry_set_txfreq(e, freq) != 0)
+			return -1;
+	}
+
+	/* Handle Squelch Mode */
+	if(dict_has_key(opts, "squelch")) {
+		if(vx7if_mem_entry_set_squelch(e,
+					dict_str_for_key(opts, "squelch")) != 0)
+			return -1;
+	}
+
+	/* Handle CTCSS */
+	if(dict_has_key(opts, "ctcss")) {
+		uint32_t v;
+		if(get_uint_opt("ctcss", &v, opts) != 0) {
+			logerror("must specify ctcss tone value\n");
+			return -1;
+		}
+		if(vx7if_mem_entry_set_ctcss(e, v) != 0)
+			return -1;
+	}
+
+	/* Handle DCS */
+	if(dict_has_key(opts, "dcs")) {
+		uint32_t v;
+		if(get_uint_opt("dcs", &v, opts) != 0) {
+			logerror("must specify dcs code\n");
+			return -1;
+		}
+		if(vx7if_mem_entry_set_dcs(e, v) != 0)
+			return -1;
+	}
+
+	/* Handle Frequency Step*/
+	if(dict_has_key(opts, "freqstep")) {
+		uint32_t freq;
+		if(get_uint_opt("freqstep", &freq, opts) != 0) {
+			logerror("must specify frequency step value\n");
+			return -1;
+		}
+		if(vx7if_mem_entry_set_freq_step(e, freq) != 0)
+			return -1;
+	}
+
 	return 1;
 }
 
 START_CMD_OPTS(memedit_opts)
-	CMD_OPT(tag, '\0', "tag", "set station name")
-	CMD_OPT(freq, '\0', "freq", "set station frequency in Hz")
-	CMD_OPT(skip, '\0', "skip", "skip station during scan")
-	CMD_OPT(prefer, '\0', "prefer", "make station preferred")
-	CMD_OPT(txpwr, '\0', "txpwr", "set transmit power (L1, L2, L3, HI)")
+	CMD_OPT(tag, '\0', "tag",
+			"set station name")
+	CMD_OPT(freq, '\0', "freq",
+			"set station frequency in Hz")
+	CMD_OPT(skip, '\0', "skip",
+			"skip station during scan")
+	CMD_OPT(prefer, '\0', "prefer",
+			"make station preferred")
+	CMD_OPT(rxmode, '\0', "rxmode",
+			"set receive mode (N-FM, W-FM, AM)")
+	CMD_OPT(txpwr, '\0', "txpwr",
+			"set transmit power (L1, L2, L3, HI)")
+	CMD_OPT(txmode, '\0', "txmode",
+			"set transmit mode (SIMPLEX, +RPT, -RPT, INDEP_TX)")
+	CMD_OPT(txfreq, '\0', "txfreq",
+			"set transmit frequency in Hz (offset for RPT modes)")
+	CMD_OPT(squelch, '\0', "squelch",
+			"set squelch mode (NONE, TONE, TONE_SQL, DCS)")
+	CMD_OPT(ctcss, '\0', "ctcss",
+			"set ctcss tone frequency in tenth Hz")
+	CMD_OPT(dcs, '\0', "dcs",
+			"set dcs code")
+	CMD_OPT(freqstep, '\0', "freqstep",
+			"set frequency step in Hz")
 END_CMD_OPTS;
 
 APPCMD_OPT(memedit, &memedit, "edit a memory location",

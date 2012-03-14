@@ -228,7 +228,6 @@ const char *vx7if_mem_entry_get_rxmode(const struct vx7_mem_entry *e);
 int vx7if_mem_entry_set_squelch(struct vx7_mem_entry *e, const char *squelch);
 const char *vx7if_mem_entry_get_squelch(const struct vx7_mem_entry *e);
 
-/* TODO */
 /* CTCSS */
 int vx7if_mem_entry_set_ctcss(struct vx7_mem_entry *e, uint16_t tenth_hz);
 uint16_t vx7if_mem_entry_get_ctcss(const struct vx7_mem_entry *e);
@@ -236,7 +235,6 @@ uint16_t vx7if_mem_entry_get_ctcss(const struct vx7_mem_entry *e);
 /* DCS */
 int vx7if_mem_entry_set_dcs(struct vx7_mem_entry *e, uint16_t dcs);
 uint16_t vx7if_mem_entry_get_dcs(const struct vx7_mem_entry *e);
-/* END TODO */
 
 /* Tag */
 int vx7if_mem_entry_set_tag(struct vx7_mem_entry *e, const char *tag);

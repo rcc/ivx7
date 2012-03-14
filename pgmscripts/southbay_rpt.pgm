@@ -1,0 +1,21 @@
+# AB6VS
+# Location: Loma Prieta
+# Owner:    LPARC
+# Notes:    Affiliated with ARES
+memedit --tag=AB6VS --freq=440550000 --txmode=+RPT --squelch=TONE --ctcss=948 M001
+
+# WR6ABD
+# Location: Loma Prieta
+# Owner:    LPRC
+memedit --tag=WR6ABD --freq=146640000 --txmode=-RPT --squelch=TONE --ctcss=1622 M002
+
+# WR6ABD - WINS
+# Location: Loma Prieta
+# Owner:    LPRC
+# Notes:    Winsystem
+memedit --tag=LPRCWINS --freq=442900000 --txmode=+RPT --squelch=TONE --ctcss=1622 M003
+
+# WA6GFY
+# Location: Mt. Umunhum
+# Owner:    Lockheed ARC
+memedit --tag=WA6GFY --freq=443775000 --txmode=+RPT --squelch=TONE --ctcss=1000 M004
