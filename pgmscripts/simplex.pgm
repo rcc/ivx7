@@ -1,1 +1,9 @@
 memedit --tag=H01 --freq=146420000 M050
+
+# Call frequencies
+# 2M National Calling Frequency
+memedit --tag=2MCALL --freq=144200000 M060
+# 2M National Simplex Calling Frequency
+memedit --tag=2MSXCALL --freq=146520000 M061
+# 70cm Calling Frequency
+memedit --tag=70CMCALL --freq=432100000 M062
