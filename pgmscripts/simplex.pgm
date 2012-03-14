@@ -1,4 +1,4 @@
-memedit --tag=H01 --freq=146420000 M050
+memedit --tag=H01 --freq=146420000 --squelch=TONE_SQL --ctcss=1000 M050
 
 # Call frequencies
 # 2M National Calling Frequency
