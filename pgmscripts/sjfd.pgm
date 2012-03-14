@@ -1,0 +1,11 @@
+# SJFD Frequencies (listen + tx)
+
+# Main dispatch
+memedit --tag=SJFD --freq=155025000 --txmode=INDEP_TX --txfreq=154010000 --squelch=TONE --ctcss=1738 M110
+# Tac 11
+memedit --tag=SFJD11 --freq=1559250000 --txmode=INDEP_TX --txfreq=154355000 --squelch=TONE --ctcss=1230 M111
+
+
+
+
+

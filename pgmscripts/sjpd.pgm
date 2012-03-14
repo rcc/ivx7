@@ -1,0 +1,21 @@
+# SJPD District Frequencies (listen + tx)
+
+# Districts R,D,V
+memedit --tag=SJPD-RDV --freq=460150000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1318 M100
+# Districts N&F
+memedit --tag=SJPD-NF --freq=460275000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1622 M101
+memedit --tag=SJPD-MW --freq=460200000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1365 M102
+memedit --tag=SJPD-CP --freq=460425000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1679 M103
+memedit --tag=SJPD-EK --freq=460400000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1462 --prefer M104
+memedit --tag=SJPD-LS --freq=460325000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1462 --prefer M105
+memedit --tag=SJPD-AT --freq=460475000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1365 --prefer M106
+memedit --tag=SJPD-XY --freq=460525000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1799 M107
+
+# These are interop frequencies (C1 = city-wide common 1, etc.)
+memedit --tag=SJPD-C1 --freq=460100000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1365 M108
+memedit --tag=SJPD-C2 --freq=460425000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1679 M109
+
+
+
+
+
