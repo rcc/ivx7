@@ -139,6 +139,22 @@ enum vx7_mem_flag {
  */
 uint8_t vx7if_checksum(const struct vx7_clone_data *clone);
 
+/* FUNCTION:    vx7if_checksum_bytes
+ *
+ * + DESCRIPTION:
+ *   - calculate checksum of a range of bytes
+ *
+ * + PARAMETERS:
+ *   + uint8_t *bytes
+ *     - data to checksum
+ *   + size_t len
+ *     - length of data to checksum
+ *
+ * + RETURNS: uint8_t
+ *   - checksum
+ */
+uint8_t vx7if_checksum_bytes(uint8_t *bytes, size_t len);
+
 /* FUNCTION:    vx7if_mem_entry_valid
  *
  * + DESCRIPTION:

@@ -96,11 +96,15 @@ const char *squelch_table[] = {
 /*********************************** Data ***********************************/
 uint8_t vx7if_checksum(const struct vx7_clone_data *clone)
 {
+	return vx7if_checksum_bytes((uint8_t *)clone, offsetof(struct vx7_clone_data, checksum));
+}
+
+uint8_t vx7if_checksum_bytes(uint8_t *bytes, size_t len)
+{
 	size_t i;
 	uint8_t sum;
 
-	for(i = 0, sum = 0; i < offsetof(struct vx7_clone_data, checksum);
-			sum += ((uint8_t *)clone)[i++]);
+	for(i = 0, sum = 0; i < len; sum += bytes[i++]);
 
 	return sum;
 }
