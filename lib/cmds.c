@@ -63,18 +63,56 @@ static const struct cmd *lookup_cmd(const char *name,
 
 static int tokenize_cmd_string(char *argstr, char **argv, size_t max_args)
 {
-	char *tok, *brkt=NULL;
-	char *sep = " \t";
-	size_t i;
+	size_t argc, i;
+	size_t slen = strlen(argstr);
+	int esc, start;
 
-	for(tok = strtok_r(argstr, sep, &brkt), i = 0;
-			tok && (i < (max_args - 1));
-			tok = strtok_r(NULL, sep, &brkt), i++) {
-		argv[i] = tok;
+	for(i = 0, argc = 0, esc = 0, start = 1;
+			argstr[i] && argc < (max_args - 1); i++) {
+		switch(argstr[i]) {
+		case ' ':
+		case '\t':
+			if(!esc) {
+				argstr[i] = '\0';
+				start = 1;
+			} else {
+				/* Don't tokenize */
+				memmove(&argstr[i - 1], &argstr[i],
+						slen + 1 - i);
+				slen--;
+				i--;
+				esc = 0;
+			}
+			break;
+
+		case '\\':
+			if(!esc) {
+				esc = 1;
+			} else {
+				/* Double backslash */
+				memmove(&argstr[i - 1], &argstr[i],
+						slen + 1 - i);
+				slen--;
+				i--;
+				esc = 0;
+			}
+		default:
+			if(esc && argstr[i] != '\\') {
+				logwarn("invalid escape character: %c\n",
+						argstr[i]);
+				esc = 0;
+			}
+			if(start) {
+				start = 0;
+				argv[argc++] = &argstr[i];
+			}
+			break;
+		}
 	}
-	argv[i] = NULL;
 
-	return (int)i;
+	argv[argc] = NULL;
+
+	return (int)argc;
 }
 
 static const struct cmd_opt *findlongopt(const struct cmd *cmd_entry,
