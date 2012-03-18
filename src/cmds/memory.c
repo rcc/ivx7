@@ -240,6 +240,59 @@ APPCMD_OPT(memedit, &memedit, "edit a memory location",
 		"    PMS_L01, PMS_U01, ..., PMS_L20, PMS_U20",
 		NULL, memedit_opts);
 
+CMDHANDLER(memcopy)
+{
+	struct vx7_clone_data *clone;
+	struct vx7_mem_entry *e1, *e2;
+	uint32_t memidx1, memidx2;
+	enum vx7_mem_type memtype1, memtype2;
+
+	if(APPDATA->clone == NULL) {
+		logerror("no loaded clone\n");
+		return -1;
+	}
+	clone = APPDATA->clone;
+
+	if(argc < 2) {
+		logerror("invalid usage\n");
+		return -1;
+	}
+
+	/* Get Source Entry */
+	if(vx7if_mem_entry_with_name(argv[0], &memidx1, &memtype1) != 0) {
+		logerror("invalid memory name: %s\n", argv[0]);
+		return -1;
+	}
+	if((e1 = vx7if_mem_entry(clone, memidx1, memtype1)) == NULL) {
+		return -1;
+	}
+
+	/* Get Destination Entry */
+	if(vx7if_mem_entry_with_name(argv[1], &memidx2, &memtype2) != 0) {
+		logerror("invalid memory name: %s\n", argv[1]);
+		return -1;
+	}
+	if((e2 = vx7if_mem_entry(clone, memidx2, memtype2)) == NULL) {
+		return -1;
+	}
+
+	vx7if_mem_entry_set_status(clone, memidx2, memtype2,
+			vx7if_mem_entry_get_status(clone, memidx1, memtype1));
+	vx7if_mem_entry_set_flag(clone, memidx2, memtype2,
+			vx7if_mem_entry_get_flag(clone, memidx1, memtype1));
+	memcpy(e2, e1, sizeof(*e2));
+
+	return 2;
+}
+
+APPCMD(memcopy, &memcopy, "copy a memory location",
+		"usage: memcopy <source> <dest>\n"
+		"  Memory Locations:\n"
+		"    M001, M002, ..., M449, M450\n"
+		"    OTM1, OTM2, ..., OTM9, OTM0\n"
+		"    PMS_L01, PMS_U01, ..., PMS_L20, PMS_U20",
+		NULL);
+
 
 CMDHANDLER(meminvalidate)
 {

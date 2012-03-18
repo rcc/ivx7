@@ -28,10 +28,8 @@ memedit --tag=WA6GFY --freq=443775000 --txmode=+RPT --squelch=TONE --ctcss=1000 
 memedit --tag=H01 --freq=146420000 --squelch=TONE_SQL --ctcss=1000 M050
 
 # Call frequencies
-# 2M National Calling Frequency
-memedit --tag=2MCALL --freq=144200000 M060
 # 2M National Simplex Calling Frequency
-memedit --tag=2MSXCALL --freq=146520000 M061
+memedit --tag=2MCALL --freq=146520000 M061
 # 70cm Calling Frequency
 memedit --tag=70CMCALL --freq=432100000 M062
 
@@ -39,11 +37,24 @@ memedit --tag=70CMCALL --freq=432100000 M062
 # runs from M100 - M160
 script pgmscripts/carla.pgm
 
-# unskip CARLA07 and CARLA10
-memedit --normal M111
-memedit --normal M117
+# Carla 10
+memcopy M117 OTM1
+memedit --normal OTM1
+# Carla 7
+memcopy M111 OTM2
+memedit --normal OTM2
 
 ################### FRS and MURS ###############################################
 # runs from M432 - M450
 script pgmscripts/frs_murs.pgm
-memedit --tag=FRS\ 4.10 --freq=462637000 --txpwr=L1 --squelch=TONE_SQL --ctcss=948 --skip M431
+memcopy M435 M431
+memedit --tag=FRS\ 4.10 --squelch=TONE_SQL --ctcss=948 M431
+
+################### Band Limits ################################################
+# 2M
+memedit --tag=2M\ BOT --freq=144900000 PMS_L01
+memedit --tag=2M\ TOP --freq=147570000 PMS_U01
+
+# 70CM
+memedit --tag=70CM\ BOT --freq=432100000 PMS_L02
+memedit --tag=70CM\ TOP --freq=450000000 PMS_U02
