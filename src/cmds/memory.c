@@ -115,6 +115,10 @@ CMDHANDLER(memedit)
 		if(vx7if_mem_entry_set_flag(clone, memidx, memtype,
 					VX7_MEMFLAG_PREFERRED) != 0)
 			return -1;
+	} else if(dict_has_key(opts, "normal")) {
+		if(vx7if_mem_entry_set_flag(clone, memidx, memtype,
+					VX7_MEMFLAG_NORMAL) != 0)
+			return -1;
 	}
 
 	/* Handle Tag */
@@ -204,6 +208,8 @@ START_CMD_OPTS(memedit_opts)
 			"set station name")
 	CMD_OPT(freq, '\0', "freq",
 			"set station frequency in Hz")
+	CMD_OPT(normal, '\0', "normal",
+			"make station flags normal")
 	CMD_OPT(skip, '\0', "skip",
 			"skip station during scan")
 	CMD_OPT(prefer, '\0', "prefer",

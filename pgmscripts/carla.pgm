@@ -2,121 +2,121 @@
 memedit --tag=CARLA01L  --freq=147600000 --squelch=TONE --ctcss=1000 --skip M100
 
 # San Francisco
-memedit --tag=CARLA02  --freq=442075000 --txmode=+RPT --squelch=TONE --ctcss=1000 --skip M101
-memedit --tag=CARLA02L --freq=442075000 --txmode=+RPT --squelch=TONE --ctcss=1622 --skip M102
+memedit --tag=CARLA02  --freq=442075000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1000 --skip M101
+memedit --tag=CARLA02L --freq=442075000 --txmode=+RPT --squelch=TONE     --ctcss=1622 --skip M102
 
 # Pt. Arena
-memedit --tag=CARLA03  --freq=443075000 --txmode=+RPT --squelch=TONE --ctcss=1000 --skip M103
-memedit --tag=CARLA03L --freq=443075000 --txmode=+RPT --squelch=TONE --ctcss=1738 --skip M104
+memedit --tag=CARLA03  --freq=443075000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1000 --skip M103
+memedit --tag=CARLA03L --freq=443075000 --txmode=+RPT --squelch=TONE     --ctcss=1738 --skip M104
 
 # Greenfield
-memedit --tag=CARLA04  --freq=442075000 --txmode=+RPT --squelch=TONE --ctcss=1148 --skip M105
-memedit --tag=CARLA04L --freq=442075000 --txmode=+RPT --squelch=TONE --ctcss=1679 --skip M106
+memedit --tag=CARLA04  --freq=442075000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1148 --skip M105
+memedit --tag=CARLA04L --freq=442075000 --txmode=+RPT --squelch=TONE     --ctcss=1679 --skip M106
 
 # Oakland
-memedit --tag=CARLA05  --freq=443050000 --txmode=+RPT --squelch=TONE --ctcss=1148 --skip M107
-memedit --tag=CARLA05L --freq=443050000 --txmode=+RPT --squelch=TONE --ctcss=1738 --skip M108
+memedit --tag=CARLA05  --freq=443050000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1148 --skip M107
+memedit --tag=CARLA05L --freq=443050000 --txmode=+RPT --squelch=TONE     --ctcss=1738 --skip M108
 
 # Stonyford / Willows
-memedit --tag=CARLA06  --freq=443075000 --txmode=+RPT --squelch=TONE --ctcss=1148 --skip M109
-memedit --tag=CARLA06L --freq=443075000 --txmode=+RPT --squelch=TONE --ctcss=1679 --skip M110
+memedit --tag=CARLA06  --freq=443075000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1148 --skip M109
+memedit --tag=CARLA06L --freq=443075000 --txmode=+RPT --squelch=TONE     --ctcss=1679 --skip M110
 
 # San Jose
-memedit --tag=CARLA07  --freq=443075000 --txmode=+RPT --squelch=TONE --ctcss=1230 M111
-memedit --tag=CARLA07L --freq=443075000 --txmode=+RPT --squelch=TONE --ctcss=1622 --skip M112
+memedit --tag=CARLA07  --freq=443075000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1230 --skip M111
+memedit --tag=CARLA07L --freq=443075000 --txmode=+RPT --squelch=TONE     --ctcss=1622 --skip M112
 
 # Tahoe
-memedit --tag=CARLA08  --freq=442075000 --txmode=+RPT --squelch=TONE --ctcss=1273 --skip M113
-memedit --tag=CARLA08L --freq=442075000 --txmode=+RPT --squelch=TONE --ctcss=1514 --skip M114
+memedit --tag=CARLA08  --freq=442075000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1273 --skip M113
+memedit --tag=CARLA08L --freq=442075000 --txmode=+RPT --squelch=TONE     --ctcss=1514 --skip M114
 
 # Modesto
-memedit --tag=CARLA09  --freq=442075000 --txmode=+RPT --squelch=TONE --ctcss=1230 --skip M115
-memedit --tag=CARLA09L --freq=442075000 --txmode=+RPT --squelch=TONE --ctcss=1738 --skip M116
+memedit --tag=CARLA09  --freq=442075000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1230 --skip M115
+memedit --tag=CARLA09L --freq=442075000 --txmode=+RPT --squelch=TONE     --ctcss=1738 --skip M116
 
 # Santa Cruz / Monterey
-memedit --tag=CARLA10  --freq=443475000 --txmode=+RPT --squelch=TONE --ctcss=1230 M117
-memedit --tag=CARLA10L --freq=443475000 --txmode=+RPT --squelch=TONE --ctcss=1738 --skip M118
+memedit --tag=CARLA10  --freq=443475000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1230 --skip M117
+memedit --tag=CARLA10L --freq=443475000 --txmode=+RPT --squelch=TONE     --ctcss=1738 --skip M118
 
 # Walnut Creek
-memedit --tag=CARLA11  --freq=443475000 --txmode=+RPT --squelch=TONE --ctcss=1148 --skip M119
-memedit --tag=CARLA11L --freq=443475000 --txmode=+RPT --squelch=TONE --ctcss=1622 --skip M120
+memedit --tag=CARLA11  --freq=443475000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1148 --skip M119
+memedit --tag=CARLA11L --freq=443475000 --txmode=+RPT --squelch=TONE     --ctcss=1622 --skip M120
 
 # Pleasanton
-memedit --tag=CARLA12  --freq=442075000 --txmode=+RPT --squelch=TONE --ctcss=1035 --skip M121
-memedit --tag=CARLA12L --freq=442075000 --txmode=+RPT --squelch=TONE --ctcss=1567 --skip M122
+memedit --tag=CARLA12  --freq=442075000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1035 --skip M121
+memedit --tag=CARLA12L --freq=442075000 --txmode=+RPT --squelch=TONE     --ctcss=1567 --skip M122
 
 # Shasta Lake
-memedit --tag=CARLA13  --freq=442075000 --txmode=+RPT --squelch=TONE --ctcss=1148 --skip M123
-memedit --tag=CARLA13L --freq=442075000 --txmode=+RPT --squelch=TONE --ctcss=1679 --skip M124
+memedit --tag=CARLA13  --freq=442075000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1148 --skip M123
+memedit --tag=CARLA13L --freq=442075000 --txmode=+RPT --squelch=TONE     --ctcss=1679 --skip M124
 
 # Cisco Grove
-memedit --tag=CARLA14  --freq=443475000 --txmode=+RPT --squelch=TONE --ctcss=1000 --skip M125
-memedit --tag=CARLA14L --freq=443475000 --txmode=+RPT --squelch=TONE --ctcss=1567 --skip M126
+memedit --tag=CARLA14  --freq=443475000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1000 --skip M125
+memedit --tag=CARLA14L --freq=443475000 --txmode=+RPT --squelch=TONE     --ctcss=1567 --skip M126
 
 # Coalinga / Fresno
-memedit --tag=CARLA15  --freq=440750000 --txmode=+RPT --squelch=TONE --ctcss=1148 --skip M127
-memedit --tag=CARLA15L --freq=440750000 --txmode=+RPT --squelch=TONE --ctcss=1622 --skip M128
+memedit --tag=CARLA15  --freq=440750000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1148 --skip M127
+memedit --tag=CARLA15L --freq=440750000 --txmode=+RPT --squelch=TONE     --ctcss=1622 --skip M128
 
 # Vacaville / Sacramento
-memedit --tag=CARLA16  --freq=440750000 --txmode=+RPT --squelch=TONE --ctcss=1000 --skip M129
-memedit --tag=CARLA16L --freq=440750000 --txmode=+RPT --squelch=TONE --ctcss=1738 --skip M130
+memedit --tag=CARLA16  --freq=440750000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1000 --skip M129
+memedit --tag=CARLA16L --freq=440750000 --txmode=+RPT --squelch=TONE     --ctcss=1738 --skip M130
 
 # Sonora
-memedit --tag=CARLA17  --freq=443475000 --txmode=+RPT --squelch=TONE --ctcss=1035 --skip M131
-memedit --tag=CARLA17L --freq=443475000 --txmode=+RPT --squelch=TONE --ctcss=1514 --skip M132
+memedit --tag=CARLA17  --freq=443475000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1035 --skip M131
+memedit --tag=CARLA17L --freq=443475000 --txmode=+RPT --squelch=TONE     --ctcss=1514 --skip M132
 
 # Topaz Lake
-memedit --tag=CARLA18  --freq=443475000 --txmode=+RPT --squelch=TONE --ctcss=1109 --skip M133
-memedit --tag=CARLA18L --freq=443475000 --txmode=+RPT --squelch=TONE --ctcss=1679 --skip M134
+memedit --tag=CARLA18  --freq=443475000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1109 --skip M133
+memedit --tag=CARLA18L --freq=443475000 --txmode=+RPT --squelch=TONE     --ctcss=1679 --skip M134
 
 # Hayward
-memedit --tag=CARLA19  --freq=443325000 --txmode=+RPT --squelch=TONE --ctcss=1148 --skip M135
-memedit --tag=CARLA19L --freq=443325000 --txmode=+RPT --squelch=TONE --ctcss=1738 --skip M136
+memedit --tag=CARLA19  --freq=443325000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1148 --skip M135
+memedit --tag=CARLA19L --freq=443325000 --txmode=+RPT --squelch=TONE     --ctcss=1738 --skip M136
 
 # Burney
-memedit --tag=CARLA20  --freq=440750000 --txmode=+RPT --squelch=TONE --ctcss=1230 --skip M137
-memedit --tag=CARLA20L --freq=440750000 --txmode=+RPT --squelch=TONE --ctcss=1567 --skip M138
+memedit --tag=CARLA20  --freq=440750000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1230 --skip M137
+memedit --tag=CARLA20L --freq=440750000 --txmode=+RPT --squelch=TONE     --ctcss=1567 --skip M138
 
 # Reno / Sparks
-memedit --tag=CARLA21  --freq=440750000 --txmode=+RPT --squelch=TONE --ctcss=1273 --skip M139
-memedit --tag=CARLA21L --freq=440750000 --txmode=+RPT --squelch=TONE --ctcss=1567 --skip M140
+memedit --tag=CARLA21  --freq=440750000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1273 --skip M139
+memedit --tag=CARLA21L --freq=440750000 --txmode=+RPT --squelch=TONE     --ctcss=1567 --skip M140
 
 # Hawthorne
-memedit --tag=CARLA22  --freq=440725000 --txmode=+RPT --squelch=TONE --ctcss=1273 --skip M141
-memedit --tag=CARLA22L --freq=440725000 --txmode=+RPT --squelch=TONE --ctcss=1567 --skip M142
+memedit --tag=CARLA22  --freq=440725000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1273 --skip M141
+memedit --tag=CARLA22L --freq=440725000 --txmode=+RPT --squelch=TONE     --ctcss=1567 --skip M142
 
 # Reno / Tahoe
-memedit --tag=CARLA23  --freq=441550000 --txmode=+RPT --squelch=TONE --ctcss=1273 --skip M143
-memedit --tag=CARLA23L --freq=441550000 --txmode=+RPT --squelch=TONE --ctcss=1567 --skip M144
+memedit --tag=CARLA23  --freq=441550000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1273 --skip M143
+memedit --tag=CARLA23L --freq=441550000 --txmode=+RPT --squelch=TONE     --ctcss=1567 --skip M144
 
 # Carson City
-memedit --tag=CARLA24  --freq=443325000 --txmode=+RPT --squelch=TONE --ctcss=1273 --skip M145
-memedit --tag=CARLA24L --freq=443325000 --txmode=+RPT --squelch=TONE --ctcss=1567 --skip M146
+memedit --tag=CARLA24  --freq=443325000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1273 --skip M145
+memedit --tag=CARLA24L --freq=443325000 --txmode=+RPT --squelch=TONE     --ctcss=1567 --skip M146
 
 # Redding
-memedit --tag=CARLA25  --freq=444325000 --txmode=+RPT --squelch=TONE --ctcss=1000 --skip M147
-memedit --tag=CARLA25L --freq=444325000 --txmode=+RPT --squelch=TONE --ctcss=1738 --skip M148
+memedit --tag=CARLA25  --freq=444325000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1000 --skip M147
+memedit --tag=CARLA25L --freq=444325000 --txmode=+RPT --squelch=TONE     --ctcss=1738 --skip M148
 
 # Geyserville
-memedit --tag=CARLA26  --freq=443475000 --txmode=+RPT --squelch=TONE --ctcss=1109 --skip M149
-memedit --tag=CARLA26L --freq=443475000 --txmode=+RPT --squelch=TONE --ctcss=1679 --skip M150
+memedit --tag=CARLA26  --freq=443475000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1109 --skip M149
+memedit --tag=CARLA26L --freq=443475000 --txmode=+RPT --squelch=TONE     --ctcss=1679 --skip M150
 
 # Quincy
-memedit --tag=CARLA27  --freq=440725000 --txmode=+RPT --squelch=TONE --ctcss=1000 --skip M151
-memedit --tag=CARLA27L --freq=440725000 --txmode=+RPT --squelch=TONE --ctcss=1738 --skip M152
+memedit --tag=CARLA27  --freq=440725000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1000 --skip M151
+memedit --tag=CARLA27L --freq=440725000 --txmode=+RPT --squelch=TONE     --ctcss=1738 --skip M152
 
 # McCloud
-memedit --tag=CARLA28  --freq=443475000 --txmode=+RPT --squelch=TONE --ctcss=1000 --skip M153
-memedit --tag=CARLA28L --freq=443475000 --txmode=+RPT --squelch=TONE --ctcss=1738 --skip M154
+memedit --tag=CARLA28  --freq=443475000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1000 --skip M153
+memedit --tag=CARLA28L --freq=443475000 --txmode=+RPT --squelch=TONE     --ctcss=1738 --skip M154
 
 # San Luis Obispo
-memedit --tag=CARLA29  --freq=443500000 --txmode=+RPT --squelch=TONE --ctcss=1000 --skip M155
-memedit --tag=CARLA29L --freq=443500000 --txmode=+RPT --squelch=TONE --ctcss=1622 --skip M156
+memedit --tag=CARLA29  --freq=443500000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1000 --skip M155
+memedit --tag=CARLA29L --freq=443500000 --txmode=+RPT --squelch=TONE     --ctcss=1622 --skip M156
 
 # Oakland
-memedit --tag=CARLA35  --freq=146850000 --txmode=-RPT --squelch=TONE --ctcss=1148 --skip M157
-memedit --tag=CARLA35L --freq=146850000 --txmode=-RPT --squelch=TONE --ctcss=1738 --skip M158
+memedit --tag=CARLA35  --freq=146850000 --txmode=-RPT --squelch=TONE_SQL --ctcss=1148 --skip M157
+memedit --tag=CARLA35L --freq=146850000 --txmode=-RPT --squelch=TONE     --ctcss=1738 --skip M158
 
 # Stonyford / Willows
-memedit --tag=CARLA36  --freq=146115000 --txmode=+RPT --squelch=TONE --ctcss=1230 --skip M159
-memedit --tag=CARLA36L --freq=146115000 --txmode=+RPT --squelch=TONE --ctcss=1738 --skip M160
+memedit --tag=CARLA36  --freq=146115000 --txmode=+RPT --squelch=TONE_SQL --ctcss=1230 --skip M159
+memedit --tag=CARLA36L --freq=146115000 --txmode=+RPT --squelch=TONE     --ctcss=1738 --skip M160
