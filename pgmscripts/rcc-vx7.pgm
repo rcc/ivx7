@@ -37,12 +37,10 @@ memedit --tag=70CMCALL --freq=432100000 M062
 # runs from M100 - M160
 script pgmscripts/carla.pgm
 
-# Carla 10
-memcopy M117 OTM1
-memedit --normal OTM1
 # Carla 7
-memcopy M111 OTM2
-memedit --normal OTM2
+memedit --normal M111
+# Carla 10
+memedit --normal M117
 
 ################### FRS and MURS ###############################################
 # runs from M432 - M450
