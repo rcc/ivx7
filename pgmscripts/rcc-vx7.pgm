@@ -24,6 +24,11 @@ memedit --tag=WINS\ LP --freq=442900000 --txmode=+RPT --squelch=TONE --ctcss=162
 # Owner:    Lockheed ARC
 memedit --tag=WA6GFY --freq=443775000 --txmode=+RPT --squelch=TONE --ctcss=1000 M004
 
+# N6NFI
+# Location: Stanford / Palo Alto
+# Owner:    SPARK/SARS
+memedit --tag=N6NFI --freq=145230000 --txmode=-RPT --squelch=TONE --ctcss=1000 M005
+
 ################### SIMPLEX ####################################################
 memedit --tag=H01 --freq=146420000 --squelch=TONE_SQL --ctcss=1000 M050
 
